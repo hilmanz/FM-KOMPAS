@@ -213,9 +213,9 @@ function calculatePlayerPerformance(game_id,done){
 
 		],
 		function(err,result){
-			conn.end(function(err){
-				done(err);	
-			});
+			conn.release();
+			done(err);	
+			
 			
 		});
 
@@ -277,10 +277,10 @@ function updateGameFixtures(game_id,data,done){
 				}
 			],
 			function(err,results){
-				conn.end(function(err){
-					console.log(game_id,'update fixtures completed');
-					done(err);
-				});
+				conn.release();
+				console.log(game_id,'update fixtures completed');
+				done(err);
+				
 					
 			}
 		);
@@ -304,9 +304,9 @@ function calculateTeamOverallPoints(game_id,callback){
 							 overall_points = VALUES(overall_points),\
 							 last_update = VALUES(last_update);",
 							[game_id],function(err,rs){
-								conn.end(function(err){
-									callback(err);
-								});
+								conn.release();
+								callback(err);
+								
 							});
 
 		}
@@ -382,12 +382,12 @@ function generatePlayerPoints(game_id,callback){
 			],
 			function(err,result){
 				console.log('completed');
-				conn.end(function(err){
-					if(!err){
-						console.log('closing connection');
-						callback(null,true);
-					}
-				});
+				conn.release();
+				if(!err){
+					console.log('closing connection');
+					callback(null,true);
+				}
+				
 			}
 		);
 		
@@ -542,10 +542,10 @@ function savePlayerStats(game_id,team_id,data,callback){
 
 				},
 			function(err){
-				conn.end(function(err){
-					console.log('saving stats for player ',data.PlayerRef,'finished');
-					callback(null,1);
-				});
+				conn.release();
+				console.log('saving stats for player ',data.PlayerRef,'finished');
+				callback(null,1);
+				
 			});
 			
 		});

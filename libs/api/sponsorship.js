@@ -39,9 +39,9 @@ function getAvailableSponsorship(game_team_id,callback){
 				LIMIT 100;",
 				[game_team_id],
 				function(err,rs){
-					conn.end(function(e){
-						callback(err,rs);	
-					});
+					conn.release();
+					callback(err,rs);	
+					
 				});
 	});
 	
@@ -145,13 +145,13 @@ function applySponsorship(game_id,matchday,game_team_id,sponsor_id,callback){
 		],
 		function(err,result){
 			
-			conn.end(function(e){
-				if(result){
-					callback(err,true);
-				}else{
-					callback(err,false);
-				}
-			});
+			conn.release();
+			if(result){
+				callback(err,true);
+			}else{
+				callback(err,false);
+			}
+			
 			
 		});
 	});
@@ -166,9 +166,9 @@ function getActiveSponsors(game_team_id,callback){
 					WHERE a.game_team_id = ?;",
 					[game_team_id],
 					function(err,rs){
-						conn.end(function(e){
-							callback(err,rs);	
-						});
+						conn.release();
+						callback(err,rs);	
+						
 					});
 	});
 }

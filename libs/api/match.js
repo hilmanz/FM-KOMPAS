@@ -39,9 +39,9 @@ function fixtures(done){
 				LIMIT 1000;",
 				[],
 				function(err,match){
-					conn.end(function(e){
-						done(err,match);						
-					});
+					conn.release();
+					done(err,match);						
+					
 				});
 	});
 	
@@ -51,9 +51,9 @@ function next_match(team_id,done){
 		conn.query("",
 				[],
 				function(err,match){
-					conn.end(function(e){
-						done(err,match);						
-					});
+					conn.release();
+					done(err,match);						
+					
 				});
 	});
 	
@@ -122,9 +122,9 @@ function getMatchResultForUserTeam(game_team_id,game_id,done){
 		],
 
 		function(err,result){
-			conn.end(function(err){
-				done(err,result);
-			});
+			conn.release();
+			done(err,result);
+			
 		});
 
 	});
@@ -186,10 +186,9 @@ function results(game_id,done){
 				}
 			],
 			function(err,result){
-				conn.end(function(e){
-					console.log(result);
-					done(err,result);	
-				});
+				conn.release();
+				console.log(result);
+				done(err,result);	
 			}
 		);
 	});

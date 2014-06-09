@@ -103,9 +103,9 @@ function get_master_team_stats(game_id,done){
 					[game_id],
 		function(err,rs){
 			if(err){console.log('lineupstats - ERROR - ',err.message);}
-			conn.end(function(err){
-				done(err,rs);	
-			});
+			conn.release();
+			done(err,rs);	
+			
 		});
 
 	});
@@ -117,12 +117,12 @@ function get_master_match_summary(game_id,done){
 					[game_id],
 		function(err,rs){
 			if(err){console.log(err.message);}
-			conn.end(function(err){
-				for(var i in rs){
-					rs[i].avg_points = rs[i].overall_points / 11;
-				}
-				done(err,rs);	
-			});
+			conn.release();
+			for(var i in rs){
+				rs[i].avg_points = rs[i].overall_points / 11;
+			}
+			done(err,rs);	
+			
 		});
 
 	});
@@ -134,9 +134,9 @@ function get_user_teams(start,limit,done){
 				[start,limit],
 		function(err,rs){
 			if(err){console.log(err.message);}
-			conn.end(function(err){
-				done(err,rs);	
-			});
+			conn.release();
+			done(err,rs);	
+		
 		});
 	});
 }
@@ -147,9 +147,9 @@ function get_user_teams_by_idRange(since_id,until_id,limit,done){
 				[since_id,until_id,limit],
 		function(err,rs){
 			if(err){console.log(err.message);}
-			conn.end(function(err){
-				done(err,rs);	
-			});
+			conn.release();
+			done(err,rs);	
+		
 		});
 	});
 }
@@ -523,10 +523,10 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 							
 						},
 			function(err){
-				conn.end(function(err){
-					done(null);
-					console.log('done')
-				});
+				conn.release();
+				done(null);
+				console.log('done')
+				
 			}
 		);
 
@@ -876,9 +876,9 @@ function addToHistory(game_id,team,done){
 				
 			}
 		],function(err,rs){
-			conn.end(function(err){
-				done(err);
-			});
+			conn.release();
+			done(err);
+			
 		});
 	});
 }
@@ -926,14 +926,14 @@ function getTeamLineups(game_id,team,done){
 			}
 		],
 		function(err,rs){
-			conn.end(function(err){
-					console.log('ISSUE1','get team lineup ends');
-					if(typeof rs !== 'object' && rs.length > 0){
-						err = new Error('no lineups :(');
-						rs = [];
-					}
-					done(err,rs);
-			});
+			conn.release();
+			console.log('ISSUE1','get team lineup ends');
+			if(typeof rs !== 'object' && rs.length > 0){
+				err = new Error('no lineups :(');
+				rs = [];
+			}
+			done(err,rs);
+			
 		});
 		
 	});	
@@ -1016,9 +1016,9 @@ function updateLineupStats(game_id,lineups,summary,player_stats,in_game,done){
 							
 						},
 						function(err){
-							conn.end(function(err){
-								done(null,matched_players);	
-							});
+							conn.release();
+							done(null,matched_players);	
+							
 						});
 	});
 }
@@ -1037,9 +1037,9 @@ function update_team_points(done){
 					ON DUPLICATE KEY UPDATE\
 					points = VALUES(points);",
 					[],function(err,rs){
-						conn.end(function(err){
-							done(err);	
-						});
+						conn.release();
+						done(err);	
+						
 					});
 	});
 }

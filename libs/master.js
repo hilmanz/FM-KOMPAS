@@ -68,10 +68,10 @@ exports.update_team_data = function(data,callback){
 		console.log(result);
 	}
 	
-	conn.end(function(err){
+	conn.release();
 		console.log('db complete');
 		update_player_data(team_data,callback);
-	});
+	
 
 	function update_player_data(team_data,callback){
 		console.log(team_data);
@@ -137,10 +137,10 @@ exports.update_team_data = function(data,callback){
 				});
 			}
 		}
-		conn.end(function(err){
-			console.log('adding players completed !');
-			callback(team_data);
-		});
+		conn.release();
+		console.log('adding players completed !');
+		callback(team_data);
+		
 		
 	}
 	

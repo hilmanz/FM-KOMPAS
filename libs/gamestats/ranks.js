@@ -72,14 +72,14 @@ exports.update = function(done){
 			}
 		],
 		function(err,isDone){
-			conn.end(function(err){
+			conn.release();
 				console.log('connection end');
 				pool.end(function(err){
 					console.log('pool closed');
 					
 					done(err,null);
 				});
-			});
+			
 		});
 		
 	});

@@ -1,6 +1,6 @@
 {
   "name": "fantasy-football-api-service",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "scripts": {
     "start": "node app.js"
@@ -9,7 +9,7 @@
     "express": "3.1.1",
     "jade": "*",
     "xml2json": "*",
-    "mysql": "2.0.0-alpha8",
+    "mysql": "latest",
     "mu2": "*",
     "handlebars": "*",
     "async": "*",
@@ -20,7 +20,7 @@
     "crypto": "*",
     "connect-redis": "1.4.7",
     "redis": "*",
-    "optimist": "0.5.2",
+    "optimist": "latest",
     "winston": "*",
     "string":"latest",
     "nodemailer":"latest",

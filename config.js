@@ -5,9 +5,9 @@ exports.config = {
 		host:'localhost',
 		username:'root',
 		password:'root',
-		database:'ffgame',
+		database:'ffgame_wc',
 		frontend_schema:'fantasy',
-		optadb: 'optadb'
+		optadb: 'optadb_wc'
 	},
 	port: 3002,
 	redis:{
@@ -22,9 +22,9 @@ exports.config = {
 		host:'182.253.203.90:9443',
 		username:'supersoccer',
 		password: '123456',
-		returnUrl: 'http://localhost/fantasy/merchandises/payment',
+		returnUrl: 'http://localhost/fantasy_wc/merchandises/payment',
 		returnUrl2: 'http://localhost/duf/supersoccer_fork/onlinecatalog/complete',
-		returnUrl3: 'http://localhost/fantasy/merchandises/pay/return',
+		returnUrl3: 'http://localhost/fantasy_wc/merchandises/pay/return',
 		returnUrl4: 'http://localhost/duf/supersoccer_fork/onlinecatalog/pay/success'
 	},
 	mailer:{
@@ -34,7 +34,7 @@ exports.config = {
 	mailgun:{
 		//user: "postmaster@sandbox6048e62f52c444e28b8529f4e62f0c1e.mailgun.org",
 		//pass: "22q7hrefk9j8"
-		from: "postmaster@lamusicstore.co.id",
+		from: "postmaster@mg.supersoccer.co.id",
 		user: "postmaster@mg.supersoccer.co.id",
 		pass: "7xr67iht6bu6"
 	}

@@ -33,7 +33,8 @@ function askForChallengeCode(req,res,api_key){
 	prepareDb(function(conn){
 		conn.query("SELECT * FROM ffgame.api_keys WHERE api_key = ? LIMIT 1",
 					[api_key],function(err,rs){
-						conn.end(function(err){
+						conn.release();
+						
 							if(!err){
 								if(rs[0].api_key == api_key){
 									console.log(req.session);
@@ -47,7 +48,7 @@ function askForChallengeCode(req,res,api_key){
 							}else{
 								res.send(401,{error:'Invalid API Key'});
 							}
-						});
+						
 		});
 	});
 }
@@ -58,7 +59,7 @@ function authenticateCode(req,res,api_key,request_code){
 		prepareDb(function(conn){
 			conn.query("SELECT * FROM ffgame.api_keys WHERE api_key = ? LIMIT 1",
 						[api_key],function(err,rs){
-							conn.end(function(err){
+							conn.release();
 								if(!err){
 									if(rs[0].api_key == api_key){
 										var hash = getRequestCodeHash(rs[0].api_key,
@@ -84,7 +85,7 @@ function authenticateCode(req,res,api_key,request_code){
 								}else{
 									res.send(401,{error:'Invalid API Key'});
 								}
-							});
+							
 			});
 		});
 	}else{

@@ -88,9 +88,10 @@ function getLineup(redisClient,game_team_id,callback){
 				}
 			],
 		function(err,result){
-			conn.end(function(e){
-				callback(err,result);
-			});
+			conn.release();
+			
+			callback(err,result);
+			
 		});
 	});
 	
@@ -183,9 +184,9 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 				}
 			],
 			function(err,result){
-				conn.end(function(e){
-					done(err,result);	
-				});
+				conn.release();
+				done(err,result);	
+				
 			}
 		);
 	});
@@ -320,14 +321,15 @@ function getPlayers(game_team_id,callback){
 				],
 				function(err,result){
 					console.log('getPlayers',result);
-					conn.end(function(e){
-						redisClient.set('getPlayers_'+game_team_id,
-										JSON.stringify(result),
-										function(err,redis_status){
-							callback(err,result);	
-						});
-						
+					
+					conn.release();
+					redisClient.set('getPlayers_'+game_team_id,
+									JSON.stringify(result),
+									function(err,redis_status){
+						callback(err,result);	
 					});
+						
+					
 				});
 			});
 		}else{
@@ -350,9 +352,9 @@ function getBudget(game_team_id,callback){
 				[game_team_id,game_team_id],
 				function(err,rs){
 					console.log(S(this.sql).collapseWhitespace().s);
-					conn.end(function(e){
-						callback(err,rs);	
-					});
+					conn.release();
+					callback(err,rs);	
+					
 				});
 	});
 	
@@ -377,13 +379,14 @@ function getPlayerDetail(player_id,callback){
 				[player_id],
 				function(err,rs){
 					console.log('getPlayers',player_id,'getPlayerDetail',S(this.sql).collapseWhitespace().s);
-					conn.end(function(e){
-						if(rs!=null && rs.length==1){
-							callback(err,rs[0]);	
-						}else{
-							callback(err,null);
-						}
-					});
+					
+					conn.release();
+					if(rs!=null && rs.length==1){
+						callback(err,rs[0]);	
+					}else{
+						callback(err,null);
+					}
+					
 				});
 	});
 	
@@ -409,7 +412,7 @@ function getTeamPlayerDetail(game_team_id,player_id,callback){
 		conn.query(sql,
 				[game_team_id,player_id],
 				function(err,rs){
-					conn.end(function(e){
+					conn.release();
 						try{
 							if(rs.length==1){
 								callback(err,rs[0]);	
@@ -420,7 +423,7 @@ function getTeamPlayerDetail(game_team_id,player_id,callback){
 							callback(err,null);
 						}
 						
-					});
+					
 				});
 	});
 	
@@ -439,9 +442,9 @@ function getPlayerStats(player_id,callback){
 		conn.query(sql,
 				[player_id],
 				function(err,rs){
-					conn.end(function(e){
-						callback(err,rs);	
-					});
+					conn.release();
+					callback(err,rs);	
+					
 				});
 	});
 	
@@ -469,9 +472,9 @@ function getPlayerOverallStats(game_team_id,player_id,callback){
 		conn.query(sql,
 				[player_id,game_team_id,game_team_id],
 				function(err,rs){
-					conn.end(function(e){
-						callback(err,rs);	
-					});
+					conn.release();
+					callback(err,rs);	
+					
 				});
 	});
 	
@@ -499,13 +502,13 @@ function getPlayerTeamStats(game_team_id,player_id,callback){
 									[game_team_id,player_id],
 									function(err,rs){
 										console.log(S(this.sql).collapseWhitespace().s);
-										conn.end(function(e){
-											redisClient.set('getPlayerTeamStats_'+game_team_id+'_'+player_id,
-															JSON.stringify(rs),
-															function(err,result){
-												callback(err,rs);	
-											});
+										conn.release();
+										redisClient.set('getPlayerTeamStats_'+game_team_id+'_'+player_id,
+														JSON.stringify(rs),
+														function(err,result){
+											callback(err,rs);	
 										});
+										
 								});
 						});
 		}else{
@@ -619,14 +622,14 @@ function getPlayerDailyTeamStats(game_team_id,player_id,player_pos,done){
 					}
 				],
 				function(err,result){
-					conn.end(function(e){
-						redisClient.set('getPlayerDailyTeamStats_'+game_team_id+'_'+player_id,
-										JSON.stringify(result),
-										function(err,rs){
-											done(err,result);
-										});
+					conn.release();
+					redisClient.set('getPlayerDailyTeamStats_'+game_team_id+'_'+player_id,
+									JSON.stringify(result),
+									function(err,rs){
+										done(err,result);
+									});
 						
-					});
+					
 				});	
 			});
 		}else{
@@ -759,9 +762,9 @@ function getFinancialStatement(game_team_id,done){
 				}
 			],
 			function(err,result){
-				conn.end(function(e){
-					done(err,result);
-				});
+				conn.release();
+				done(err,result);
+				
 			}
 		);
 	});
@@ -782,9 +785,9 @@ function getWeeklyFinance(game_team_id,week,done){
 				}
 			],
 			function(err,result){
-				conn.end(function(e){
-					done(err,result);
-				});
+				conn.release();
+				done(err,result);
+				
 			});
 	});
 }
@@ -863,9 +866,8 @@ function next_match(team_id,done){
 				}
 			],
 			function(err,result){
-				conn.end(function(e){
-					done(err,result);
-				});
+				conn.release();
+				done(err,result);
 			}
 		);
 	});
@@ -885,9 +887,9 @@ function getVenue(team_id,done){
 				}
 			],
 			function(err,result){
-				conn.end(function(e){
-					done(err,result);
-				});
+				conn.release();
+				done(err,result);
+				
 			}
 		);
 	});
@@ -963,9 +965,9 @@ function best_match(game_team_id,done){
 				}
 			],
 			function(err,result){
-				conn.end(function(e){
-					done(err,result);
-				});
+				conn.release();
+				done(err,result);
+				
 			}
 		);
 	});
@@ -1050,9 +1052,9 @@ function last_earning(game_team_id,done){
 				}
 			],
 			function(err,result){
-				conn.end(function(e){
-					done(err,result);
-				});
+				conn.release();
+				done(err,result);
+				
 			}
 		);
 	});
@@ -1138,9 +1140,9 @@ function last_expenses(game_team_id,done){
 				}
 			],
 			function(err,result){
-				conn.end(function(e){
-					done(err,result);
-				});
+				conn.release();
+				done(err,result);
+				
 			}
 		);
 	});
@@ -1177,9 +1179,9 @@ function best_player(game_team_id,done){
 				
 			],
 			function(err,result){
-				conn.end(function(e){
-					done(err,result);
-				});
+				conn.release();
+				done(err,result);
+			
 			}
 		);
 	});
@@ -1206,9 +1208,9 @@ function getTransferWindow(done){
 				}
 			],
 			function(err,result){
-				conn.end(function(err){
-					done(err,result);
-				});
+				conn.release();
+				done(err,result);
+				
 			});
 	});
 }
@@ -1472,9 +1474,9 @@ function sale(redisClient,window_id,game_team_id,player_id,done){
 				}
 			],
 			function(err,result){
-				conn.end(function(e){
-					done(err,result);
-				});
+				conn.release();
+				done(err,result);
+				
 			}
 		);
 	});
@@ -1738,9 +1740,9 @@ function buy(redisClient,window_id,game_team_id,player_id,done){
 				if(err){
 					console.log(err.message);
 				}
-				conn.end(function(e){
-					done(err,result);
-				});
+				conn.release();
+				done(err,result);
+				
 			}
 		);
 	});
@@ -1776,9 +1778,9 @@ function leaderboard(done){
 			],
 			function(err,result){
 				console.log(result);
-				conn.end(function(e){
-					done(err,result);
-				});
+				conn.release();
+				done(err,result);
+				
 			}
 		);
 	});
@@ -1837,9 +1839,9 @@ function matchstatus(matchday,done){
 			],
 			function(err,result){
 				console.log('rs -> '+result);
-				conn.end(function(e){
-					done(err,result);
-				});
+				conn.release();
+				done(err,result);
+				
 			}
 		);
 	});
@@ -1963,9 +1965,9 @@ function getCash(game_team_id,done){
 			},
 		],
 		function(err,result){
-			conn.end(function(e){
-				done(err,result);	
-			});
+			conn.release();
+			done(err,result);	
+			
 		});
 	});
 }
@@ -2053,9 +2055,9 @@ function redeemCode(game_team_id,coupon_code,done){
 			}
 		],
 		function(err,result){
-			conn.end(function(e){
-				done(err,result);
-			});
+			conn.release();
+			done(err,result);
+			
 		});
 	});
 }
@@ -2163,9 +2165,9 @@ function apply_perk(game_team_id,perk_id,done){
 			}
 		],
 		function(err,rs){
-			conn.end(function(err){
-				done(err,rs);	
-			});
+			conn.release();
+			done(err,rs);	
+			
 			
 		});
 	});
@@ -2251,9 +2253,9 @@ function check_perk(game_team_id,perk_id,done){
 			}
 		],
 		function(err,rs){
-			conn.end(function(err){
-				done(err,rs);	
-			});
+			conn.release();
+			done(err,rs);	
+			
 			
 		});
 	});
@@ -2290,12 +2292,12 @@ exports.setPostponedStatus = function(redisClient,game_id,toggle,callback){
 				}
 			],
 			function(err,rs){
-				conn.end(function(err){
-					redisClient.set('postponed-'+game_id,1,function(err,rs){
-						console.log('postponed-'+game_id+'->'+rs);
-						callback(err);
-					});
+				conn.release();
+				redisClient.set('postponed-'+game_id,1,function(err,rs){
+					console.log('postponed-'+game_id+'->'+rs);
+					callback(err);
 				});
+				
 			});
 		});
 		
@@ -2316,12 +2318,12 @@ exports.setPostponedStatus = function(redisClient,game_id,toggle,callback){
 				}
 			],
 			function(err,rs){
-				conn.end(function(err){
-					redisClient.del('postponed-'+game_id,
-					function(err,rs){
-						callback(err);
-					});
+				conn.release();
+				redisClient.del('postponed-'+game_id,
+				function(err,rs){
+					callback(err);
 				});
+				
 			});
 		});
 	}
@@ -2431,9 +2433,9 @@ function add_expenditure(game_team_id,transaction_name,amount,done){
 				},
 			],
 			function(err,result){
-				conn.end(function(e){
-					done(err,result);
-				});
+				conn.release();
+				done(err,result);
+				
 			}
 		);
 	});

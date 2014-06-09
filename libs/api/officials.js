@@ -39,9 +39,9 @@ function official_list(game_team_id,done){
 				}
 			],
 			function(err,result){
-				conn.end(function(e){
-					done(err,result);						
-				});
+				conn.release();
+				done(err,result);						
+				
 			});
 	});
 }
@@ -69,9 +69,9 @@ function hire_official(game_team_id,official_id,callback){
 				}
 			],
 			function(err,result){
-				conn.end(function(e){
-					callback(err,result);
-				});
+				conn.release();
+				callback(err,result);
+				
 			}
 		);
 	});
@@ -81,9 +81,9 @@ function remove_official(game_team_id,official_id,callback){
 	prepareDb(function(conn){
 		conn.query("DELETE FROM ffgame.game_team_officials WHERE game_team_id = ? AND official_id = ?",
 					[game_team_id,official_id],function (err,rs){
-						conn.end(function(e){
-							callback(err,rs);
-						});
+						conn.release();
+						callback(err,rs);
+						
 					});
 	});
 }

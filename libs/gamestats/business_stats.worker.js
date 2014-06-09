@@ -46,11 +46,11 @@ exports.update = function(since_id,until_id,game_id,done){
 					conn.query("SELECT COUNT(*) as total FROM ffgame.game_users",
 								[],
 								function(err,rs){
-										conn.end(function(err){
-											total_teams = rs[0].total;
-											console.log('total_teams',total_teams);
-											callback(err);
-										});	
+										conn.release();
+										total_teams = rs[0].total;
+										console.log('total_teams',total_teams);
+										callback(err);
+										
 								});
 				});
 			},
@@ -146,11 +146,11 @@ function calculateIncomeForAllHomeTeams(since_id,until_id,game_id,game,home_team
 			
 		],
 		function(err,result){
-			conn.end(function(err){
-				console.log('home_rank',home_rank);
-				console.log('AWAY RANK',away_rank);
-				processHomeTeams(since_id,until_id,start,limit,team_id,game_id,home_rank,away_rank,game,done);
-			});
+			conn.release();
+			console.log('home_rank',home_rank);
+			console.log('AWAY RANK',away_rank);
+			processHomeTeams(since_id,until_id,start,limit,team_id,game_id,home_rank,away_rank,game,done);
+			
 		});
 	});
 }
@@ -181,7 +181,7 @@ function processHomeTeams(since_id,until_id,start,limit,team_id,game_id,rank,awa
 					[team_id,since_id,until_id,start,limit],
 					function(err,rs){
 						console.log(S(this.sql).collapseWhitespace().s);
-							conn.end(function(err){
+							conn.release();
 								console.log('processing each home teams');
 								async.eachSeries(rs,
 									function(team,callback){
@@ -211,7 +211,7 @@ function processHomeTeams(since_id,until_id,start,limit,team_id,game_id,rank,awa
 										}	
 								});
 								
-							});	
+							
 					});
 	});
 }
@@ -232,7 +232,7 @@ function processAwayTeams(since_id,until_id,start,limit,team_id,game_id,rank,awa
 					[team_id,since_id,until_id,start,limit],
 					function(err,rs){
 							console.log(S(this.sql).collapseWhitespace().s);
-							conn.end(function(err){
+							conn.release();
 								
 								console.log('processing each away teams');
 								async.eachSeries(rs,
@@ -263,7 +263,7 @@ function processAwayTeams(since_id,until_id,start,limit,team_id,game_id,rank,awa
 										}	
 								});
 								
-							});	
+								
 					});
 	});
 }
@@ -530,10 +530,10 @@ function calculate_home_revenue_stats(team,game_id,game,rank,away_rank,done){
 			],
 			function(err,result){
 				console.log('home calculation finished',result);
-				conn.end(function(err){
-					console.log('finished calculation');
-					done(err,null);
-				});		
+				conn.release();
+				console.log('finished calculation');
+				done(err,null);
+				
 			}
 		);
 		
@@ -700,10 +700,10 @@ function calculate_away_revenue_stats(team,game_id,game,rank,away_rank,done){
 			],
 			function(err,result){
 				console.log(result);
-				conn.end(function(err){
-					console.log('finished calculation');
-					done(err,null);
-				});		
+				conn.release();
+				console.log('finished calculation');
+				done(err,null);
+					
 			}
 		);
 		
@@ -769,10 +769,10 @@ function getHomeTeams(team_id,start,limit,done){
 		conn.query("SELECT * FROM ffgame.game_fixtures WHERE game_id=?",
 					[game_id],
 					function(err,rs){
-							conn.end(function(err){
-								console.log('disconnected')
-								done(err,rs);
-							});	
+							conn.release();
+							console.log('disconnected')
+							done(err,rs);
+							
 					});
 		
 	});
@@ -785,10 +785,10 @@ function getGameFixture(game_id,done){
 					[game_id],
 					function(err,rs){
 							console.log(S(this.sql).collapseWhitespace().s);
-							conn.end(function(err){
-								console.log('disconnected')
-								done(err,rs);
-							});	
+							conn.release();
+							console.log('disconnected')
+							done(err,rs);
+						
 					});
 		
 	});
@@ -824,10 +824,8 @@ function getTeamProfile(game,done){
 			],
 			function(err,result){
 				//console.log(result);
-				conn.end(function(err){
-					done(err,{home:result[0],away:result[1]});	
-				});
-				
+				conn.release();
+				done(err,{home:result[0],away:result[1]});	
 		});
 		
 			

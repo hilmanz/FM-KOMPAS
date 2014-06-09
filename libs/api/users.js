@@ -35,9 +35,9 @@ function register(data,callback){
 					VALUES(?,?,?,?,?,?,NOW());",
 					[data.name,data.email,data.phone,data.fb_id,1,''],function(err,rs){
 						
-						conn.end(function(err){
-							callback(err,rs);
-						});
+						conn.release();
+						callback(err,rs);
+						
 		});
 	});
 }
@@ -46,9 +46,9 @@ function removeByFbId(fb_id,callback){
 		conn.query("DELETE FROM ffgame.game_users\
 					WHERE fb_id = ?",
 					[fb_id],function(err,rs){
-						conn.end(function(err){
-							callback(err,rs);
-						});
+						conn.release();
+						callback(err,rs);
+						
 		});
 	});
 }

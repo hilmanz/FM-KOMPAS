@@ -32,9 +32,9 @@ function getTeams(callback){
 	prepareDb(function(conn){
 		conn.query("SELECT uid,name FROM ffgame.master_team ORDER BY name LIMIT 100;",
 			[],function(err,team){
-				conn.end(function(err){
-					callback(err,team);
-				});
+				conn.release();
+				callback(err,team);
+				
 			});
 	});
 	
@@ -93,9 +93,9 @@ function getPlayers(team_uid,callback){
 				}
 			],
 			function(err,result){
-				conn.end(function(err){
-					callback(err,result);
-				});
+				conn.release();
+				callback(err,result);
+				
 			}
 		);
 	});
@@ -125,9 +125,9 @@ function getMasterTopPlayers(total,callback){
 				
 			],
 			function(err,result){
-				conn.end(function(err){
-					callback(err,result);
-				});
+				conn.release();
+				callback(err,result);
+				
 			}
 		);
 	});
@@ -137,9 +137,9 @@ function getTeamById(team_uid,callback){
 	prepareDb(function(conn){
 		conn.query("SELECT uid,name FROM ffgame.master_team WHERE uid = ? LIMIT 1;",
 		[team_uid],function(err,team){
-			conn.end(function(err){
-				callback(err,team[0]);
-			});
+			conn.release();
+			callback(err,team[0]);
+			
 		});
 	});
 	
@@ -214,9 +214,9 @@ function create(data,callback){
 			],
 			function(err,result){
 				
-				conn.end(function(e){
-					callback(err,result);	
-				});
+				conn.release();
+				callback(err,result);	
+				
 			}
 		);
 	});
@@ -249,9 +249,9 @@ function remove_team(game_team_id,callback){
 				
 			],
 			function(err,result){
-				conn.end(function(e){
-					callback(err,result);	
-				});
+				conn.release();
+				callback(err,result);	
+				
 			}
 		);
 	});
@@ -291,9 +291,9 @@ function getUserTeam(fb_id,done){
 				},
 			],
 			function(err,result){
-				conn.end(function(e){
-					done(err,result);	
-				});
+				conn.release();
+				done(err,result);	
+				
 			}
 		);
 	});
@@ -393,9 +393,9 @@ function getUserTeamPoints(fb_id,done){
 			],
 			function(err,result){
 				console.log(result);
-				conn.end(function(e){
-					done(err,result);	
-				});
+				conn.release();
+				done(err,result);	
+				
 			}
 		);
 	});

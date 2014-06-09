@@ -45,11 +45,12 @@ exports.update = function(game_id,start,done){
 					conn.query("SELECT COUNT(*) as total FROM ffgame.game_users",
 								[],
 								function(err,rs){
-										conn.end(function(err){
+										conn.release();
+									
 											total_teams = rs[0].total;
 											console.log('total_teams',total_teams);
 											callback(err);
-										});	
+										
 								});
 				});
 			},
@@ -143,11 +144,11 @@ function calculateIncomeForAllHomeTeams(game_id,game,home_team,away_team,done){
 			
 		],
 		function(err,result){
-			conn.end(function(err){
+			conn.release();
 				console.log('home_rank',home_rank);
 				console.log('AWAY RANK',away_rank);
 				processHomeTeams(start,limit,team_id,game_id,home_rank,away_rank,game,done);
-			});
+			
 		});
 	});
 }
@@ -178,7 +179,7 @@ function processHomeTeams(start,limit,team_id,game_id,rank,away_rank,game,done){
 					[team_id,start,limit],
 					function(err,rs){
 						console.log(this.sql);
-							conn.end(function(err){
+							conn.release();
 								console.log('processing each home teams');
 								async.eachSeries(rs,
 									function(team,callback){
@@ -208,7 +209,7 @@ function processHomeTeams(start,limit,team_id,game_id,rank,away_rank,game,done){
 										}	
 								});
 								
-							});	
+							
 					});
 	});
 }
@@ -228,38 +229,38 @@ function processAwayTeams(start,limit,team_id,game_id,rank,away_rank,game,done){
 					WHERE a.team_id = ? AND a.n_status=1 LIMIT ?,?;",
 					[team_id,start,limit],
 					function(err,rs){
-							conn.end(function(err){
-								console.log(this.sql);
-								console.log('processing each away teams');
-								async.eachSeries(rs,
-									function(team,callback){
-										async.waterfall([
-											function(cb){
-												calculate_away_revenue_stats(team,game_id,game,rank,away_rank,function(err){
-													cb(err);		
-												});
-											},
-											function(cb){
-												punishment.execute_punishment(conn,
-																			game_id,team.id,team.team_id,
-																			function(err,rs){
-																				cb(err,rs);	
-																			});
-											}
-										],
-										function(err,r){
-											callback();
-										});
+							conn.release();
+							console.log(this.sql);
+							console.log('processing each away teams');
+							async.eachSeries(rs,
+								function(team,callback){
+									async.waterfall([
+										function(cb){
+											calculate_away_revenue_stats(team,game_id,game,rank,away_rank,function(err){
+												cb(err);		
+											});
+										},
+										function(cb){
+											punishment.execute_punishment(conn,
+																		game_id,team.id,team.team_id,
+																		function(err,rs){
+																			cb(err,rs);	
+																		});
+										}
+									],
+									function(err,r){
+										callback();
+									});
 
-									},function(err){
-										if(rs.length==limit){
-											processAwayTeams(start+100,limit,team_id,game_id,rank,away_rank,game,done)
-										}else{
-											done(err,[]);
-										}	
-								});
+								},function(err){
+									if(rs.length==limit){
+										processAwayTeams(start+100,limit,team_id,game_id,rank,away_rank,game,done)
+									}else{
+										done(err,[]);
+									}	
+							});
 								
-							});	
+							
 					});
 	});
 }
@@ -526,10 +527,10 @@ function calculate_home_revenue_stats(team,game_id,game,rank,away_rank,done){
 			],
 			function(err,result){
 				console.log(result);
-				conn.end(function(err){
-					console.log('finished calculation');
-					done(err,null);
-				});		
+				conn.release();
+				console.log('finished calculation');
+				done(err,null);
+				
 			}
 		);
 		
@@ -696,10 +697,10 @@ function calculate_away_revenue_stats(team,game_id,game,rank,away_rank,done){
 			],
 			function(err,result){
 				console.log(result);
-				conn.end(function(err){
-					console.log('finished calculation');
-					done(err,null);
-				});		
+				conn.release();
+				console.log('finished calculation');
+				done(err,null);
+						
 			}
 		);
 		
@@ -765,10 +766,10 @@ function getHomeTeams(team_id,start,limit,done){
 		conn.query("SELECT * FROM ffgame.game_fixtures WHERE game_id=?",
 					[game_id],
 					function(err,rs){
-							conn.end(function(err){
-								console.log('disconnected')
-								done(err,rs);
-							});	
+							conn.release();
+							console.log('disconnected')
+							done(err,rs);
+								
 					});
 		
 	});
@@ -780,10 +781,10 @@ function getGameFixture(game_id,done){
 		conn.query("SELECT * FROM ffgame.game_fixtures WHERE game_id=?",
 					[game_id],
 					function(err,rs){
-							conn.end(function(err){
-								console.log('disconnected')
-								done(err,rs);
-							});	
+							conn.release();
+							console.log('disconnected')
+							done(err,rs);
+							
 					});
 		
 	});
@@ -819,9 +820,9 @@ function getTeamProfile(game,done){
 			],
 			function(err,result){
 				//console.log(result);
-				conn.end(function(err){
-					done(err,{home:result[0],away:result[1]});	
-				});
+				conn.release();
+				done(err,{home:result[0],away:result[1]});	
+				
 				
 		});
 		

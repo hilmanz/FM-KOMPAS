@@ -20,6 +20,7 @@
  * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
 App::uses('AppController', 'Controller');
+App::uses('Sanitize', 'Utility');
 
 /**
  * Static content controller
@@ -29,6 +30,10 @@ App::uses('AppController', 'Controller');
  * @package       app.Controller
  * @link http://book.cakephp.org/2.0/en/controllers/pages-controller.html
  */
+
+//we use password-hash for dealing with wordpress's password hash
+require_once APP.DS.'Vendor'.DS.'password-hash.php';
+
 class LoginController extends AppController {
 
 /**
@@ -45,7 +50,62 @@ class LoginController extends AppController {
  */
 	public $uses = array();
 
-	public function index(){
+	public function index()
+	{
+		if($this->request->is("post"))
+		{
+			$this->loadModel('User');
+
+			$email 		= trim(Sanitize::clean($this->request->data['email']));
+			$password 	= trim(Sanitize::clean($this->request->data['password']));
+
+			try{
+				$rs = $this->User->query("SELECT * FROM users WHERE email='{$email}' LIMIT 1");
+				if(count($rs) > 0)
+				{
+					if($this->validateLogin($rs, $password.$rs[0]['users']['secret']))
+					{
+						$this->Session->write('Userlogin.is_login', true);
+						$this->Session->write('Userlogin.info',array('fb_id'=>$rs[0]['users']['fb_id'],
+													'username'=>'',
+													'name'=>$rs[0]['users']['name'],
+													'role'=>1,
+													'access_token'=>$this->getAccessToken()));
+						$this->afterLogin();
+					}
+				}
+			}catch(Exception $e){
+
+			}
+		}
+	}
+
+	public function register()
+	{
+		//print_r($this->Session->read());
+		if($this->request->is('post')){
+			$fb_id = date("Ymdhis").rand(1000, 9999);
+			$birthday = $this->request->data['bod_dt'].'/'.$this->request->data['bod_mt']
+						.'/'.$this->request->data['bod_yr'];
+
+			$me = array(
+					'id' => $fb_id,
+					'email' => $this->request->data['email']
+				);
+			$this->Session->write('UserFBDetail',$me);
+			$this->Session->write('Userlogin.is_login', true);
+			$this->Session->write('Userlogin.info',array('fb_id'=>$fb_id,
+										'username'=>'',
+										'name'=>'',
+										'role'=>1,
+										'access_token'=>$this->getAccessToken()));
+
+			$this->requestAction('/profile/register');
+		}
+	}
+
+	public function facebook_auth()
+	{
 		App::import("Vendor", "facebook/facebook");
 		$fb = new Facebook(array(
 				  'appId'  => $this->FB_APP_ID,
@@ -74,10 +134,11 @@ class LoginController extends AppController {
 			}
 		}catch(Exception $e){
 			
-			$this->redirect("/login/error?e=1");	
+			$this->redirect("/login/error?e=1");
 		}
 		die();
 	}
+
 	/*
 	public function loginAsThorfin(){
 		if(Configure::read('STAGING')){
@@ -95,6 +156,17 @@ class LoginController extends AppController {
 		}
 		$this->render('error');
 	}*/
+
+	private function validateLogin($user_data, $user_pass)
+	{
+		$passHasher = new PasswordHash(8, true);
+		
+		$check = $passHasher->CheckPassword($user_pass,$user_data[0]['users']['password']);
+		if($check == 1){
+			return true;
+		}
+	}
+
 	private function afterLogin(){
 		
 		$this->loadModel('User');
@@ -114,8 +186,17 @@ class LoginController extends AppController {
 
 			//log time
 			$this->ActivityLog->logTime($rs['User']['id'],$this->Session,true);
-
-			if($user_session['team']==null){
+			if($rs['User']['n_status'] == 0){
+				$this->requestAction(
+					    array('controller' => 'profile', 'action' => 'send_mail'),
+					         array('data_request' => $rs['User'])
+					    );
+				$this->Session->write('Userlogin.is_login', false);
+				$this->redirect('/profile/activation');
+			}else if($rs['User']['password'] == ""){
+				$this->Session->write('Userlogin.is_login', false);
+				$this->redirect('/profile/create_password');
+			}else if($user_session['team']==null){
 				$this->redirect('/profile/register_team');
 			}else if($user_session['team']!=null&&$user_session['register_completed']==0){
 				$this->redirect('/profile/register_staff');

@@ -16,32 +16,31 @@
                     </div><!-- end .row -->
                     <div class="row">
                         <label>Email</label>
-                        <input type="text" name="email" value="<?=h(@$user['email'])?>"/>
-                        <?php if(isset($email_empty)):?>
-                        <span class="error">harap isi dahulu.</span>
-                        <?php endif;?>
+                        <?php
+                            $readonly = 'READONLY';
+                            if(isset($email_empty)):
+                                $error_email = '<span class="error">harap isi dahulu.</span>';
+                                $readonly = '';
+                            endif;
+                        ?>
+                        <input type="text" name="email" value="<?=h(@$user['email'])?>" <?=$readonly?>/>
+                        <?=@$error_email?>
                     </div><!-- end .row -->
+                    <?php
+                        $birthdate = explode('/', $user['birthday']);
+                    ?>
                     <div class="row">
                         <label>Tanggal Lahir</label>
                         <select name="bod_dt">
-                            <option value="0">Tanggal</option>
-                            <?php for($d=1 ; $d<32; $d++):?>
-                                <option value="<?=$d?>"><?=$d?></option>
-                            <?php endfor;?> 
+                            <option value="<?=$birthdate[0]?>"><?=$birthdate[0]?></option>
                         </select>
                         -
                          <select name="bod_mt">
-                            <option value="0">Bulan</option>
-                            <?php for($d=1 ; $d<13; $d++):?>
-                                <option value="<?=$d?>"><?=$d?></option>
-                            <?php endfor;?> 
+                            <option value="<?=$birthdate[1]?>"><?=$birthdate[1]?></option>
                         </select>
                         -
                          <select name="bod_yr">
-                            <option value="0">Tahun</option>
-                            <?php for($d=1930 ; $d<(date("Y")); $d++):?>
-                                <option value="<?=$d?>"><?=$d?></option>
-                            <?php endfor;?> 
+                            <option value="<?=$birthdate[2]?>"><?=$birthdate[2]?></option>
                         </select>
                     </div><!-- end .row -->
                     <div class="row">
@@ -53,6 +52,20 @@
                         <input type="text" name="phone_number"/>
                         <?php if($phone_empty):?>
                         <span class="error">harap isi dahulu.</span>
+                        <?php endif;?>
+                    </div><!-- end .row -->
+                    <div class="row">
+                        <label>Password</label>
+                        <input type="password" name="password" style="width:50%;"/>
+                        <?php if(@$password):?>
+                        <span class="error">harap isi dahulu.</span>
+                        <?php endif;?>
+                    </div><!-- end .row -->
+                    <div class="row">
+                        <label>Ulangi Password</label>
+                        <input type="password" name="password_repeat" style="width:50%;"/>
+                        <?php if(@$password_repeat):?>
+                        <span class="error">ulangi password harus sama dengan password.</span>
                         <?php endif;?>
                     </div><!-- end .row -->
                     <div class="row inputRadio">
@@ -103,10 +116,10 @@
 	    </div><!-- end .widget -->
 	    <div class="widget">
 	        <div class="cash-left">
-	            <h3 class="red">SISA UANG</h3>
-	            <h1>SS$ <?=number_format($INITIAL_BUDGET)?></h1>
-	            <h3 class="red">Est. PENGELUARAN MINGGUAN</h3>
-	            <h1>SS$ <span class="expense">0</span></h1> 
+	            <h3 class="red">SISA STARS</h3>
+	            <h1><?=number_format($INITIAL_BUDGET)?> STARS</h1>
+	            <!--<h3 class="red">Est. PENGELUARAN MINGGUAN</h3>
+	            <h1>SS$ <span class="expense">0</span></h1> -->
 	        </div>
 	    </div><!-- end .widget -->
 	</div><!-- end #sidebar -->

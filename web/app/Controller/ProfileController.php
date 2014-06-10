@@ -24,6 +24,12 @@ App::uses('Sanitize', 'Utility');
 App::uses('File', 'Utility');
 require_once APP . 'Vendor' . DS. 'Thumbnail.php';
 
+//we use password-hash for dealing with wordpress's password hash
+require_once APP.DS.'Vendor'.DS.'password-hash.php';
+
+require_once APP.DS.'Vendor'.DS.'autoload-mailgun.php';
+use Mailgun\Mailgun;
+
 /**
  * Static content controller
  *
@@ -101,6 +107,50 @@ class ProfileController extends AppController {
 
 		$booster = $this->Game->getPoinBooster($userData['team']['id']);
 		$this->set('booster', $booster);
+	}
+
+	public function create_password()
+	{
+		$userData = $this->getUserData();
+		$this->loadModel('User');
+		if($this->request->is('post'))
+		{
+			$password 			= trim(Sanitize::clean($this->request->data['password']));
+			$password_repeat 	= trim(Sanitize::clean($this->request->data['password_repeat']));
+			$secret				= md5(date("Ymdhis"));
+			if($password != $password_repeat)
+			{
+				$this->Session->setFlash("Maaf, Password tidak sama");
+			}
+			else if(strlen($password) < 6)
+			{
+				$this->Session->setFlash("Password harus lebih dari 6 karakter");
+			}
+			else
+			{
+				$passHasher = new PasswordHash(8, true);
+				$user_pass = $passHasher->HashPassword($password.$secret);
+				
+				//update table user by fb_id
+				$fb_id = intval($userData['fb_id']);
+				try{
+					$this->User->query("UPDATE users 
+										SET password='{$user_pass}', secret = '{$secret}' 
+										WHERE fb_id = '{$fb_id}'");
+					$rs_user = $this->User->findByFb_id($fb_id);
+
+					if($rs_user['User']['n_status'] == 0){
+						if($this->send_mail($rs_user['User'])){
+							$this->redirect('/profile/activation');
+						}
+					}
+				}catch(Exception $e){
+					$this->Session->setFlash("Terjadi Kesalahan, silahkan coba lagi");
+					Cakelog::write('error', "ProfileController.create_password message ".$e->getMessage());
+				}
+				
+			}
+		}
 	}
 
 	public function update(){
@@ -195,6 +245,31 @@ class ProfileController extends AppController {
 			}
 		}else{
 			$this->redirect("/");
+		}
+	}
+
+	public function activation()
+	{
+		$user_fb = $this->Session->read('UserFBDetail');
+		$this->loadModel('User');
+
+		$this->set('user_data', $user_fb);
+
+		if($this->request->is("post"))
+		{
+			$act_code = trim(Sanitize::clean($this->request->data['act_code']));
+			$rs_user = $this->User->findByFb_id($user_fb['id']);
+
+			if($act_code == $rs_user['User']['activation_code'])
+			{
+				$this->User->query("UPDATE users SET n_status = 1 WHERE fb_id = '{$user_fb['id']}'");
+				$this->Session->write('Userlogin.is_login', true);
+				$this->redirect('/profile/register_team');
+			}
+			else
+			{
+				$this->Session->setFlash("Kode Aktivasi Salah");
+			}
 		}
 	}
 
@@ -367,15 +442,30 @@ class ProfileController extends AppController {
 								$this->redirect('/profile/error');
 			}else{
 				if($this->request->is('post') && $this->request->data['phone_number']!=null 
-					&& strlen($this->request->data['email']) > 0){
+					&& strlen($this->request->data['name']) > 0 
+					&& strlen($this->request->data['email']) > 0 
+					&& strlen($this->request->data['password']) > 0
+					&& strlen($this->request->data['password']) > 5
+					&& $this->request->data['password'] == $this->request->data['password_repeat']){
 					$this->request->data['hearffl'] = (isset($this->request->data['hearffl'])) ? $this->request->data['hearffl'] : 0;
 					$this->request->data['daylyemail'] = (isset($this->request->data['daylyemail'])) ? $this->request->data['daylyemail'] : 0;
 					$this->request->data['daylysms'] = (isset($this->request->data['daylysms'])) ? $this->request->data['daylysms'] : 0;
 					$this->request->data['firstime'] = (isset($this->request->data['firstime'])) ? $this->request->data['firstime'] : 0;
 					$birthdate = intval($this->request->data['bod_yr']).'-'.intval($this->request->data['bod_mt']).'-'.intval($this->request->data['bod_dt']);
-					$data = array('fb_id'=>$user_fb['id'],
+					$secret		= md5(date("Ymdhis"));
+					$passHasher = new PasswordHash(8, true);
+					$user_pass 	= $passHasher->HashPassword($this->request->data['password'].$secret);
+					$fb_id_ori = $user_fb['id'];
+					if(isset($this->request->data['not_facebook'])){
+						$fb_id_ori = NULL;
+					}
+
+					$data = array('fb_id_ori'=>$fb_id_ori,
+								  'fb_id'=>$user_fb['id'],
 								  'name'=>$this->request->data['name'],
 								  'email'=>$this->request->data['email'],
+								  'password'=>$user_pass,
+								  'secret'=>$secret,
 								  'location'=>$this->request->data['city'],
 								  'phone_number'=>$this->request->data['phone_number'],
 								  'register_date'=>date("Y-m-d H:i:s"),
@@ -385,8 +475,9 @@ class ProfileController extends AppController {
 								  'survey_has_play'=>$this->request->data['firstime'],
 								  'faveclub'=>Sanitize::clean($this->request->data['faveclub']),
 								  'birthdate'=>$birthdate,
-								  'n_status'=>1,
-								  'register_completed'=>0
+								  'n_status'=>0,
+								  'register_completed'=>0,
+								  'activation_code' => date("Ymdhis").rand(100, 999)
 								  );
 					//make sure that the fb_id is unregistered
 					$check = $this->User->findByFb_id($user_fb['id']);
@@ -411,13 +502,22 @@ class ProfileController extends AppController {
 
 							//register user into gameAPI.
 							$response = $this->ProfileModel->setProfile($data);
-							
+
 							if($response['status']==1){
 								//send info
 								$msg = "@p1_".$rs['User']['id']." sudah terdaftar dalam fantasy football.";
 								$this->Info->write('new player',$msg);
-								
-								$this->redirect("/profile/register_team");
+
+								if($rs['User']['n_status'] == 0){
+									if($this->send_mail($rs['User']))
+									{
+										$this->redirect("/profile/activation");
+									}
+								}else{
+									$this->redirect("/profile/register_team");
+								}
+
+								//$this->redirect("/profile/register_team");
 							}else{
 								$this->User->delete($this->User->id);
 								$this->Session->setFlash('Mohon maaf, tidak berhasil mendaftarkan akun kamu. 
@@ -432,6 +532,17 @@ class ProfileController extends AppController {
 				}else if($this->request->is('post') && strlen($this->request->data['email']) == 0){
 					$this->Session->setFlash('Harap mengisi email terlebih dahulu !');
 					$this->set('email_empty',true);
+				}else if($this->request->is('post') && strlen($this->request->data['password']) == 0){
+					$this->Session->setFlash('Harap mengisi password terlebih dahulu !');
+					$this->set('password',true);
+				}else if($this->request->is('post') && strlen($this->request->data['password']) < 6){
+					$this->Session->setFlash('Password harus 6 karakter atau lebih');
+				}else if($this->request->is('post') 
+					&& $this->request->data['password'] != $this->request->data['password_repeat']){
+					$this->Session->setFlash('Maaf, Password tidak sama');
+					$this->set('password_repeat',true);
+				}else if($this->request->is('post') && strlen($this->request->data['name']) == 0){
+					$this->Session->setFlash('Harap mengisi nama terlebih dahulu !');
 				}
 			}
 			
@@ -489,5 +600,37 @@ class ProfileController extends AppController {
 			print json_encode(array('status'=>0));
 		}
 		die();
+	}
+
+	public function send_mail($data = array()){
+		$view = new View($this, false);
+
+		if(isset($this->request->data_request))
+		{
+			$data = $this->request->data_request;
+		}
+
+		var_dump(isset($this->request->data_request));
+
+		$body = $view->element('email_activation',array(
+										'activation_code'=> $data['activation_code'],
+									));
+
+		# Instantiate the client.
+		$mgClient = new Mailgun('key-9oyd1c7638c35gmayktmgeyjhtyth5w0');
+		$domain = "sandbox6048e62f52c444e28b8529f4e62f0c1e.mailgun.org";
+
+		# Make the call to the client.
+		$result = $mgClient->sendMessage($domain, array(
+		    'from'    => 'Kode Aktivasi <me@samples.mailgun.org>',
+		    'to'      => '<'.$data['email'].'>',
+		    'subject' => 'Kode Aktivasi',
+		    'html'    => $body
+		));
+		if($result->http_response_code == 200){
+			return true;
+		}
+
+		return false;
 	}
 }

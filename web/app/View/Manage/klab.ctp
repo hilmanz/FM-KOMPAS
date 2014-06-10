@@ -132,18 +132,18 @@ function isStaffExist($staff_token,$name){
     					</td>
                         <td>
                             <span>Rank: <strong><?=number_format($USER_RANK)?></strong></span>
-                            <span>Uang: <strong>ss$ <?=number_format($team_bugdet)?></strong></span>
+                            <span>Stars: <strong><?=number_format($team_bugdet)?> Stars</strong></span>
                             <span>Point: <strong><?=number_format($USER_POINTS)?></strong></span>
-                            <span>Gaji Mingguan: <strong>ss$ <?=number_format($weekly_salaries)?></strong></span>
+                            <!--<span>Gaji Mingguan: <strong>ss$ <?=number_format($weekly_salaries)?></strong></span>-->
                         </td>
-                        <td colspan="2" class="pendapatan">
+                        <!--<td colspan="2" class="pendapatan">
                         	
                             <p title="Pendapatan Minggu Lalu">
                               <span class="ico icon-plus-alt">&nbsp;</span>
                             	<strong class="amounts">ss$ <?=number_format($last_earning)?></strong></p>
                             <p title="Pengeluaran Minggu Lalu"><span class="ico icon-minus-alt">&nbsp;</span>
                             	<strong class="amounts">ss$ <?=number_format($last_expenses)?></strong></p>
-                        </td>
+                        </td>-->
                       </tr>
                     </table>
                 </div><!-- end .entry -->
@@ -177,7 +177,7 @@ function isStaffExist($staff_token,$name){
                 </a>
             </div>
 					</div><!-- end .col3 -->
-					<div class="col3 fl">
+					<div class="col-content fl">
 						<div class="widget PergerakanRanking">
 							<h3>Pergerakan Poin</h3>
 							<div class="entry tr">
@@ -187,16 +187,16 @@ function isStaffExist($staff_token,$name){
 							</div><!-- end .entry -->
 						</div><!-- end .widget -->
 					</div><!-- end .col3 -->
-					<div class="col3 fl">
+					<!--<div class="col3 fl">
 						<div class="widget PergerakanKeuangan">
 							<h3>Pergerakan Keuangan</h3>
 							<div class="entry tr">
 								<div id="chart_keuangan" class="chartbox">
 									
 								</div>
-							</div><!-- end .entry -->
-						</div><!-- end .widget -->
-					</div><!-- end .col3 -->
+							</div>
+						</div>
+					</div> -->
 				</div><!-- end .row -->
 				<div class="row">
 					<div class="col3 fl">

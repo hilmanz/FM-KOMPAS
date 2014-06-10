@@ -317,3 +317,22 @@ CREATE TABLE fantasy.agent_returned_stocks (
   PRIMARY KEY (`id`),
   KEY `IDX_AGENT_ITEM_REQUEST` (`agent_id`,`merchandise_item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+ALTER TABLE `fantasy`.`users` 
+ADD COLUMN `password` VARCHAR(64) NULL AFTER `email`;
+
+ALTER TABLE `fantasy`.`users` 
+ADD COLUMN `secret` VARCHAR(32) NULL AFTER `password`;
+
+ALTER TABLE `fantasy`.`users` 
+ADD COLUMN `fb_id_ori` VARCHAR(32) NULL AFTER `id`;
+
+ALTER TABLE `fantasy`.`users` 
+ADD UNIQUE INDEX `fb_id_ori_UNIQUE` (`fb_id_ori` ASC);
+
+ALTER TABLE `ffgame`.`game_fixtures` 
+ADD COLUMN `group_name` VARCHAR(3) NULL AFTER `match_date`;
+
+ALTER TABLE `fantasy`.`users` 
+ADD COLUMN `activation_code` VARCHAR(64) NULL AFTER `birthdate`;

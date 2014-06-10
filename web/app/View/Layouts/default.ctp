@@ -44,7 +44,7 @@
                 <?php if($USER_IS_LOGIN):?>
                      <?php
                         
-                       $user_masked_id = intval(Configure::read('RANK_RANDOM_NUM')) + intval($USER_DATA['team']['id']);
+                       $user_masked_id = intval(Configure::read('RANK_RANDOM_NUM')) + intval(@$USER_DATA['team']['id']);
                      ?>
           			 <div id="header">
              		  	<a id="logo" href="<?=$this->Html->url('/manage/team')?>" title="SUPER SOCCER - FANTASY FOOTBALL LEAGUE">&nbsp;</a>

@@ -309,7 +309,7 @@ class AppController extends Controller {
 			);
 			$perks =  $this->DigitalPerk->find('all',array(
 				'conditions'=>array(
-					'DigitalPerk.game_team_id' => $this->userData['team']['id'],
+					'DigitalPerk.game_team_id' => @$this->userData['team']['id'],
 					'DigitalPerk.available > 0',
 					'DigitalPerk.n_status' => 1
 				),

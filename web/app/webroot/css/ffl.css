@@ -916,7 +916,7 @@ select.styled{
 	border:none;
 	background:none;
 }
-input[type=text]{
+input[type=text], input[type="password"]{
 	background:#303030;
 	border-radius:4px;
 	border:none;

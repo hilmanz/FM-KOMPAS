@@ -68,8 +68,8 @@
 	    
 	    <div class="widget">
 	        <div class="cash-left">
-	            <h3 class="red">SISA UANG</h3>
-	            <h1>SS$ <?=number_format($team_bugdet)?></h1>
+	            <h3 class="red">SISA STARS</h3>
+	            <h1><?=number_format($team_bugdet)?> STARS</h1>
 	            <h3 class="red">JUMLAH POINT</h3>
 	            <h1><?=number_format($USER_POINTS)?> pts</h1> 
                 <h3 class="red">JUMLAH COINS</h3>

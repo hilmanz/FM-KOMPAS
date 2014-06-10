@@ -15,7 +15,8 @@ var config = require('./config').config;
 var async = require('async');
 var request = require('request');
 var argv = require('optimist').argv;
-
+var report_team = require(path.resolve('./libs/stats_report_team'));
+var report_player = require(path.resolve('./libs/stats_report_player'));
 //mysql pool
 var pool  = mysql.createPool({
    host     : config.database.host,
@@ -77,7 +78,22 @@ app.get('/simulator/update', [], function(req,res){
 	});
 	
 });
-
+app.get('/playerstats/:game_id',[],function(req,res){
+	client.get('player_stats'+req.params.game_id,function(err,resp){
+		var data = JSON.parse(resp);
+		report_player.process_team_stats(data,function(err,rs){
+			res.send(200,{status:1,data:rs});
+		});
+	});
+});
+app.get('/matchstats/:game_id',[],function(req,res){
+	client.get('teamstats_'+req.params.game_id,function(err,resp){
+		var data = JSON.parse(resp);
+		report_team.process_team_stats(data,function(err,rs){
+			res.send(200,{status:1,data:rs});
+		});
+	});
+});
 app.get('/get/:game_id',[],function(req,res){
 	
 	client.get('lvrt_'+req.params.game_id,function(err,resp){
@@ -304,4 +320,6 @@ function resetData(done){
 function accessDenied(req,res){
 	res.send(401,'Access Denied');
 }
+
+
 

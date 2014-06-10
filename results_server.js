@@ -286,9 +286,9 @@ function update_match_data(data,done){
 				 data.attendance],
 				function(err,rs){
 					console.log(S(this.sql).collapseWhitespace().s);
-					conn.end(function(err){
+					conn.release();
 						done(err,rs);
-					});
+					
 			});
 		}else{
 			done(new Error('db lost'),null);
@@ -342,9 +342,8 @@ function update_bookings(game_id,teams,done){
 					next();
 				}
 			},function(err){
-				conn.end(function(err){
-					done(err,'ok');
-				});
+				conn.release();
+				done(err,'ok');
 			});
 		}else{
 			done(new Error('db lost'),null);
@@ -403,9 +402,9 @@ function update_goals(game_id,teams,done){
 					next();
 				}
 			},function(err){
-				conn.end(function(err){
-					done(err,'ok');
-				});
+				conn.release();
+				done(err,'ok');
+				
 			});
 		}else{
 			done(new Error('db lost'),null);
@@ -454,9 +453,9 @@ function update_team_stats(game_id,teams,done){
 					next();
 				}
 			},function(err){
-				conn.end(function(err){
-					done(err,'ok');
-				});
+				conn.release();
+				done(err,'ok');
+				
 			});
 		}else{
 			done(new Error('db lost'),null);
@@ -516,9 +515,8 @@ function update_substitutions(game_id,teams,done){
 					next();
 				}
 			},function(err){
-				conn.end(function(err){
-					done(err,'ok');
-				});
+				conn.release();
+				done(err,'ok');
 			});
 		}else{
 			done(new Error('db lost'),null);
@@ -567,9 +565,9 @@ function update_lineup(game_id,teams,done){
 					next();
 				}
 			},function(err){
-				conn.end(function(err){
-					done(err,'ok');
-				});
+				conn.release();
+				done(err,'ok');
+				
 			});
 		}else{
 			done(new Error('db lost'),null);
@@ -646,9 +644,9 @@ function update_team_ref(game_id,teams,done){
 
 
 			},function(err){
-				conn.end(function(err){
-					done(err,'ok');
-				});
+				conn.release();
+				done(err,'ok');
+				
 			});
 		}else{
 			done(new Error('db lost'),null);
@@ -704,9 +702,9 @@ function update_player_stats(game_id,teams,done){
 					next();
 				}
 			},function(err){
-				conn.end(function(err){
-					done(err,'ok');
-				});
+				conn.release();
+				done(err,'ok');
+				
 			});
 		}else{
 			done(new Error('db lost'),null);

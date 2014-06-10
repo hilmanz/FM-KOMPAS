@@ -610,8 +610,6 @@ class ProfileController extends AppController {
 			$data = $this->request->data_request;
 		}
 
-		var_dump(isset($this->request->data_request));
-
 		$body = $view->element('email_activation',array(
 										'activation_code'=> $data['activation_code'],
 									));

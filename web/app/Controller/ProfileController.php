@@ -251,9 +251,22 @@ class ProfileController extends AppController {
 		}else{
 			if($userData['team'] == '')
 			{
-				$teams = $this->Game->getTeams();
-				$this->set('team_list',$teams);
-				$this->set('INITIAL_BUDGET',Configure::read('INITIAL_BUDGET'));
+				if($this->request->is('post')){
+					if(strlen($this->request->data['team_name']) > 0
+						&& strlen($this->request->data['team_id']) > 0
+						&& strlen($this->request->data['fb_id']) > 0){
+						$this->Session->write('TeamRegister',$this->request->data);
+						$this->redirect('/profile/select_player');
+					}else{
+						$this->Session->setFlash('Kamu harus memilih salah satu team terlebih dahulu !');
+						$this->redirect('/profile/team_error');
+					}
+					
+				}else{
+					$teams = $this->Game->getTeams();
+					$this->set('team_list',$teams);
+					$this->set('INITIAL_BUDGET',Configure::read('INITIAL_BUDGET'));
+				}
 			}
 			else
 			{

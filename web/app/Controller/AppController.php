@@ -130,7 +130,7 @@ class AppController extends Controller {
 
 				
 
-				$this->nextMatch['match']['last_match_ts'] = strtotime($this->nextMatch['match']['last_match']);
+				@$this->nextMatch['match']['last_match_ts'] = strtotime(@$this->nextMatch['match']['last_match']);
 				
 				$this->nextMatch['match']['match_date_ts'] = strtotime(@$this->nextMatch['match']['match_date']);
 				

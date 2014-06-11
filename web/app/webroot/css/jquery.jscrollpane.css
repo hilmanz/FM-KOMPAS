@@ -117,7 +117,8 @@
 }
 .starters h4,.substitutions h4{
 	padding: 5px 10px;
-	background: url(../images/tr2.png) repeat;
+	background: #f3f3f3;
+    margin: 0 0 10px 0;
 	border-radius: 5px;
 	line-height: 22px;
 	height: 20px;

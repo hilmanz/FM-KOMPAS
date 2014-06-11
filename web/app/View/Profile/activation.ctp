@@ -1,4 +1,4 @@
-<div class="tr" style="width:450px;" >
+<div id="boxgrey" >
 	<?php echo $this->Session->flash(); ?>
 	Kode Aktivasi Telah dikirim ke email Anda <?=$user_data['email']?><br />
 	Silahkan buka email

@@ -1,23 +1,24 @@
-<div class="tr fl" style="width:500px;" >
-	<?php echo $this->Session->flash();?>
-	<form method="post" action="<?=$this->Html->url('/login');?>" enctype="application/x-www-form-urlencoded">
-		<div class="row">
-	        <label>Email</label>
-	        <input type="text" name="email" >
-	    </div>
-	    <div class="row">
-	        <label>Password</label>
-	        <input type="password" name="password" >
-	    </div>
-	    <div class="row">
-	        <input value="Login" class="button" type="submit">
-	    </div>
-    </form>
+<div id="loginContainer">
+    <div  id="login">
+        <?php echo $this->Session->flash();?>
+        <form method="post" action="<?=$this->Html->url('/login');?>" enctype="application/x-www-form-urlencoded">
+            <div class="row">
+                <label>Email</label>
+                <input type="text" name="email" >
+            </div>
+            <div class="row">
+                <label>Password</label>
+                <input type="password" name="password" >
+            </div>
+            <div class="row">
+                <input value="Login" class="button" type="submit">
+            </div>
+        </form>
+    </div>
+    <div  id="loginFB">
+        <a href="javascript:fb_login();" class="boxButton loginFacebook">&nbsp;</a>
+    </div>
 </div>
-<div class="tr fr" style="width:500px;" >
-	<a href="javascript:fb_login();" class="boxButton loginFacebook">&nbsp;</a>
-</div><!-- -->
-
 <!-- -->
 <script>
   window.fbAsyncInit = function() {

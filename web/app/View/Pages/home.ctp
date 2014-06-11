@@ -89,10 +89,6 @@
 </div><!-- end #content -->
 
 <div id="sidebar">
-	<div id="loginbox" class="tr">
-		<a href="<?=$this->Html->url('/login');?>" class="boxButton loginFacebook">&nbsp;</a>
-  		<a href="<?=$this->Html->url('/login/register');?>" class="boxButton createAccount">&nbsp;</a>
-    </div>
     <div class="widgets tr" id="gameNews">
         <h3>Game News & Update</h3>
         <div class="gameNews">

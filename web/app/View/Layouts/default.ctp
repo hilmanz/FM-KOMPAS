@@ -40,7 +40,7 @@
    	<div id="flag"></div>
  	<div id="body">
         <div id="universal">
-
+                <a id="brazil-edition" href="<?=$this->Html->url('/manage/team')?>" title="BRAZIL EDITION">&nbsp;</a>
                 <?php if($USER_IS_LOGIN):?>
                      <?php
                         
@@ -77,8 +77,13 @@
                 <?php else:?>
           			 <div id="header">
             		 <a id="logo" href="<?=$this->Html->url('/')?>" title="SUPER SOCCER - FANTASY FOOTBALL LEAGUE">&nbsp;</a>
+                    <div id="loginbox">
+                        <a href="<?=$this->Html->url('/login');?>" class="boxButton loginBtn">&nbsp;</a>
+                        <a href="<?=$this->Html->url('/login/register');?>" class="boxButton createAccount">&nbsp;</a>
+                    </div>
          		     </div><!-- end #header -->
           		<?php endif;?>
+            <div id="container">
             <?php
                 if($USER_IS_LOGIN):
             ?>
@@ -184,7 +189,6 @@
                     </ul>
                 </div>
             <?php endif;?>
-            <div id="container">
 				<?php echo $this->fetch('content'); ?>
             </div><!-- end #container -->
             <div id="footer">

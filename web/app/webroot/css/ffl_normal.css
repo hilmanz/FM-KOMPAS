@@ -19,19 +19,19 @@ ol,ul {list-style:none;}
 caption,th {text-align:left;}
 q:before,q:after{content:'';}
 body{
-	background: url(../images/worldcup/bg.jpg) no-repeat center center fixed;
+	background: url(../images/bg.jpg) no-repeat center center fixed;
 	background-color:#000;
 	-webkit-background-size: cover;
 	-moz-background-size: cover;
 	-o-background-size: cover;
 	background-size: cover;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/worldcup/bg.jpg', sizingMethod='scale');
-	-ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/worldcup/bg.jpg', sizingMethod='scale')";
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/bg.jpg', sizingMethod='scale');
+	-ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/bg.jpg', sizingMethod='scale')";
 	margin:0;
 	padding:0;
     font-family: 'ColaborateRegular';
 	font-size:14px;
-	color:#333;
+	color:#fff;
 	line-height:1.4;
 	overflow-x:hidden;
 	 -webkit-font-smoothing: antialiased;
@@ -56,7 +56,7 @@ h4{
 }
 a{
 	text-decoration:none;
-	color:#80b241 ;
+	color:#c20101;
 	outline:none;
 	-webkit-transition: all 0.3s ease-in-out;
 	-moz-transition: all 0.3s ease-in-out;
@@ -66,15 +66,15 @@ a{
 }
 a:hover{
 	text-decoration:underline;
-	color:#529300 
+	color:#FC0
 }
 .fl{ float:left;}
 .fr{ float:right;}
 .yellow{
-	color:#80b241 ;
+	color:#fdcb02;
 }
 .red{
-	color:#80b241;
+	color:#F00;
 }
 .white{
 	color:#FFF;
@@ -101,6 +101,7 @@ a.download-appstore{
 }
 /*============= LAYOUT ===============*/
 #body{
+	background:url(../images/top-nav-bg.png) top repeat-x;
 }
 #effect{
 	width:100%; height:100%;
@@ -114,13 +115,8 @@ a.download-appstore{
 	position:relative;
 }
 #header{
-	box-shadow:0 0 20px rgba(0,0,0,0.3);
-	border-radius:5px;
+	height:60px;
 	position:relative;
-    overflow: hidden;
-    padding: 10px;
-	background:#fff;
-    margin: 0 0 20px 0;
 }
 #header2{
 	height:120px;
@@ -128,34 +124,31 @@ a.download-appstore{
 }
 #container{
 	padding:20px;
-	background:#fff;
-	box-shadow:0 0 20px rgba(0,0,0,0.3);
-	border-radius:5px;
+	background:url(../images/tr.png) repeat;
+	box-shadow:0 0 50px rgba(0,0,0,0.25) inset,0 0 10px rgba(0,0,0,0.7) inset;
+	-o-box-shadow:0 0 50px rgba(0,0,0,0.25) inset,0 0 10px rgba(0,0,0,0.7) inset;
+	border-radius:7px;
 	overflow:hidden;
 	clear:both;
 }
 #logo{
-	background:url(../images/worldcup/logo.png) no-repeat;
-	width:254px; height:77px; display:block;
+	background:url(../images/logo.png) no-repeat;
+	width:680px; height:80px; display:block;
+	position:absolute;
+	top:-8px;
+	left:28px;
 	text-decoration:none;
 	float:left;
-    margin: 10px 0 0 0;
-}
-#brazil-edition{
-    background: url(../images/worldcup/braziledition.png) no-repeat;
-    width: 519px; height: 47px;
-    margin: 20px auto;
-    display:block;
 }
 #user-info{
 	float:right;
 	right:25px;
-	top:20px;
+	top:10px;
 	position:relative;
 	line-height:18px;
 }
 #user-info a{
-	color:#8ead3a ;
+	color:#fff;
 }
 #user-info a.logout{
 	color:#000;
@@ -173,41 +166,52 @@ a.download-appstore{
 }
 /*============= navigation ===============*/
 #navigation{
-	background:url(../images/worldcup/bg_nav.png) no-repeat;
-	width:1030px;
-	margin:0 auto 20px auto;
-	position:relative;
-	height:35px;
-    text-align: center;
+	background:url(../images/tr.png) repeat;
+	box-shadow:0 0 50px rgba(0,0,0,0.25) inset,0 0 10px rgba(0,0,0,0.7) inset;
+	-o-box-shadow:0 0 50px rgba(0,0,0,0.25) inset,0 0 10px rgba(0,0,0,0.7) inset;
+	border-radius:7px;
+	padding:5px 0;
+	margin:0 0 20px 0;
+	text-align:center;
+	min-height:40px;
+	display:table;
+	width:100%;
 }
 #navigation ul{
 	margin:0;
 	list-style:none;
 	padding:0;
-    float: none;
 }
 #navigation ul li{
+	width:130px;
 	display:inline-block;
+	background:#232323;
+	padding:3px;
+	box-shadow:0 0 2px rgba(0,0,0,0.25) inset,1px 1px 1px rgba(255,125,124,0.2);
+	-o-box-shadow:0 0 2px rgba(0,0,0,0.25) inset,1px 1px 1px rgba(255,125,124,0.2);
+	border-radius:4px;
 	margin:0 8px;
-    float: none;
 }
 #navigation ul li a{
+	background:url(../images/bg_nav.jpg) repeat-x 0 -32px;
 	display:block;
-	line-height:35px;
-	color:#333;
-    padding: 0 10px;
+	line-height:32px;
+	color:#fff;
+	text-shadow:0 1px 1px #000;
+	border-radius:4px;
+	border:solid 1px #222222;
 	width:auto;
 	font-size:12px;
-	background:none;
 }
 #navigation ul ul{
 	background:none;
 	left:auto;
-	top:35px;
+	top:45px;
+	padding:5px;
+	background:#000;
 }
 #navigation ul ul li a{
-    background: #333;
-	color:#fff;
+	background:url(../images/bg_nav.jpg) repeat-x 0 -32px;
 	line-height: 30px;
 	border-radius: 0;
 	text-align: left;
@@ -216,7 +220,7 @@ a.download-appstore{
 	border-bottom: solid 1px #222;
 }
 #navigation ul ul li a:hover{
-    background: #222;
+	box-shadow: none;
 }
 #navigation ul ul li{
 	width: auto;
@@ -232,15 +236,14 @@ a.download-appstore{
 	height:auto;
 }
 #navigation ul li a:hover,#navigation ul li.current a{
-	background:none;
-	color:#8ead3a ;
+	background:url(../images/bg_nav.jpg) repeat-x;
+	color:#ff0000;
 	text-decoration:none;
 }
 #info-bar{
 	overflow:hidden;
 	border-radius:5px;
 	padding:5px 20px;
-    background: #f3f3f3;
 }
 #info-bar h4{
 	margin:0;
@@ -267,18 +270,17 @@ a.download-appstore{
 	font-size:16px;
 }
 .nav-side ul li a:hover,.nav-side ul li.current a,.nav-side ul li.current span{
-	background:#666;
+	background:url(../images/tr2.png) repeat;
 	text-decoration:none;
-	color:#fff;
+	color:#FC0;
 }
 
 .topnav{
-	background:url(../images/worldcup/bg_nav.png) no-repeat;
 	width:1030px;
-	margin:0 auto 20px auto;
+	margin:0 auto;
 	position:relative;
-	height:35px;
-    text-align: center;
+	top:13px;
+	height:70px;
 }
 #topnav ul{
 	margin:0;
@@ -286,22 +288,46 @@ a.download-appstore{
 }
 #topnav li{
 	margin:0 25px;
-    display: inline-block;
+	float:left;
 }
 #topnav li li{
 	margin:0;
 }
 #topnav li a{
-	color:#333;
-	line-height:35px ;
+	color:#fff;
+	line-height:30px;
 	display:block;
-	padding:0 10px 0 10px;
+	padding:0 10px 0 37px;
 	text-transform:uppercase;
-	font-size:14px;
+	font-size:12px;
 }
 #topnav li a:hover{
 	text-decoration:none;
-	color:#529300 ;
+	color:#F00;
+}
+.nav1{
+	background:url(../images/nav-home.jpg) no-repeat;
+}
+.nav2{
+	background:url(../images/nav-tv.jpg) no-repeat;
+}
+.nav3{
+	background:url(../images/nav-english-league.jpg) no-repeat;
+}
+.nav4{
+	background:url(../images/nav-international-soccer.jpg) no-repeat;
+}
+.nav5{
+	background:url(../images/nav-indonesian-league.jpg) no-repeat;
+}
+.nav6{
+	background:url(../images/nav-futsal.jpg) no-repeat;
+	padding:0 10px 0 45px !important;
+}
+.nav7{
+	padding:0 !important;
+	width:200px !important;
+	text-align:center;
 }
 #topnav ul li{
 	float:none;
@@ -310,12 +336,10 @@ a.download-appstore{
 }
 #topnav ul li a{
 	display:block;
-	background:#333;
-    color: #fff;
-	border-top:solid 1px #444;
+	background:url(../images/tr4.png) repeat;
+	border-top:solid 1px #333;
 	line-height:35px;
 	padding:0 15px;
-    text-align: left;
 }
 #topnav ul li a:hover{
 	background:#000;
@@ -349,7 +373,7 @@ a.download-appstore{
 	color:#fdcb02;
 }
 #newsticker h3 a{
-	color:#333;
+	color:#fdcb02;
 }
 /*============= colom ===============*/
 .box4{
@@ -392,7 +416,7 @@ a.download-appstore{
 	border-bottom:solid 1px #742d2d;
 }
 .whites{
-	color:#333;
+	color:#fff;
 }
 /*============= FORMATION ===============*/
 .field-container{
@@ -411,6 +435,7 @@ a.download-appstore{
 }
 .widget,.widgets{
 	padding:15px 20px;
+	margin:0 0 2px 20px;
 	overflow:hidden;
 	border-radius:5px;
 }
@@ -423,14 +448,12 @@ a.download-appstore{
 }
 .widgets h3{
 	margin:0;
-    color: #80b241 ;
-    font-size: 24px;
 }
 .widgets a{
-	color:#666;
+	color:#fdcb02;
 }
 .widgets a:hover{
-    text-decoration: underline;
+	color:#FC0;
 }
 .match-team{
 	text-align:center;
@@ -579,7 +602,7 @@ a.download-appstore{
     font-size: 10px;
 }
 .jersey-player a{
-	color:#333;
+	color:white;
 }
 .jersey{
 	width:46px; height:46px;
@@ -668,7 +691,7 @@ a.download-appstore{
 	margin:0;
 }
 .tr{
-    border: solid 1px #ddd;
+	background:url(../images/tr.png) repeat;
 }
 .tr2{
 	background:url(../images/tr2.png) repeat;
@@ -697,7 +720,7 @@ a.download-appstore{
 }
 #listBox h3{
 	font-size:22px;
-	color:#80b241 ;
+	color:#fdcb02;
 }
 #listBox .box:last-child{
 	margin:0;
@@ -722,8 +745,10 @@ a.download-appstore{
 	padding:0;
 }
 #loginbox{
+	padding:20px 10px;
 	text-align:center;
-    float: right;
+	border-radius:5px;
+	margin:0 0 30px 0;
 }
 #loginbox h3{
 	margin:0;
@@ -739,14 +764,10 @@ a.download-appstore{
 }
 .loginFacebook{
 	background-image:url(../images/btn_login_facebook.png);
-	margin:0 auto 10px auto;
-}
-.loginBtn{
-	background-image:url(../images/worldcup/btn_login.png);
-	margin:0 auto 10px auto;
+	margin:0 auto 20px auto;
 }
 .createAccount{
-	background-image:url(../images/worldcup/btn_create_account.png);
+	background-image:url(../images/btn_create_account.png);
 }
 .boxButton:hover{
 	text-decoration:none;
@@ -785,8 +806,8 @@ a.download-appstore{
 }
 .row{
 	clear:both;
-    border-bottom: solid 1px #ddd;
-	padding:15px 0;
+	background:url(../images/dot.png) bottom repeat-x;
+	padding:18px 0;
 	overflow:hidden;
 }
 .rows{
@@ -947,7 +968,6 @@ input[type=text], input[type="password"]{
 	padding:0 20px;
 }
 .avatarBox{
-    background: #fff;
 	width:150px;
 	padding:15px;
 	position:absolute;
@@ -1085,7 +1105,7 @@ input[type=text], input[type="password"]{
 	overflow:hidden;
 }
 .ui-tabs-panel{
-	background:#f3f3f3;
+	background:url(../images/tr.png) repeat;
 	clear:both;
 	padding:20px;
 	overflow:hidden;
@@ -1241,11 +1261,11 @@ table td a.button,table td .buttons{
 	margin:0;
 	font-size:40px;
 	line-height:40px;
-	color:#8ead3a ;
+	color:#FC0;
 }
 /*============= FOOTER ===============*/
 #footer{
-	border-top:solid 1px #ddd;
+	border-top:solid 1px #8b3535;
 	padding:20px 0 0 0;
 	height:100px;
 	margin:30px 0 0 0;
@@ -1548,7 +1568,7 @@ table td a.button,table td .buttons{
 	min-height:75px;
 }
 .fbexpired .box h3{
-	color:#333;
+	color:#eee;
 	font-size:22px;
 	line-height:35px;
 }
@@ -1670,13 +1690,13 @@ table td a.button,table td .buttons{
 }
 #maintenancePage h1{
 	font-size:40px;
-	color:#80b241;
+	color:#fdcb02;
 	margin:0;
 }
 #maintenancePage h2{
 	margin:0;
 	font-size:30px;
-	color:#333;
+	color:#fff;
 }
 .player-detail,.profileStats-container{
 	width:500px;
@@ -1832,6 +1852,7 @@ h3.tabtitle{
 }
 #starterTeam .flex-viewport{
 	height:670px !important;
+	top:20px;
 	padding:10px;
 	left:-10px;
 }
@@ -1878,7 +1899,7 @@ h3.tabtitle{
 	float:left;
 }
 #listBox .widgets{
-	width:318px;
+	width:320px;
 	margin:20px 0 0 20px;
 	float:left;
 	border-radius:5px;
@@ -1912,9 +1933,6 @@ h3.tabtitle{
 	margin:0;
 	color:#c20101;
 }
-.cash-left{
-    padding: 0 20px;
-}
 #klabPage .row{
 	clear:both;
 	padding:0;
@@ -1923,7 +1941,6 @@ h3.tabtitle{
 #klabPage .widget h3{
 	margin: 0;
 	background: #000;
-    color: #fff;
 	padding: 5px 15px;
 	border-radius: 5px 5px 0 0;
 }
@@ -1962,14 +1979,14 @@ h3.tabtitle{
 }
 .RingkasanKlab span{
 	display:block;
-	color:#333;
+	color:#fff;
 }
 .RingkasanKlab strong{
 	font-weight:bold;
-	color:#8ead3a ;
+	color:#fdcb02;
 }
 .PertandinganLalu td a{
-	color:#8ead3a ;
+	color:#fdcb02;
 }
 .chartbox{
 	height:170px;
@@ -2052,7 +2069,6 @@ h3.tabtitle{
 .instrution h4{
 	font-size:16px;
 	margin:0;
-    color: #fff;
 }
 .fake-title{
 	display:none;
@@ -2269,8 +2285,9 @@ table.dataTable{
 	
 }
 .detailCatalog h4{
-	margin:0;
-	font-size:16px;
+	margin:0 0 10px;
+	font-size:17px;
+	height:34px;
 }
 .detailCatalog .price{
 	font-size:18px;
@@ -2501,15 +2518,15 @@ table.dataTable{
 }
 .rowboxs h3{
 	font-size:24px;
-	color:#80b241 ;
+	color:#fdcb02;
 }
 .rowboxs h1{
 	font-size:30px;
-	color:#80b241 ;
+	color:#fdcb02;
 	margin:10px 0;
 }
 .rowboxs h4{
-	color:#80b241 ;
+	color:#fdcb02;
 }
 .flex-control-nav{
 	display:none;
@@ -2590,11 +2607,11 @@ table.dataTable{
 }
 #faqPage .howto-entry h3{
 	font-size: 14px;
-	color: #80b241 ;
+	color: #fdcb02;
 	text-transform: uppercase;
 }
 .entry-home strong{
-	color:#222;
+	color:#fdcb02;
 	font-weight:bold;
 }
 #formationBox{
@@ -2603,27 +2620,17 @@ table.dataTable{
 }
 #boxSquad{
 	float:left;
-	margin:0 0 0 18px;
+	margin:0 0 0 20px;
 	width:305px;
 }
 #bannerBox{
 	width:254px;
 }
-.catalog-list{
-    margin: 20px 0;
-}
 .catalog-list a.button{
-	background:#8ead3a ;
+	background:url(../images/tr.png) repeat;
 	line-height:35px;
 	text-transform:uppercase;
-	border-radius:5px;
-    border: none;
-    color: #fff;
-    border-bottom:solid 1px #fff;
-    text-shadow: none;
-}
-.rowd .catalog-list{
-    padding: 10px;
+	border-radius:0;
 }
 .button2{
 	line-height:35px;
@@ -2756,38 +2763,4 @@ a.btnCoin:hover,a.btnCoinMandiri:hover{
 	margin: 0;
 	font-size: 20px;
 	color: #fff;
-}
-#loginContainer{
-    text-align: center;
-}
-#login,#loginFB{
-    margin: 0 10px;
-    text-align: left;
-    vertical-align: top;
-    width:280px; min-height: 220px;
-    display: inline-block;
-    background: #f2f2f2;
-    border-radius:5px;
-    padding:10px 20px;
-}
-#loginFB .loginFacebook{
-    margin: 85px auto 10px auto;
-}
-#login #flashMessage{
-    border: none;
-    background: none;
-    font-size: 12px;
-    color: #333;
-    padding: 10px 0 0 0;
-    color: #f00;
-    margin: 0;
-}
-#login .row:last-child{
-    border:none;
-}
-#boxgrey{
-    width: auto;
-    padding: 20px;
-    background: #f3f3f3;
-    border-radius: 5px; 
 }

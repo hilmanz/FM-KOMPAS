@@ -317,24 +317,24 @@ class ManageController extends AppController {
 			/*
 			$sql = "SELECT game_id,home_id,away_id,b.name AS home_name,c.name AS away_name,
 					a.matchday,a.match_date,a.home_score,a.away_score
-					FROM ffgame.game_fixtures a
-					INNER JOIN ffgame.master_team b
+					FROM ffgame_wc.game_fixtures a
+					INNER JOIN ffgame_wc.master_team b
 					ON a.home_id = b.uid
-					INNER JOIN ffgame.master_team c
+					INNER JOIN ffgame_wc.master_team c
 					ON a.away_id = c.uid
 					WHERE (a.home_id = '{$this->userData['team']['team_id']}' 
 							OR a.away_id = '{$this->userData['team']['team_id']}')
-					AND EXISTS (SELECT 1 FROM ffgame_stats.game_match_player_points d
+					AND EXISTS (SELECT 1 FROM ffgame_stats_wc.game_match_player_points d
 								WHERE d.game_id = a.game_id 
 								AND d.game_team_id = {$this->userData['team']['id']} LIMIT 1)
 					ORDER BY a.matchday DESC";
 			*/
 			$sql = "SELECT game_id,home_id,away_id,b.name AS home_name,c.name AS away_name,
 					a.matchday,a.match_date,a.home_score,a.away_score
-					FROM ffgame.game_fixtures a
-					INNER JOIN ffgame.master_team b
+					FROM ffgame_wc.game_fixtures a
+					INNER JOIN ffgame_wc.master_team b
 					ON a.home_id = b.uid
-					INNER JOIN ffgame.master_team c
+					INNER JOIN ffgame_wc.master_team c
 					ON a.away_id = c.uid
 					WHERE (a.home_id = '{$this->userData['team']['team_id']}' 
 							OR a.away_id = '{$this->userData['team']['team_id']}')
@@ -517,7 +517,7 @@ class ManageController extends AppController {
 				foreach($rs['data']['daily_stats'] as $n=>$v){
 					$fixture = $this->Team->query("SELECT matchday,match_date,
 										UNIX_TIMESTAMP(match_date) as ts
-										FROM ffgame.game_fixtures 
+										FROM ffgame_wc.game_fixtures 
 										WHERE game_id='{$n}' 
 										LIMIT 1");
 
@@ -530,7 +530,7 @@ class ManageController extends AppController {
 		}
 		
 		//stats modifier
-		$modifier = $this->Game->query("SELECT * FROM ffgame.game_matchstats_modifier as Modifier");
+		$modifier = $this->Game->query("SELECT * FROM ffgame_wc.game_matchstats_modifier as Modifier");
 		$this->set('modifiers',$modifier);
 
 		//enable OPTA Widget
@@ -576,7 +576,7 @@ class ManageController extends AppController {
 										d as Defender,
 										m as Midfielder,
 										f as Forward
-										FROM ffgame.game_matchstats_modifier as stats;");
+										FROM ffgame_wc.game_matchstats_modifier as stats;");
 
 		$modifier = array();
 		foreach($rs as $r){
@@ -624,7 +624,7 @@ class ManageController extends AppController {
 										d as Defender,
 										m as Midfielder,
 										f as Forward
-										FROM ffgame.game_matchstats_modifier as stats;");
+										FROM ffgame_wc.game_matchstats_modifier as stats;");
 
 		$modifier = array();
 		foreach($rs as $r){
@@ -656,9 +656,9 @@ class ManageController extends AppController {
 				// remove di database game
 				$user_id = $this->userData['team']['user_id'];
 				$team_id = $this->userData['team']['id'];
-				$this->User->query("DELETE FROM ffgame.game_users WHERE id ={$user_id};");
-				$this->User->query("DELETE FROM ffgame.game_teams WHERE id = {$team_id};");
-				$this->User->query("DELETE FROM ffgame.game_team_players WHERE game_team_id = {$team_id};");
+				$this->User->query("DELETE FROM ffgame_wc.game_users WHERE id ={$user_id};");
+				$this->User->query("DELETE FROM ffgame_wc.game_teams WHERE id = {$team_id};");
+				$this->User->query("DELETE FROM ffgame_wc.game_team_players WHERE game_team_id = {$team_id};");
 				//remove di database frontend.
 
 				$user = $this->User->findByFb_id($this->userData['fb_id']);
@@ -686,7 +686,7 @@ class ManageController extends AppController {
 			$club = $this->Team->findByUser_id($user['User']['id']);
 			$next_match = $this->Game->getNextMatch($userData['team']['team_id']);
 			$this->loadModel('Team');
-			$rs = $this->Team->query("UPDATE ffgame.game_fixtures SET is_processed = 0 
+			$rs = $this->Team->query("UPDATE ffgame_wc.game_fixtures SET is_processed = 0 
 								WHERE id={$next_match['match']['id']}");
 		}else{
 			$this->redirect('/manage/team');
@@ -695,7 +695,7 @@ class ManageController extends AppController {
 	public function reset_matches(){
 		if(Configure::read('debug')>0){
 			$this->loadModel('Team');
-			$rs = $this->Team->query("UPDATE ffgame.game_fixtures 
+			$rs = $this->Team->query("UPDATE ffgame_wc.game_fixtures 
 										SET period='PreMatch',is_processed = 1");
 		}else{
 			$this->redirect('/manage/team');
@@ -708,7 +708,7 @@ class ManageController extends AppController {
 			$club = $this->Game->getTeam($userData['fb_id']);
 			
 			$this->loadModel('Team');
-			$rs = $this->Team->query("DELETE FROM ffgame.game_team_expenditures
+			$rs = $this->Team->query("DELETE FROM ffgame_wc.game_team_expenditures
 								WHERE game_team_id={$club['id']}");
 		}else{
 			$this->redirect('/manage/team');

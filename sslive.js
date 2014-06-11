@@ -258,9 +258,9 @@ function simulate(done){
 		],
 		function(err,rs){
 			console.log('foo');
-			conn.end(function(err){
-				done(err,rs);
-			});
+			conn.release();
+			done(err,rs);
+			
 		});
 	});
 
@@ -310,9 +310,9 @@ function resetData(done){
 			}
 		],
 		function(err,rs){
-			conn.end(function(err){
+			conn.release();
 				done(err,rs);
-			});
+			
 		});
 	});
 }

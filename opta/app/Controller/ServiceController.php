@@ -42,7 +42,7 @@ class ServiceController extends AppController {
 		'content' => $post_data
 		);
 		header('Content-type: text/xml');
-		if($this->saveXMLFile($posts)){
+		if(@$this->saveXMLFile($posts)){
 			$this->set('response',array('status'=>1,'message'=>'ok'));	
 		}else{
 			$this->set('response',array('status'=>0,'message'=>'unable to save the xml'));	

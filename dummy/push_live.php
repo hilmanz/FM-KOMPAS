@@ -1,15 +1,11 @@
 <?
 //set xml request
-$fp = fopen('/home/opta/data/srml-8-2012-f442367-matchresults.xml','r');
-$xml = "";
-while(!feof($fp)){
-	$xml.=fgets($fp,4098).PHP_EOL;
-}
-fclose($fp);
+$xml = file_get_contents('/home/duf/node_workspace/fantasy_fork/data/srml-8-2013-f694955-matchresults.xml');
+
 $data = array(
 'x-meta-feed-type: F9',
 'x-meta-feed-parameters: feed params',
-'x-meta-default-filename: srml-8-2012-f442367-matchresults.xml',
+'x-meta-default-filename: srml-8-2013-f694955-matchresults.xml',
 'x-meta-game-id: 8',
 'x-meta-competition-id: 8',
 'x-meta-season-id: 2012',
@@ -27,7 +23,7 @@ $data = array(
 'encoding: UTF-8'
 );
 //set URL
-$url = 'http://push.supersoccer.co.id/';
+$url = 'http://push-sg.supersoccer.co.id/';
 // Get the curl session object
 $session = curl_init($url);
 // set url to post to

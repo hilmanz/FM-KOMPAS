@@ -8,7 +8,7 @@ var fs = require('fs');
 var path = require('path');
 var xmlparser = require('xml2json');
 var async = require('async');
-var config = require(path.resolve('./config_ucl')).config;
+var config = require(path.resolve('./config')).config;
 var mysql = require('mysql');
 var dateFormat = require('dateformat');
 var redis = require('redis');
@@ -55,14 +55,14 @@ pool.getConnection(function(err,conn){
 			
 		],
 		function(err,rs){
-			conn.end(function(err){
+			conn.release();
 				pool.end(function(err){
 					console.log('done');
 					redisClient.quit(function(err){
 						console.log('redis session ended');
 					});
 				});
-			});
+			
 		});
 });
 

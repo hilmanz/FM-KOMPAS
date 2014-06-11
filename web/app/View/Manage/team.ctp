@@ -1,12 +1,9 @@
 <?php
 $can_update_formation = true;
-<<<<<<< HEAD
+
 if(isset($close_time)):
-if(time() > $close_time['ts'] && Configure::read('debug') == 0){
-=======
 
 if(time() > @$close_time['ts'] && Configure::read('debug') == 0){
->>>>>>> 2fc00bcb40dd75d27aca4e99db404212d833e193
    
     $can_update_formation = false;
     if(time() > $open_time){

@@ -457,6 +457,7 @@ class ManageController extends AppController {
 			$this->set('best_match','N/A');
 		}else{
 			
+			
 			$best_match['data']['points'] = number_format($best_match['data']['points']);
 			if($best_match['data']['match']['home_id']==$team_id){
 				$against = $best_match['data']['match']['away_name'];

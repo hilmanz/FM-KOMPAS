@@ -132,7 +132,7 @@ function isStaffExist($staff_token,$name){
     					</td>
                         <td>
                             <span>Rank: <strong><?=number_format($USER_RANK)?></strong></span>
-                            <span>Stars: <strong><?=number_format($team_bugdet)?> Stars</strong></span>
+                            <span>Stars: <strong><?=number_format($team_bugdet)?> Star</strong></span>
                             <span>Point: <strong><?=number_format($USER_POINTS)?></strong></span>
                             <!--<span>Gaji Mingguan: <strong>ss$ <?=number_format($weekly_salaries)?></strong></span>-->
                         </td>
@@ -253,7 +253,7 @@ function isStaffExist($staff_token,$name){
 									  <th width="70">Posisi</th>
 									 
 									  <th width="5">Poin</th>
-									  <th class="alignright" width="120">Nilai (ss$)</th>
+									  <th class="alignright" width="120">Nilai (Star)</th>
 									 
 									</tr>
 								  </thead>
@@ -628,9 +628,9 @@ function isStaffExist($staff_token,$name){
                     <th data-hide="phone,tablet" width="64">Negara</th>
                     <th data-hide="phone,tablet" width="70">Posisi</th>
                    
-                    <th data-hide="phone,tablet" class="alignright" width="120">Gaji* (ss$)</th>
+                    <!--<th data-hide="phone,tablet" class="alignright" width="120">Gaji* (ss$)</th>-->
                     <th data-hide="phone,tablet" class="aligncenter" width="5">Poin</th>
-                    <th data-hide="phone,tablet" class="alignright" width="120">Nilai (ss$)</th>
+                    <th data-hide="phone,tablet" class="alignright" width="120">Nilai (Stars)</th>
                     <th data-hide="phone,tablet" style="text-align:center;">Tindakan</th>
                   </tr>
                  </thead>
@@ -667,7 +667,7 @@ function isStaffExist($staff_token,$name){
                     <td><?=h($player['country'])?></td>
                     <td><?=$player_pos?></td>
                    
-                    <td class="alignright">ss$ <?=number_format($player['salary'])?></td>
+                    <!--<td class="alignright">ss$ <?=number_format($player['salary'])?></td>-->
                     <?php
                       if($player['points']!=0){
                         $last_performance = floatval($player['last_performance']);
@@ -677,13 +677,10 @@ function isStaffExist($staff_token,$name){
                       }
                     ?>
                     <td class="aligncenter"><?=(($player['points']))?></td>
-                    <td class="alignright">ss$ <?=number_format(intval($player['transfer_value'])+$performance_bonus)?></td>
+                    <td class="alignright"><?=number_format(intval($player['transfer_value'])+$performance_bonus)?> Star</td>
                     <td width="10"><a data-team-name="<?=h($club['team_name'])?>" data-player-name="<?=$player['name']?>" data-price="<?=number_format(intval($player['transfer_value'])+$performance_bonus)?>" data-team="<?=$player['team_id']?>" data-player="<?=$player['uid']?>" id="btnSale" class="buttons" href="<?=$this->Html->url('/manage/player/'.$player['uid'])?>"><span>LIHAT</span></a></td>
                   </tr>
                   <?php endforeach;?>
-                  <tr>
-                    <td colspan="10">*) Gaji Per Minggu</td>
-                  </tr>
                  </tbody>
                 </table>
                 </div><!-- end .player-list -->

@@ -223,16 +223,16 @@ function getStats($category,$pos,$modifiers,$map,$stats){
     					</td>
                         <td>
                             <span>Rank: <strong><?=number_format($USER_RANK)?></strong></span>
-                            <span>Uang: <strong>ss$ <?=number_format($team_bugdet)?></strong></span>
+                            <span>Stars: <strong><?=number_format($team_bugdet)?> Star</strong></span>
                             <span>Point: <strong><?=number_format($USER_POINTS)?></strong></span>
                         </td>
-                        <td colspan="2" class="pendapatan">
+                        <!--<td colspan="2" class="pendapatan">
                         	
                             <p><span class="ico icon-plus-alt">&nbsp;</span>
                             	<strong class="amounts">ss$ <?=number_format($last_earning)?></strong></p>
                             <p><span class="ico icon-minus-alt">&nbsp;</span>
                             	<strong class="amounts">ss$ <?=number_format($last_expenses)?></strong></p>
-                        </td>
+                        </td>-->
                       </tr>
                     </table>
                 </div><!-- end .entry -->
@@ -256,10 +256,10 @@ function getStats($category,$pos,$modifiers,$map,$stats){
                 <h3 class="clubname"><?=h($data['player']['name'])?></h3>
             </div>
         </div>
-        <div class="club-info fl">
+        <!--<div class="club-info fl">
             <p>Gaji Mingguan</p>
             <h4><?=number_format($data['player']['salary'])?></h4>
-        </div>
+        </div>-->
         <div class="club-info fl">
             <p>Nilai Transfer</p>
             <h4>
@@ -278,7 +278,8 @@ function getStats($category,$pos,$modifiers,$map,$stats){
                   
                     $transfer_value = $data['player']['transfer_value'] + $performance;
                     echo number_format($transfer_value);
-                ?>
+                ?> 
+                Star
             </h4>
         </div>
         <div class="club-info fl">

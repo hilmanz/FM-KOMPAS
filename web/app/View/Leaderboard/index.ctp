@@ -24,16 +24,16 @@ $overall = isset($overall) ? "selected='selected'":"";
     					</td>
                         <td>
                             <span>Rank: <strong><?=number_format($USER_RANK)?></strong></span>
-                            <span>Uang: <strong>ss$ <?=number_format($team_bugdet)?></strong></span>
+                            <span>Stars: <strong><?=number_format($team_bugdet)?> Star</strong></span>
                             <span>Point: <strong><?=number_format($USER_POINTS)?></strong></span>
                         </td>
-                        <td colspan="2" class="pendapatan">
+                        <!--<td colspan="2" class="pendapatan">
                         	
                             <p><span class="ico icon-plus-alt">&nbsp;</span>
                             	<strong class="amounts">ss$ <?=number_format($last_earning)?></strong></p>
                             <p><span class="ico icon-minus-alt">&nbsp;</span>
                             	<strong class="amounts">ss$ <?=number_format($last_expenses)?></strong></p>
-                        </td>
+                        </td>-->
                       </tr>
                     </table>
                 </div><!-- end .entry -->

@@ -91,7 +91,7 @@
                         	<a href="<?=$this->Html->url('/manage/club')?>">Klab Saya</a>
                             <ul>
                             	<li><a href="<?=$this->Html->url('/manage/club')?>#tabs-Info">Info</a></li>
-                            	<li><a href="<?=$this->Html->url('/manage/club')?>#tabs-Money">Keuangan</a></li>
+                            	<!--<li><a href="<?=$this->Html->url('/manage/club')?>#tabs-Money">Keuangan</a></li>-->
                             	<li><a href="<?=$this->Html->url('/manage/club')?>#tabs-Players">Pemain</a></li>
                             </ul>
                         </li>

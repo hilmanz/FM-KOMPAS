@@ -253,10 +253,10 @@ $weekly_performance = null;
                 <h3 class="clubname"><?=h($data['player']['name'])?></h3>
             </div>
         </div>
-        <div class="club-info fl">
+        <!--<div class="club-info fl">
             <p>Gaji Mingguan</p>
             <h4><?=number_format($data['player']['salary'])?></h4>
-        </div>
+        </div>-->
         <div class="club-info fl">
             <p>Nilai Transfer</p>
             <h4>
@@ -733,7 +733,7 @@ $("#btnSale").fancybox({
     <div class="confirm">
         <h1>Apakah kamu ingin menjual pemain ini?</h1>
         <h3>Pemain yang sudah dijual akan hilang dari lineup dan tidak dapat di undo</h3>
-        <h4>SS$ <%=transfer_value%></h4>
+        <h4><%=transfer_value%> Star</h4>
         <opta widget="playerprofile" sport="football" competition="8" season="2013" team="<%=team%>" 
           player="<%=uid%>" show_image="true" show_nationality="true" opta_logo="false" 
           narrow_limit="400"></opta>

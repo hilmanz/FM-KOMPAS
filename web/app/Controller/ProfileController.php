@@ -143,6 +143,9 @@ class ProfileController extends AppController {
 						if($this->send_mail($rs_user['User'])){
 							$this->redirect('/profile/activation');
 						}
+					}else{
+						$this->Session->write('Userlogin.is_login', true);
+						$this->redirect('/manage/team');
 					}
 				}catch(Exception $e){
 					$this->Session->setFlash("Terjadi Kesalahan, silahkan coba lagi");
@@ -262,9 +265,19 @@ class ProfileController extends AppController {
 
 			if($act_code == $rs_user['User']['activation_code'])
 			{
-				$this->User->query("UPDATE users SET n_status = 1 WHERE fb_id = '{$user_fb['id']}'");
-				$this->Session->write('Userlogin.is_login', true);
-				$this->redirect('/profile/register_team');
+				try{
+					$this->User->query("UPDATE users SET n_status = 1 WHERE fb_id = '{$user_fb['id']}'");
+					$rs_user = $this->User->findByFb_id($user_fb['id']);
+					if($rs_user['User']['password'] == ''){
+						$this->Session->write('Userlogin.is_login', false);
+						$this->redirect('/profile/create_password');
+					}else{
+						$this->Session->write('Userlogin.is_login', true);
+						$this->redirect('/profile/register_team');
+					}
+				}catch(Exception $e){
+
+				}
 			}
 			else
 			{

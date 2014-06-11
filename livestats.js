@@ -45,6 +45,7 @@ pool.getConnection(function(err,conn){
 				getGameIdsByMatchday(conn,matchday,cb);
 			},
 			function(matchday,game_id,cb){
+				console.log(game_id);
 				//foreach game_ids, retrieve the playerstats
 				//and populate it into ffgame_stats_wc.master_player_progress
 				//console.log(game_id);
@@ -81,7 +82,7 @@ pool.getConnection(function(err,conn){
 
 function getCurrentMatchday(conn,done){
 	conn.query("SELECT matchday FROM \
-				ffgame_wc.game_fixtures \
+				optadb_wc.game_fixtures \
 				WHERE is_processed = 0 \
 				ORDER BY id ASC LIMIT 1;",
 				[],function(err,rs){
@@ -95,7 +96,7 @@ function getCurrentMatchday(conn,done){
 
 function getGameIdsByMatchday(conn,matchday,done){
 	conn.query("SELECT game_id,period FROM \
-				ffgame_wc.game_fixtures \
+				optadb_wc.game_fixtures \
 				WHERE matchday = ? \
 				ORDER BY id ASC LIMIT 10;",
 				[matchday],function(err,rs){
@@ -448,7 +449,7 @@ function storeGameIdPlayerPointsToRedis(conn,game_id,done){
 						a.atk,a.def,a.error,\
 						a.ts,b.name,b.team_id \
 						FROM ffgame_stats_wc.master_player_progress a\
-						INNER JOIN ffgame_wc.master_player b\
+						INNER JOIN optadb_wc.master_player b\
 						ON a.player_id = b.uid \
 						WHERE game_id = ? LIMIT 10000;",
 						[game_id],

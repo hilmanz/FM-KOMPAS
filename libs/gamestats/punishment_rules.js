@@ -3,6 +3,12 @@
 * there's 2 kind of punishment.
 * income cuts, or balance deduction.
 * so every rule must returns an object that consists income_cuts and balance_deduction.
+
+*
+* Update for worldcup 
+* - home income punishment is disabled.
+* home balance cuts and away balance cuts penalty now is -5 star
+*
 */
 var path = require('path');
 var config = require(path.resolve('./config')).config;
@@ -16,13 +22,13 @@ exports.home_income_cuts = home_income_cuts;
 
 //balance dikurangi untuk 2 home game berikutnya atau sampai transfer window berikutnya
 var home_balance_cuts = function(){
-	return {income_cuts:0,balance_cuts:150000,terms:{type:'2home_or_next_transfer',amount:3}};
+	return {income_cuts:0,balance_cuts:5,terms:{type:'2home_or_next_transfer',amount:3}};
 }
 exports.home_balance_cuts = home_balance_cuts;
 
 //balance dikurangi selama 4 minggu berturut2
 var away_balance_cuts = function(){
-	return {income_cuts:0,balance_cuts:500000,terms:{type:'weekly',amount:5}};
+	return {income_cuts:0,balance_cuts:5,terms:{type:'weekly',amount:5}};
 }
 exports.away_balance_cuts = away_balance_cuts;
 
@@ -404,7 +410,7 @@ function doPunish(conn,game_id,game_team_id,team_id,item,cb){
 								callback(err);
 							});
 			},
-			function(callback){
+			/*function(callback){
 				//get tickets sold
 				conn.query("SELECT amount FROM ffgame.game_team_expenditures \
 							WHERE game_id = ? AND game_team_id = ? \
@@ -440,7 +446,7 @@ function doPunish(conn,game_id,game_team_id,team_id,item,cb){
 				}else{
 					callback(null);
 				}
-			},
+			},*/
 			function(callback){
 				if(!is_home && item.punishment=='home_balance_cuts'){
 					t.balance_cuts = 0;
@@ -482,9 +488,10 @@ function doPunish(conn,game_id,game_team_id,team_id,item,cb){
 			function(callback){
 				if(cut_ok){
 					if(item.punishment=='home_income_cuts'){
-						sendNotification(conn,game_id,game_team_id,1,function(err){
+						/*sendNotification(conn,game_id,game_team_id,1,function(err){
 							callback(err);
-						});
+						});*/
+						callback(null);
 
 					}else if(item.punishment=='home_balance_cuts'){
 						sendNotification(conn,game_id,game_team_id,2,function(err){

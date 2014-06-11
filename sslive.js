@@ -219,7 +219,7 @@ function simulate(done){
 		async.waterfall([
 			function(cb){
 				//get all pushlogs 
-				conn.query("SELECT * FROM optadb.pushlogs WHERE gameId=? AND feedType = 'F9' ORDER BY id ASC;",
+				conn.query("SELECT * FROM optadb_wc.pushlogs WHERE gameId=? AND feedType = 'F9' ORDER BY id ASC;",
 							[str_game_id],function(err,rs){
 								cb(err,rs);
 							});
@@ -273,26 +273,26 @@ function resetData(done){
 	pool.getConnection(function(err,conn){
 		async.waterfall([
 			function(cb){
-				conn.query("UPDATE optadb.matchinfo \
+				conn.query("UPDATE optadb_wc.matchinfo \
 							SET period = 'PreMatch', home_score = 0, away_score=0, matchtime = 0 WHERE game_id=?;",
 							[game_id],function(err,rs){
 								cb(err);
 							});
 			},
 			function(cb){
-				conn.query("DELETE FROM optadb.player_stats WHERE game_id=?;",
+				conn.query("DELETE FROM optadb_wc.player_stats WHERE game_id=?;",
 							[game_id],function(err,rs){
 								cb(err);
 							});
 			},
 			function(cb){
-				conn.query("DELETE FROM optadb.goals WHERE game_id=?;",
+				conn.query("DELETE FROM optadb_wc.goals WHERE game_id=?;",
 							[game_id],function(err,rs){
 								cb(err);
 							});
 			},
 			function(cb){
-				conn.query("DELETE FROM optadb.substitutions WHERE game_id=?;",
+				conn.query("DELETE FROM optadb_wc.substitutions WHERE game_id=?;",
 							[game_id],function(err,rs){
 								cb(err);
 							});

@@ -125,6 +125,7 @@ class PagesController extends AppController {
 		$top_players = $this->Game->getMasterTopPlayers(5);
 		$this->set('top_players',$top_players);
 	}
+	
 	private function getLastWeekTopManagers(){
 		$this->loadModel("Point");
 	    $this->loadModel('User');

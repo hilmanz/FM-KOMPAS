@@ -30,7 +30,7 @@ function prepareDb(callback){
 function getTeams(callback){
 	
 	prepareDb(function(conn){
-		conn.query("SELECT uid,name FROM ffgame.master_team ORDER BY name LIMIT 100;",
+		conn.query("SELECT uid,name FROM ffgame_wc.master_team ORDER BY name LIMIT 100;",
 			[],function(err,team){
 				conn.release();
 				callback(err,team);
@@ -48,7 +48,7 @@ function getPlayers(team_uid,callback){
 				function(callback){
 					conn.query("SELECT uid,name,birth_date,real_position,known_name,join_date,\
 					position,country,salary,transfer_value \
-					FROM ffgame.master_player \
+					FROM ffgame_wc.master_player \
 					WHERE team_id=? ORDER BY last_name ASC,position ASC LIMIT 100",
 					[team_uid],
 					function(err,players){
@@ -65,11 +65,11 @@ function getPlayers(team_uid,callback){
 									FROM (\
 									(SELECT SUM(points) AS total_points ,\
 									0 AS performance, 0 AS last_points\
-									FROM ffgame_stats.master_player_performance \
+									FROM ffgame_stats_wc.master_player_performance \
 									WHERE player_id = ?)\
 									UNION ALL\
 									(SELECT 0 ,performance,points \
-										FROM ffgame_stats.master_player_performance\
+										FROM ffgame_stats_wc.master_player_performance\
 										WHERE player_id= ?\
 										ORDER BY id DESC LIMIT 1)\
 									)a;\
@@ -111,8 +111,8 @@ function getMasterTopPlayers(total,callback){
 				function(callback){
 					conn.query("SELECT a.uid AS player_id,a.team_id,\
 								name,SUM(points) AS total\
-								FROM ffgame.master_player a\
-								INNER JOIN ffgame_stats.master_match_player_points b\
+								FROM ffgame_wc.master_player a\
+								INNER JOIN ffgame_stats_wc.master_match_player_points b\
 								ON a.uid = b.player_id\
 								GROUP BY b.player_id ORDER BY total DESC LIMIT ?;",
 					[parseInt(total)],
@@ -135,7 +135,7 @@ function getMasterTopPlayers(total,callback){
 /** get team detail from master **/
 function getTeamById(team_uid,callback){
 	prepareDb(function(conn){
-		conn.query("SELECT uid,name FROM ffgame.master_team WHERE uid = ? LIMIT 1;",
+		conn.query("SELECT uid,name FROM ffgame_wc.master_team WHERE uid = ? LIMIT 1;",
 		[team_uid],function(err,team){
 			conn.release();
 			callback(err,team[0]);
@@ -151,7 +151,7 @@ function create(data,callback){
 			async.waterfall(
 			[
 				function(callback){
-					conn.query("SELECT id FROM ffgame.game_users WHERE fb_id=? LIMIT 1",
+					conn.query("SELECT id FROM ffgame_wc.game_users WHERE fb_id=? LIMIT 1",
 								[data.fb_id],
 								function(err,rs){
 									//console.log(this.sql);
@@ -164,7 +164,7 @@ function create(data,callback){
 						callback(new Error('no user'),'');
 					}else{
 						console.log(user);
-						conn.query("INSERT INTO ffgame.game_teams\
+						conn.query("INSERT INTO ffgame_wc.game_teams\
 								(user_id,team_id,created_date,n_status)\
 								VALUES\
 								(?,?,NOW(),1);",[user.id,data.team_id],function(err,rs){
@@ -179,7 +179,7 @@ function create(data,callback){
 				function(result,callback){
 					if(result!=null){
 
-						var sql = "INSERT IGNORE INTO ffgame.game_team_players\
+						var sql = "INSERT IGNORE INTO ffgame_wc.game_team_players\
 									(game_team_id,player_id) VALUES\
 									";
 						var d = [];
@@ -203,7 +203,7 @@ function create(data,callback){
 
 					if(game_team_id!=null){
 						conn.query(
-							"INSERT IGNORE INTO ffgame.game_team_purse(game_team_id,budget)\
+							"INSERT IGNORE INTO ffgame_wc.game_team_purse(game_team_id,budget)\
 							 VALUES(?,?)"
 						,[game_team_id,initial_money],
 						function(err,rs){
@@ -232,7 +232,7 @@ function remove_team(game_team_id,callback){
 		async.waterfall(
 			[
 				function(callback){
-					conn.query("DELETE FROM ffgame.game_teams WHERE id=? LIMIT 1",
+					conn.query("DELETE FROM ffgame_wc.game_teams WHERE id=? LIMIT 1",
 								[game_team_id],
 								function(err,rs){
 									callback(err);
@@ -240,7 +240,7 @@ function remove_team(game_team_id,callback){
 					
 				},
 				function(callback){
-					conn.query("DELETE FROM ffgame.game_team_players WHERE game_team_id=?",
+					conn.query("DELETE FROM ffgame_wc.game_team_players WHERE game_team_id=?",
 								[game_team_id],
 								function(err,rs){
 									callback(err,'');
@@ -263,7 +263,7 @@ function getUserTeam(fb_id,done){
 		async.waterfall(
 			[
 				function(callback){
-					conn.query("SELECT id FROM ffgame.game_users WHERE fb_id=? LIMIT 1",
+					conn.query("SELECT id FROM ffgame_wc.game_users WHERE fb_id=? LIMIT 1",
 								[fb_id],
 								function(err,rs){
 									console.log("TEAM : ",S(this.sql).collapseWhitespace().s);
@@ -273,7 +273,7 @@ function getUserTeam(fb_id,done){
 				},
 				function(user,callback){
 					if(typeof user !=='undefined'){
-						conn.query("SELECT * FROM ffgame.game_teams WHERE user_id = ? LIMIT 1",[
+						conn.query("SELECT * FROM ffgame_wc.game_teams WHERE user_id = ? LIMIT 1",[
 							user.id
 						],
 							function(err,team){
@@ -306,10 +306,10 @@ function getUserTeamPoints(fb_id,done){
 				function(callback){
 					//get overall points
 					conn.query("SELECT a.fb_id,b.user_id,b.id,b.team_id,c.points,0 as extra_points \
-								FROM ffgame.game_users a\
-								INNER JOIN ffgame.game_teams b\
+								FROM ffgame_wc.game_users a\
+								INNER JOIN ffgame_wc.game_teams b\
 								ON a.id = b.user_id\
-								LEFT JOIN ffgame_stats.game_team_points c\
+								LEFT JOIN ffgame_stats_wc.game_team_points c\
 								ON b.id = c.game_team_id\
 								WHERE a.fb_id = ?;",
 								[fb_id],
@@ -326,7 +326,7 @@ function getUserTeamPoints(fb_id,done){
 					if(rs!=null&&rs.id!=null){
 						//extra points
 						conn.query("SELECT SUM(extra_points) AS extra_point \
-									FROM ffgame_stats.game_team_extra_points \
+									FROM ffgame_stats_wc.game_team_extra_points \
 									WHERE game_team_id=?;",[rs.id],function(err,r){
 										if(!err){
 											if(r!=null){
@@ -349,7 +349,7 @@ function getUserTeamPoints(fb_id,done){
 										0 AS extra_points,\
 										a.matchday\
 										FROM \
-										ffgame_stats.game_team_player_weekly a\
+										ffgame_stats_wc.game_team_player_weekly a\
 										WHERE a.game_team_id = ?\
 										GROUP BY a.game_id LIMIT 400;",
 										[rs.id],
@@ -368,7 +368,7 @@ function getUserTeamPoints(fb_id,done){
 					if(rs!=null&&rs.id!=null){
 						//extra points
 						conn.query("SELECT game_id,SUM(extra_points) AS extra \
-										FROM ffgame_stats.game_team_extra_points \
+										FROM ffgame_stats_wc.game_team_extra_points \
 										WHERE game_team_id=? GROUP BY game_id LIMIT 400",
 										[rs.id],function(err,r){
 										if(!err){

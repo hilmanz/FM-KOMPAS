@@ -31,7 +31,7 @@ function authenticate(req,res){
 function askForChallengeCode(req,res,api_key){
 	
 	prepareDb(function(conn){
-		conn.query("SELECT * FROM ffgame.api_keys WHERE api_key = ? LIMIT 1",
+		conn.query("SELECT * FROM ffgame_wc.api_keys WHERE api_key = ? LIMIT 1",
 					[api_key],function(err,rs){
 						conn.release();
 						
@@ -57,7 +57,7 @@ function authenticateCode(req,res,api_key,request_code){
 	console.log('session',req.session);
 	if(typeof req.session.challenge_code !== 'undefined'){
 		prepareDb(function(conn){
-			conn.query("SELECT * FROM ffgame.api_keys WHERE api_key = ? LIMIT 1",
+			conn.query("SELECT * FROM ffgame_wc.api_keys WHERE api_key = ? LIMIT 1",
 						[api_key],function(err,rs){
 							conn.release();
 								if(!err){

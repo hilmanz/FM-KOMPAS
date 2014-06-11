@@ -30,10 +30,10 @@ function fixtures(done){
 		conn.query("SELECT a.id,\
 				a.game_id,a.home_id,b.name as home_name,a.away_id,c.name as away_name,a.home_score,a.away_score,\
 				a.matchday,a.period,a.session_id,a.attendance\
-				FROM ffgame.game_fixtures a\
-				INNER JOIN ffgame.master_team b\
+				FROM ffgame_wc.game_fixtures a\
+				INNER JOIN ffgame_wc.master_team b\
 				ON a.home_id = b.uid\
-				INNER JOIN ffgame.master_team c\
+				INNER JOIN ffgame_wc.master_team c\
 				ON a.away_id = c.uid\
 				ORDER BY a.matchday\
 				LIMIT 1000;",
@@ -63,7 +63,7 @@ function getMatchResultForUserTeam(game_team_id,game_id,done){
 		async.waterfall([
 			function(callback){
 				//get matchday first
-				conn.query("SELECT matchday FROM ffgame.game_fixtures WHERE game_id=?;",[game_id],
+				conn.query("SELECT matchday FROM ffgame_wc.game_fixtures WHERE game_id=?;",[game_id],
 							function(err,rs){
 								callback(err,rs[0].matchday);
 							});
@@ -71,11 +71,11 @@ function getMatchResultForUserTeam(game_team_id,game_id,done){
 			function(matchday,callback){
 				//get all the user's lineups who playes in matchday 1
 				conn.query("SELECT a.game_id,a.player_id,a.points,c.team_id as original_team_id,c.name,c.position\
-				FROM ffgame_stats.game_match_player_points a\
-				INNER JOIN ffgame.master_player c\
+				FROM ffgame_stats_wc.game_match_player_points a\
+				INNER JOIN ffgame_wc.master_player c\
 				ON a.player_id = c.uid\
 				WHERE game_team_id = ?\
-				AND EXISTS (SELECT 1 FROM ffgame.game_fixtures b \
+				AND EXISTS (SELECT 1 FROM ffgame_wc.game_fixtures b \
 					WHERE a.game_id = b.game_id AND b.matchday = ? LIMIT 1)\
 				ORDER BY a.points DESC;",
 				[game_team_id,matchday],
@@ -87,7 +87,7 @@ function getMatchResultForUserTeam(game_team_id,game_id,done){
 				var p = {}
 				//get each players stats
 				async.eachSeries(players,function(player,next){
-					conn.query("SELECT stats_name,stats_value,points FROM ffgame_stats.game_team_player_weekly \
+					conn.query("SELECT stats_name,stats_value,points FROM ffgame_stats_wc.game_team_player_weekly \
 								WHERE game_team_id = ? AND game_id = ? AND player_id = ?",
 								[game_team_id,player.game_id,player.player_id],
 								function(err,rs){
@@ -137,10 +137,10 @@ function results(game_id,done){
 					conn.query("SELECT a.id,\
 				a.game_id,a.home_id,b.name as home_name,a.away_id,c.name as away_name,a.home_score,a.away_score,\
 				a.matchday,a.period,a.session_id,a.attendance\
-				FROM ffgame.game_fixtures a\
-				INNER JOIN ffgame.master_team b\
+				FROM ffgame_wc.game_fixtures a\
+				INNER JOIN ffgame_wc.master_team b\
 				ON a.home_id = b.uid\
-				INNER JOIN ffgame.master_team c\
+				INNER JOIN ffgame_wc.master_team c\
 				ON a.away_id = c.uid\
 				WHERE a.game_id = ?\
 				LIMIT 1;",[game_id],
@@ -153,7 +153,7 @@ function results(game_id,done){
 
 					//get overall stats
 					conn.query("SELECT team_id,stats_name,SUM(stats_value) AS total \
-								FROM ffgame_stats.master_match_result_stats \
+								FROM ffgame_stats_wc.master_match_result_stats \
 								WHERE game_id=? GROUP BY team_id,stats_name;",
 					[game_id],
 					function(err,stats){
@@ -165,9 +165,9 @@ function results(game_id,done){
 
 					//get player stats for these match
 					conn.query("SELECT a.team_id,a.player_id,b.name,b.position,a.stats_name,SUM(a.stats_value) AS total \
-								FROM ffgame_stats.master_match_result_stats a\
+								FROM ffgame_stats_wc.master_match_result_stats a\
 								INNER JOIN\
-								ffgame.master_player b\
+								ffgame_wc.master_player b\
 								ON a.player_id = b.uid\
 								WHERE a.game_id = ?\
 								GROUP BY a.team_id,a.player_id,a.stats_name \

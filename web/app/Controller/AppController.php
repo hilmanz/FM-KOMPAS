@@ -229,7 +229,7 @@ class AppController extends Controller {
 
 						
 					}
-					
+
 					$this->closeTime = $close_time;
 					
 					$this->set('close_time',$close_time);
@@ -238,6 +238,19 @@ class AppController extends Controller {
 									
 					$this->openTime = $open_time;
 					$this->set('open_time',$open_time);
+				}else{
+					$close_time = array("datetime"=>$upcoming_match['start_dt'],
+										"ts"=>strtotime($upcoming_match['start_dt']));
+
+					$this->closeTime = $close_time;
+					
+					$this->set('close_time',$close_time);
+
+					//formation open time
+					$open_time = time() - (24*60*60);
+					$this->openTime = $open_time;
+					$this->set('open_time',$open_time);
+
 				}
 				
 

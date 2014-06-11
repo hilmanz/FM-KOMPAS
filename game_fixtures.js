@@ -1,11 +1,11 @@
 /**
-populating the ffgame.game_fixtures
+populating the ffgame_wc.game_fixtures
 **/
 /////THE MODULES/////////
 var fs = require('fs');
 var path = require('path');
-//var config = require('./config').config;
-var config = require('./config_ucl').config;
+var config = require('./config').config;
+//var config = require('./config_ucl').config;
 var xmlparser = require('xml2json');
 var master = require('./libs/master');
 var async = require('async');
@@ -45,7 +45,7 @@ function(err,result){
 });
 
 /*
-INSERT INTO ffgame.game_fixtures
+INSERT INTO ffgame_wc.game_fixtures
 (game_id,home_id,away_id,period,matchday,competition_id,session_id,home_score,away_score,attendance,is_dummy,is_processed,match_date)
 VALUES
 (?,?,?,?,?,?,?,?,?,?,?,?,?)
@@ -68,7 +68,7 @@ function process_match_data(conn,competition_id,session_id,data,done){
 			//console.log(team);
 			//callback();
 			
-			conn.query("INSERT INTO ffgame.game_fixtures\
+			conn.query("INSERT INTO ffgame_wc.game_fixtures\
 						(game_id,home_id,away_id,period,matchday,competition_id,\
 						session_id,home_score,away_score,attendance,is_dummy,is_processed,\
 						match_date)\
@@ -124,7 +124,7 @@ function handleError(err){
 	done(err,'<xml><error>1</error></xml>');
 }
 /*
-conn.query("SELECT * FROM ffgame.game_fixtures \
+conn.query("SELECT * FROM ffgame_wc.game_fixtures \
 		WHERE is_processed=0 \
 		ORDER BY id ASC LIMIT 100;",[],
 		function(err,games){

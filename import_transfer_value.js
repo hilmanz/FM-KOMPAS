@@ -10,6 +10,7 @@ var xmlparser = require('xml2json');
 var master = require('./libs/master');
 var async = require('async');
 var mysql = require('mysql');
+var S = require('string');
 /////DECLARATIONS/////////
 var FILE_PREFIX = config.updater_file_prefix+config.competition.id+'-'+config.competition.year;
 
@@ -25,7 +26,7 @@ var conn = mysql.createConnection({
 
 async.waterfall([
 	function(callback){
-		open_file('transfer_value_v3.csv',function(err,content){
+		open_file('player_star.csv',function(err,content){
 			callback(err,content.toString());
 		});
 	},
@@ -44,9 +45,8 @@ async.waterfall([
 				//console.log(a);
 				
 				data.push({
-					last_name:a[0],
-					team_id:a[1],
-					transfer_value:parseInt(a[3])
+					player_id:a[0],
+					transfer_value:parseInt(a[1])
 				});
 				
 			}
@@ -62,14 +62,16 @@ async.waterfall([
 			data,
 			function(item,next){
 				
-				conn.query("INSERT INTO ffgame.tmp_transfer(last_name,team_id,transfer_value)\
-							VALUES(?,?,?)",
-							[item.last_name,item.team_id,item.transfer_value],
+				conn.query("INSERT INTO ffgame_wc.master_player(uid,transfer_value)\
+							VALUES(?,?) ON DUPLICATE KEY UPDATE\
+							transfer_value = VALUES(transfer_value)",
+							[item.player_id,item.transfer_value],
 							function(err,rs){
+								console.log(S(this.sql).collapseWhitespace().s);
 								if(!err){
-									console.log(item.last_name,item.team_id,item.transfer_value,'DONE');
+									console.log(item.player_id,item.transfer_value,'DONE');
 								}else{
-									console.log(item.last_name,item.team_id,item.transfer_value,'FAILED');
+									console.log(item.player_id,item.transfer_value,'FAILED');
 								}
 								next();
 				});
@@ -87,7 +89,7 @@ function(err,result){
 });
 
 function open_file(the_file,done){
-	var filepath = path.resolve('./updates/'+the_file);
+	var filepath = path.resolve('./update/'+the_file);
 	fs.stat(filepath,onFileStat);
 	function onFileStat(err,stats){
 		if(!err){

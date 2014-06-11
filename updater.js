@@ -5,7 +5,7 @@ the application will check if there's a  new file exists in data folder.
 var fs = require('fs');
 var path = require('path');
 //var config = require('./config').config;
-var config = require('./config_ucl').config;
+var config = require('./config').config;
 var xmlparser = require('xml2json');
 var master = require('./libs/master');
 

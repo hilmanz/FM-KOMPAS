@@ -31,9 +31,9 @@ function prepareDb(callback){
 function getAvailableSponsorship(game_team_id,callback){
 	prepareDb(function(conn){
 		conn.query("SELECT a.id,name,value,expiry_time,is_available \
-				FROM ffgame.game_sponsorships a\
+				FROM ffgame_wc.game_sponsorships a\
 				WHERE a.is_available = 1 AND NOT EXISTS(\
-					SELECT 1 FROM ffgame.game_team_sponsors b\
+					SELECT 1 FROM ffgame_wc.game_team_sponsors b\
 					WHERE b.game_team_id = ? AND b.sponsor_id = a.id LIMIT 1\
 				) \
 				LIMIT 100;",
@@ -56,7 +56,7 @@ function applySponsorship(game_id,matchday,game_team_id,sponsor_id,callback){
 			function(callback){
 				console.log('detil sponsorship');
 				//detil sponsorship
-				conn.query("SELECT * FROM ffgame.game_sponsorships WHERE id=? LIMIT 1;",
+				conn.query("SELECT * FROM ffgame_wc.game_sponsorships WHERE id=? LIMIT 1;",
 							[sponsor_id],
 							function(err,rs){
 								try{
@@ -69,8 +69,8 @@ function applySponsorship(game_id,matchday,game_team_id,sponsor_id,callback){
 			function(sponsor_data,callback){
 				// search immediate_money perk
 				conn.query(
-					"SELECT a.* FROM ffgame.game_sponsor_perks a\
-					INNER JOIN ffgame.master_perks b \
+					"SELECT a.* FROM ffgame_wc.game_sponsor_perks a\
+					INNER JOIN ffgame_wc.master_perks b \
 					ON a.perk_id = b.id\
 					WHERE a.sponsor_id=? AND b.perk_name = 'IMMEDIATE_MONEY';",
 					[sponsor_id],
@@ -86,7 +86,7 @@ function applySponsorship(game_id,matchday,game_team_id,sponsor_id,callback){
 				});
 			},
 			function(sponsor_data,callback){
-				conn.query("SELECT * FROM ffgame.game_team_sponsors\
+				conn.query("SELECT * FROM ffgame_wc.game_team_sponsors\
 							WHERE game_team_id=? LIMIT 1",
 							[game_team_id],function(err,rs){
 					
@@ -100,7 +100,7 @@ function applySponsorship(game_id,matchday,game_team_id,sponsor_id,callback){
 			function(sponsor_data,has_sponsor,callback){
 				console.log(has_sponsor);
 				if(!has_sponsor){
-					conn.query("INSERT INTO ffgame.game_team_sponsors\
+					conn.query("INSERT INTO ffgame_wc.game_team_sponsors\
 								(game_team_id,sponsor_id,valid_for)\
 								VALUES(?,?,?)",
 								[game_team_id,sponsor_id,38],
@@ -123,7 +123,7 @@ function applySponsorship(game_id,matchday,game_team_id,sponsor_id,callback){
 					var item_name = 'Joining_Bonus';
 					//add money if available
 					if(immediate_money>0){
-						conn.query("INSERT INTO ffgame.game_team_expenditures\
+						conn.query("INSERT INTO ffgame_wc.game_team_expenditures\
 									(game_team_id,item_name,item_type,amount,game_id,\
 									match_day,item_total,base_price)\
 									VALUES\
@@ -160,8 +160,8 @@ function applySponsorship(game_id,matchday,game_team_id,sponsor_id,callback){
 function getActiveSponsors(game_team_id,callback){
 	prepareDb(function(conn){
 		conn.query("SELECT b.name,b.value,a.valid_for \
-					FROM ffgame.game_team_sponsors a\
-					INNER JOIN ffgame.game_sponsorships b\
+					FROM ffgame_wc.game_team_sponsors a\
+					INNER JOIN ffgame_wc.game_sponsorships b\
 					ON a.sponsor_id = b.id\
 					WHERE a.game_team_id = ?;",
 					[game_team_id],

@@ -1,7 +1,12 @@
 <?php
 $can_update_formation = true;
+<<<<<<< HEAD
 if(isset($close_time)):
 if(time() > $close_time['ts'] && Configure::read('debug') == 0){
+=======
+
+if(time() > @$close_time['ts'] && Configure::read('debug') == 0){
+>>>>>>> 2fc00bcb40dd75d27aca4e99db404212d833e193
    
     $can_update_formation = false;
     if(time() > $open_time){
@@ -9,7 +14,7 @@ if(time() > $close_time['ts'] && Configure::read('debug') == 0){
         $can_update_formation = true;
     }
 }else{
-    if(time() < $open_time){
+    if(time() < @$open_time){
        
         $can_update_formation = false;
     }
@@ -113,8 +118,8 @@ endif;
 
 
 <?php
- $home_logo = "http://widgets-images.s3.amazonaws.com/football/team/badges_65/".str_replace('t','',$next_match['home_id']).".png";
-  $away_logo = "http://widgets-images.s3.amazonaws.com/football/team/badges_65/".str_replace('t','',$next_match['away_id']).".png";
+ $home_logo = "http://widgets-images.s3.amazonaws.com/football/team/badges_65/".str_replace('t','',@$next_match['home_id']).".png";
+  $away_logo = "http://widgets-images.s3.amazonaws.com/football/team/badges_65/".str_replace('t','',@$next_match['away_id']).".png";
 
 if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
     if($next_match['home_id']==$club['team_id']){

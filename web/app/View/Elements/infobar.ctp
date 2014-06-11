@@ -6,7 +6,7 @@
           	<?php if(isset($next_match)):?>
             <li class="newsticker-entry">
                 <h3><a href="#" target="_blank">
-                	Pertandingan berikutnya : <?=__($next_match['home_name'])." VS ".h($next_match['away_name'])?> (Minggu ke <?=$next_match['matchday']?>) Tanggal <?=date("d/m/Y",strtotime($next_match['match_date']))?></a></h3>
+                	Pertandingan berikutnya : <?=__(@$next_match['home_name'])." VS ".h(@$next_match['away_name'])?> (Minggu ke <?=@$next_match['matchday']?>) Tanggal <?=date("d/m/Y",strtotime(@$next_match['match_date']))?></a></h3>
             </li><!-- end .newsticker-entry -->
         	<?php endif;?>
           	<?php 
@@ -23,7 +23,11 @@
           </ul><!-- end #newsticker -->
     </div>
     <?php if(time() > @$open_time):?>
+<<<<<<< HEAD
 	    <h4 id='ct1' class="fr countdown"><span class="yellow ctday">0</span> HARI  <span class="yellow cthour">0</span> JAM  <span class="yellow ctminute">0</span> MENIT ke penutupan</h4>
+=======
+	    <h4 id='ct1' class="fr countdown"><span class="yellow ctday">6</span> HARI  <span class="yellow cthour">0</span> JAM  <span class="yellow ctminute">0</span> MENIT ke penutupan</h4>
+>>>>>>> 2fc00bcb40dd75d27aca4e99db404212d833e193
 	    <h4 id='ct0' class="fr countdown" style="display:none;"><span class="yellow ctsec">0</span> DETIK ke penutupan</h4>
 	    <h4 id='ct2' class="fr countdown" style="display:none;">
 	    	<span class="yellow">Batas Waktu Set Formasi Sudah Lewat</span>

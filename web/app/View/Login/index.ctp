@@ -1,12 +1,13 @@
 <div class="tr fl" style="width:500px;" >
-	<form method="post" action="" enctype="application/x-www-form-urlencoded">
+	<?php echo $this->Session->flash();?>
+	<form method="post" action="<?=$this->Html->url('/login');?>" enctype="application/x-www-form-urlencoded">
 		<div class="row">
 	        <label>Email</label>
 	        <input type="text" name="email" >
 	    </div>
 	    <div class="row">
 	        <label>Password</label>
-	        <input type="text" name="password" >
+	        <input type="password" name="password" >
 	    </div>
 	    <div class="row">
 	        <input value="Login" class="button" type="submit">

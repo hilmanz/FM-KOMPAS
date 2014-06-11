@@ -73,9 +73,18 @@ class LoginController extends AppController {
 													'access_token'=>$this->getAccessToken()));
 						$this->afterLogin();
 					}
+					else
+					{
+						throw new Exception("");
+					}
+				}
+				else
+				{
+					throw new Exception("");
 				}
 			}catch(Exception $e){
-
+				Cakelog::write('error', 'login.index message:'.$e->getMessage());
+				$this->Session->setFlash("Username atau Password Salah !");
 			}
 		}
 	}

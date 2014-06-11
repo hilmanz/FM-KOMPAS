@@ -224,9 +224,11 @@ class ProfileController extends AppController {
 	public function register_team(){
 		$userData = $this->getUserData();
 
+
 		if(@$userData['register_completed']!=1){
 			$team = $this->Session->read('TeamRegister');
 			$this->set('previous_team',$team);
+
 			if($userData==null){
 				$this->redirect('/login/expired');
 			}
@@ -247,7 +249,16 @@ class ProfileController extends AppController {
 				$this->set('INITIAL_BUDGET',Configure::read('INITIAL_BUDGET'));
 			}
 		}else{
-			$this->redirect("/");
+			if($userData['team'] == '')
+			{
+				$teams = $this->Game->getTeams();
+				$this->set('team_list',$teams);
+				$this->set('INITIAL_BUDGET',Configure::read('INITIAL_BUDGET'));
+			}
+			else
+			{
+				$this->redirect("/");
+			}
 		}
 	}
 

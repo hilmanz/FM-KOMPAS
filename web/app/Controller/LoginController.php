@@ -181,6 +181,7 @@ class LoginController extends AppController {
 		$this->loadModel('User');
 		
 		$user_session = $this->Session->read('Userlogin.info');
+
 		//1. check if the user is already registered in database
 		$rs = $this->User->findByFb_id($user_session['fb_id']);
 		if(@$rs['User']['fb_id']==$user_session['fb_id']&&$user_session['fb_id']>0){

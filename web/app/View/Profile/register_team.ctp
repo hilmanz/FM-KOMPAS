@@ -61,14 +61,14 @@
 	            </ul>
 	        </div><!-- end .nav-side -->
 	    </div><!-- end .widget -->
-	    <div class="widget">
+	    <!--<div class="widget">
 	        <div class="cash-left">
 	            <h3 class="red">SISA UANG</h3>
 	            <h1>SS$ <?=number_format($INITIAL_BUDGET)?></h1>
 	            <h3 class="red">Est. PENGELUARAN MINGGUAN</h3>
 	            <h1>SS$ <span class="expense">0</span></h1> 
 	        </div>
-	    </div><!-- end .widget -->
+	    </div>--><!-- end .widget -->
 	</div><!-- end #sidebar -->
     </div><!-- end #thecontent -->
 </div><!-- end #fillDetailsPage -->

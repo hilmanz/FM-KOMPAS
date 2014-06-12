@@ -147,7 +147,7 @@ class ProfileController extends AppController {
 					else if($rs_user['User']['register_completed'] == 0)
 					{
 						$this->Session->write('Userlogin.is_login', true);
-						$this->redirect('/manage/register_team');
+						$this->redirect('/profile/register_team');
 					}
 					else
 					{

@@ -150,7 +150,7 @@ class LoginController extends AppController {
 				$this->redirect($fb->getLoginUrl());
 			}
 		}catch(Exception $e){
-			
+			Cakelog::write('error', 'login.facebook_auth Error facebook :'.$e->getMessage());
 			$this->redirect("/login/error?e=1");
 		}
 		die();

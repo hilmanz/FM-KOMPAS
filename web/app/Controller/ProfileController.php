@@ -494,6 +494,13 @@ class ProfileController extends AppController {
 								  'register_completed'=>0,
 								  'activation_code' => date("Ymdhis").rand(100, 999)
 								  );
+
+					$this->Session->write('Userlogin.info',array('fb_id'=>$user_fb['id'],
+											'username'=>'',
+											'name'=>$this->request->data['name'],
+											'role'=>1,
+											'access_token'=>$this->getAccessToken()));
+					
 					//make sure that the fb_id is unregistered
 					$check = $this->User->findByFb_id($user_fb['id']);
 					//make sure that the email is not registered yet.

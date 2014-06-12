@@ -14,7 +14,7 @@
                             <?php
                             $init_team_name = (isset($previous_team)) ? $previous_team['team_name'] : $USER_DATA['name'].' FC';
                             ?>
-                            <input type="text" name="team_name" value="<?=htmlspecialchars($init_team_name)?>"/>
+                            <input maxlength="20" type="text" name="team_name" value="<?=htmlspecialchars($init_team_name)?>"/>
                            
                             <span class="icon_available check"></span>
 

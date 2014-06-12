@@ -75,12 +75,12 @@ class LoginController extends AppController {
 					}
 					else
 					{
-						throw new Exception("");
+						throw new Exception("Did not match");
 					}
 				}
 				else
 				{
-					throw new Exception("");
+					throw new Exception("error sql");
 				}
 			}catch(Exception $e){
 				Cakelog::write('error', 'login.index message:'.$e->getMessage());
@@ -192,6 +192,7 @@ class LoginController extends AppController {
 
 		//1. check if the user is already registered in database
 		$rs = $this->User->findByFb_id($user_session['fb_id']);
+
 		if(@$rs['User']['fb_id']==$user_session['fb_id']&&$user_session['fb_id']>0){
 			$user_session['fb_id'] = $rs['User']['fb_id'];
 			$user_session['username'] = $rs['User']['name'];

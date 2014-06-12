@@ -506,7 +506,7 @@ class ProfileController extends AppController {
 					//make sure that the email is not registered yet.
 					$check2 = $this->User->findByEmail($this->request->data['email']);
 
-					$user_data = $check2['User'];
+					$user_data = @$check2['User'];
 					if(isset($check['User']) && $check2['User']['register_completed'] != 0){
 						$user_data = $check['User'];
 						$this->Session->destroy();

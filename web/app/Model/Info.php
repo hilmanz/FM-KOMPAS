@@ -53,7 +53,7 @@ class Info extends AppModel {
 		
 		//player 1
 		preg_match('/(\@p1_[0-9]+)/i',$post,$matches);
-		$user_id = intval(str_replace("@p1_","",$matches[0]));
+		$user_id = intval(str_replace("@p1_","",@$matches[0]));
 		$player[] = $user_id;
 
 		//player 2

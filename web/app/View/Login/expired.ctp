@@ -1,7 +1,26 @@
 <div class="fbexpired">
 	<div class="box tr last">
-		<h3>Maaf, sesi login sudah habis,<br/> mohon login-ulang menggunakan Facebook.</h3>
-		<a href="javascript:fb_login();" class="boxButton loginFacebook">&nbsp;</a>
+		<h3>Maaf, sesi login sudah habis,<br/> mohon login-ulang.</h3>
+    <div id="loginContainer">
+    <div id="login">
+          <form method="post" action="<?=$this->Html->url('/login')?>" enctype="application/x-www-form-urlencoded">
+              <div class="row">
+                  <label>Email</label>
+                  <input name="email" type="text">
+              </div>
+              <div class="row">
+                  <label>Password</label>
+                  <input name="password" type="password">
+              </div>
+              <div class="row">
+                  <input value="Login" class="button" type="submit">
+              </div>
+          </form>
+      </div>
+      <div id="loginFB">
+          <a href="javascript:fb_login();" class="boxButton loginFacebook">&nbsp;</a>
+      </div>
+  </div>
 	</div><!-- end .box -->
 </div>
 <!-- -->

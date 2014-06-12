@@ -29,7 +29,7 @@
 								<th>Posisi</th>
                                 <th>Tgl.Lahir</th>
                                 <th>Usia</th>
-                                <th>Negara Asal</th>
+                                <th>Stars</th>
                                 <!--<th>Gaji</th>-->
 							  </tr>
 							 </thead>
@@ -186,7 +186,7 @@ function populatePlayers(team_id,response){
     <td><%=pos_code%></td>
     <td><%=birthday%></td>
     <td><%=age%></td>
-    <td><%=country%></td>
+    <td><%=transfer_value%> Star</td>
     <!--<td><%=number_format(salary)%></td>-->
   </tr>
 </script>

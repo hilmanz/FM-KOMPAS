@@ -651,11 +651,11 @@ class ProfileController extends AppController {
 
 		# Instantiate the client.
 		$mgClient = new Mailgun('key-9oyd1c7638c35gmayktmgeyjhtyth5w0');
-		$domain = "sandbox6048e62f52c444e28b8529f4e62f0c1e.mailgun.org";
+		$domain = "mg.supersoccer.co.id";
 
 		# Make the call to the client.
 		$result = $mgClient->sendMessage($domain, array(
-		    'from'    => 'Kode Aktivasi <me@samples.mailgun.org>',
+		    'from'    => 'supersoccer <postmaster@mg.supersoccer.co.id>',
 		    'to'      => '<'.$data['email'].'>',
 		    'subject' => 'Kode Aktivasi',
 		    'html'    => $body

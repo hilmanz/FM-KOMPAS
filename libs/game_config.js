@@ -118,7 +118,7 @@ exports.formations = {
 }
 
 //initial amount of money the user will have.
-exports.initial_money = 0;
+exports.initial_money = 100;
 exports.sponsorship_chance = 0.4;
 exports.end_of_match_bonus = {
 	all_lineup_played: 20,

@@ -9,6 +9,7 @@ var config = require(path.resolve('./config')).config;
 var mysql = require('mysql');
 var S = require('string');
 var initial_money = require(path.resolve('./libs/game_config')).initial_money;
+var team_stars	= require(path.resolve('./libs/game_config')).team_stars;
 var pool = {};
 function prepareDb(callback){
 
@@ -168,7 +169,7 @@ function create(data,callback){
 								(user_id,team_id,created_date,n_status)\
 								VALUES\
 								(?,?,NOW(),1);",[user.id,data.team_id],function(err,rs){
-									//console.log(this.sql);
+									console.log(this.sql);
 									if(err){
 										console.log(err.message);
 									}
@@ -192,7 +193,7 @@ function create(data,callback){
 							d.push(data.players[i]);
 						}
 						conn.query(sql,d,function(err,rs){
-							//console.log(this.sql);
+							console.log(this.sql);
 							callback(err,result.insertId);
 						});
 					}else{
@@ -200,12 +201,11 @@ function create(data,callback){
 					}
 				},
 				function(game_team_id,callback){
-
 					if(game_team_id!=null){
 						conn.query(
 							"INSERT IGNORE INTO ffgame_wc.game_team_purse(game_team_id,budget)\
 							 VALUES(?,?)"
-						,[game_team_id,initial_money],
+						,[game_team_id,initial_money-team_stars[data.team_id]],
 						function(err,rs){
 							callback(err,game_team_id);
 						});

@@ -235,6 +235,7 @@ class LeaderboardController extends AppController {
 
 	}
 	public function overall(){
+		$this->render('offline');
 		$this->loadModel("Point");
 	    $this->loadModel('User');
 	    $this->Point->virtualFields['TotalPoints'] = '(Point.points + Point.extra_points)';

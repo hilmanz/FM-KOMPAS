@@ -38,15 +38,15 @@
                     </div>
                     <div class="row">
                         <label>Nama Lengkap</label>
-                        <input type="text" name="name" value="<?=h($user['name'])?>"/>
+                        <input type="text" name="name" value="<?=h($user['name'])?>" maxlength="30"/>
                     </div><!-- end .row -->
                     <div class="row">
                         <label>Nama Klab</label>
-                        <input type="text" name="team_name" value="<?=h($team['team_name'])?>"/>
+                        <input maxlength="20" type="text" name="team_name" value="<?=h($team['team_name'])?>"/>
                     </div><!-- end .row -->
                     <div class="row">
                         <label>Email</label>
-                        <input type="text" name="email" value="<?=h($user['email'])?>"/>
+                        <input type="text" name="email" value="<?=h($user['email'])?>" READONLY/>
                     </div><!-- end .row -->
                     <div class="row">
                         <label>Nomor HP</label>

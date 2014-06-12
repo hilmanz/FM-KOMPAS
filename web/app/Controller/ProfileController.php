@@ -143,7 +143,14 @@ class ProfileController extends AppController {
 						if($this->send_mail($rs_user['User'])){
 							$this->redirect('/profile/activation');
 						}
-					}else{
+					}
+					else if($rs_user['User']['register_completed'] == 0)
+					{
+						$this->Session->write('Userlogin.is_login', true);
+						$this->redirect('/manage/register_team');
+					}
+					else
+					{
 						$this->Session->write('Userlogin.is_login', true);
 						$this->redirect('/manage/team');
 					}

@@ -203,7 +203,7 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
                             </td>
                             <td>
                                 <span>Rank: <strong><?=number_format($USER_RANK)?></strong></span>
-                                <span>Uang: <strong>ss$ <?=number_format($team_bugdet)?></strong></span>
+                                <span>Stars: <strong><?=number_format($team_bugdet)?> Star</strong></span>
                                 <span>Point: <strong><?=number_format($USER_POINTS)?></strong></span>
                             </td>
                           </tr>

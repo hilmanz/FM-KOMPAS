@@ -95,7 +95,7 @@
                         	<a href="<?=$this->Html->url('/manage/team')?>">Mengelola Tim</a>
                         </li>
                     	<li>
-                        	<a href="<?=$this->Html->url('/manage/club')?>">Klab Saya</a>
+                        	<a href="<?=$this->Html->url('/manage/club')?>">Negara Saya</a>
                             <ul>
                             	<li><a href="<?=$this->Html->url('/manage/club')?>#tabs-Info">Info</a></li>
                             	<!--<li><a href="<?=$this->Html->url('/manage/club')?>#tabs-Money">Keuangan</a></li>-->
@@ -114,7 +114,7 @@
                         <li>
                             <a href="<?=$this->Html->url('/merchandises')?>">Online Catalog</a>
                         </li>
-                    	<li><a href="<?=$this->Html->url('/pages/faq')?>">Bantuan & FAQ</a></li>
+                    	<!--<li><a href="<?=$this->Html->url('/pages/faq')?>">Bantuan & FAQ</a></li>-->
                     </ul>
                 </div>
 			<?php else:?>

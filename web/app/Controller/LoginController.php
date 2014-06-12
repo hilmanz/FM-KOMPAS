@@ -210,6 +210,9 @@ class LoginController extends AppController {
 					    array('controller' => 'profile', 'action' => 'send_mail'),
 					         array('data_request' => $rs['User'])
 					    );
+
+				//print_r($rs['User']);
+				//exit();
 				$this->Session->write('Userlogin.is_login', false);
 				$this->redirect('/profile/activation');
 			}else if($rs['User']['password'] == ""){

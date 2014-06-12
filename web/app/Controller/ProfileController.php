@@ -265,14 +265,13 @@ class ProfileController extends AppController {
 		$user_fb = $this->Session->read('UserFBDetail');
 
 		$this->loadModel('User');
+		$rs_user = $this->User->findByFb_id($user_fb['id']);
 
-		$this->set('user_data', $user_fb);
+		$this->set('user_data', $rs_user['User']);
 
 		if($this->request->is("post"))
 		{
 			$act_code = trim(Sanitize::clean($this->request->data['act_code']));
-
-			$rs_user = $this->User->findByFb_id($user_fb['id']);
 
 			if($act_code == $rs_user['User']['activation_code'])
 			{

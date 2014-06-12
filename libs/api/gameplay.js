@@ -1962,8 +1962,30 @@ function getCash(game_team_id,done){
 							WHERE game_team_id=? LIMIT 1;",
 				[game_team_id],
 				function(err,rs){
+
 					try{
-						callback(err,{status:1,cash:rs[0].cash});
+						if(rs.length==0){
+							conn.query("INSERT IGNORE INTO ffgame_wc.game_team_cash\
+										(game_team_id,cash)\
+										SELECT ?,cash \
+										FROM ffgame_wc.old_cash a \
+										WHERE EXISTS (SELECT 1 FROM ffgame_wc.game_teams b\
+										INNER JOIN ffgame_wc.game_users c ON b.user_id = c.id \
+										WHERE b.id = ? AND c.fb_id = a.fb_id LIMIT 1);",[game_team_id,game_team_id],function(err,rs){
+											conn.query("SELECT cash FROM ffgame_wc.game_team_cash \
+														WHERE game_team_id=? LIMIT 1;",
+														[game_team_id],function(err,last_rs){
+															if(last_rs.length > 0){
+																callback(err,{status:1,cash:last_rs[0].cash});
+															}else{
+																callback(err,{status:1,cash:0});
+															}
+															
+														});
+										});
+						}else{
+							callback(err,{status:1,cash:rs[0].cash});
+						}
 					}catch(e){
 						callback(err,{status:1,cash:0});
 					}

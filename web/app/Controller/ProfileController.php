@@ -256,6 +256,7 @@ class ProfileController extends AppController {
 	public function activation()
 	{
 		$user_fb = $this->Session->read('UserFBDetail');
+
 		$this->loadModel('User');
 
 		$this->set('user_data', $user_fb);
@@ -263,6 +264,7 @@ class ProfileController extends AppController {
 		if($this->request->is("post"))
 		{
 			$act_code = trim(Sanitize::clean($this->request->data['act_code']));
+
 			$rs_user = $this->User->findByFb_id($user_fb['id']);
 
 			if($act_code == $rs_user['User']['activation_code'])
@@ -303,15 +305,12 @@ class ProfileController extends AppController {
 			foreach($players_selected as $p){
 				$players[] = $p['uid'];
 			}
-			/*
-			foreach($players as $n=>$p){
-					$players[$n] = Sanitize::clean(trim($p));
-			}
-			*/
+
 			$data['players'] = json_encode($players);
 
 
 			$result = $this->Game->create_team($data);
+
 			
 			if(isset($result['error'])){
 				$this->Session->setFlash('Maaf, Anda tidak dapat membentuk tim lagi. Nampaknya Anda sudah melakukan pembentukan tim sebelumnya.');
@@ -451,6 +450,7 @@ class ProfileController extends AppController {
 			$user_fb = $this->Session->read('UserFBDetail');
 			$this->set('user',$user_fb);
 			$this->set('phone_empty',false);
+
 			if($user_fb['id']==null){
 				$this->Session->setFlash('Mohon maaf, tidak berhasil login menggunakan akun facebook kamu. 
 															Silahkan coba kembali beberapa saat lagi!');
@@ -500,38 +500,44 @@ class ProfileController extends AppController {
 											'name'=>$this->request->data['name'],
 											'role'=>1,
 											'access_token'=>$this->getAccessToken()));
-					
+
 					//make sure that the fb_id is unregistered
 					$check = $this->User->findByFb_id($user_fb['id']);
 					//make sure that the email is not registered yet.
 					$check2 = $this->User->findByEmail($this->request->data['email']);
 
-					
-					if(isset($check['User'])){
+					$user_data = $check2['User'];
+					if(isset($check['User']) && $check2['User']['register_completed'] != 0){
+						$user_data = $check['User'];
 						$this->Session->destroy();
 						$this->Session->setFlash('Mohon maaf, akun kamu sudah terdaftar sebelumnya. !');
 						$this->redirect('/profile/error');
 					}else if(isset($check2['User']) 
-								&& $check2['User']['email'] == $this->request->data['email']){
+								&& $check2['User']['email'] == $this->request->data['email']
+								&& $check2['User']['register_completed'] != 0){
 						$this->Session->destroy();
 						$this->Session->setFlash('Mohon maaf, akun email ini `'.Sanitize::html($this->request->data['email']).'` sudah terdaftar sebelumnya. Silahkan menggunakan alamat email yang lain !');
 						$this->redirect('/profile/error');
 					}else{
-						$this->User->create();
-						$rs = $this->User->save($data);
+						if(!isset($check2['User'])){
+							$this->User->create();
+							$rs = $this->User->save($data);
+							$user_data = $rs['User'];
+						}
 						
-						if(isset($rs['User'])){
+						if(isset($rs['User']) || isset($check2['User'])){
 
 							//register user into gameAPI.
 							$response = $this->ProfileModel->setProfile($data);
 
-							if($response['status']==1){
+
+							if($response['status']==1 || $check2['User']['register_completed'] == 0){
 								//send info
-								$msg = "@p1_".$rs['User']['id']." sudah terdaftar dalam fantasy football.";
+								$msg = "@p1_".$user_data['id']." sudah terdaftar dalam fantasy football.";
 								$this->Info->write('new player',$msg);
 
-								if($rs['User']['n_status'] == 0){
-									if($this->send_mail($rs['User']))
+								if(@$rs['User']['n_status'] == 0 || $user_data['n_status'] == 0){
+									if($this->send_mail($user_data))
 									{
 										$this->redirect("/profile/activation");
 									}

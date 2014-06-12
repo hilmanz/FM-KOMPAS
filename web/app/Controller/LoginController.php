@@ -91,9 +91,16 @@ class LoginController extends AppController {
 
 	public function register()
 	{
-		//print_r($this->Session->read());
 		if($this->request->is('post')){
+			$this->loadModel('User');
+			$email = trim(Sanitize::clean($this->request->data['email']));
+			$rs_user = $this->User->findByEmail($email);
+
 			$fb_id = date("Ymdhis").rand(1000, 9999);
+			if(isset($rs_user['User']['email'])){
+				$fb_id = $rs_user['User']['fb_id'];
+			}
+
 			$birthday = $this->request->data['bod_dt'].'/'.$this->request->data['bod_mt']
 						.'/'.$this->request->data['bod_yr'];
 
@@ -101,6 +108,7 @@ class LoginController extends AppController {
 					'id' => $fb_id,
 					'email' => $this->request->data['email']
 				);
+
 			$this->Session->write('UserFBDetail',$me);
 			$this->Session->write('Userlogin.is_login', true);
 			$this->Session->write('Userlogin.info',array('fb_id'=>$fb_id,

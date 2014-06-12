@@ -27,7 +27,12 @@ class MarketController extends AppController {
 		$this->loadModel('User');
 		$userData = $this->getUserData();
 		$user = $this->userDetail;
+
 		$this->set('user',$user['User']);
+
+		
+		$this->set('my_team',$user['Team']);
+
 		if(!$this->hasTeam()){
 			$this->redirect('/login/expired');
 		}

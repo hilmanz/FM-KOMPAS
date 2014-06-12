@@ -488,6 +488,7 @@ a.download-appstore{
 	font-size:24px;
 }
 .squad-team{
+	background-color: #80B241;
 	min-height:750px;
 	position:relative;
 	margin:0 0 2px 0;
@@ -579,7 +580,7 @@ a.download-appstore{
     font-size: 10px;
 }
 .jersey-player a{
-	color:#333;
+	color:#fff;
 }
 .jersey{
 	width:46px; height:46px;

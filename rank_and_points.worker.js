@@ -82,7 +82,7 @@ http.request(options, function(response){
 								WHERE id = ?",
 								[resp.data.id],function(err,rs){
 									console.log('RANK-WORKER-'+bot_id,'flag queue as done');
-									conn.end(function(err){
+									conn.release();
 										dt = new Date();
 										var close_time = dt.getTime();
 										console.log('TIME','CLOSE : ',close_time);
@@ -92,7 +92,7 @@ http.request(options, function(response){
 											console.log('RANK-WORKER-'+bot_id,'database pool closed');
 										});
 										
-									});
+									
 									
 								});
 					

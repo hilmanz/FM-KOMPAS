@@ -19,7 +19,7 @@ function profileLoaded(widget, data, id){
         });
 }
 _optaParams.callbacks = [profileLoaded];
-var my_club = "<?=h($club['team_name'])?>";
+var my_club = "<?=h($my_team['team_name'])?>";
 var club_url = "<?=$this->Html->url('/market/team/'.$data['player']['original_team_id'])?>";
 <?php
 if(isset($data['daily_stats'])):

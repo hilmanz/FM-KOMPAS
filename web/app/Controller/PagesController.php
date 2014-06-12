@@ -114,6 +114,9 @@ class PagesController extends AppController {
 			$this->layout="mobile";
 		}else if($path[0]=='home'){
 			$this->getHomeContent();
+		}else if($path[0]=='coming_soon'){
+			$this->set('disable_login',true);
+			$this->layout="default";
 		}
 		$this->render(implode('/', $path));
 	}
@@ -173,6 +176,7 @@ class PagesController extends AppController {
 			    	$rs[$n]['Point'] = $rs[$n]['Weekly_point'];
 			    	$rs[$n]['Team'] = $poin['Team'];
 			    	//get manager's name
+
 			    	$manager = $this->User->findById($poin['Team']['user_id']);
 			    	$game_team = $this->Game->query("SELECT b.id as id FROM ffgame.game_users a
 								INNER JOIN ffgame.game_teams b

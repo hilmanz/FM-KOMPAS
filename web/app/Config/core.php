@@ -384,7 +384,7 @@ Configure::write('PO_ADMIN_FEE',50000);
 
 
 //Merchandise page settings
-Configure::write('MERCHANDISE_ENABLE',true);
+Configure::write('MERCHANDISE_ENABLE',false);
 
 //Ticket Category
 Configure::write('ticket_category_id',8);

@@ -77,10 +77,12 @@
                 <?php else:?>
           			 <div id="header">
             		 <a id="logo" href="<?=$this->Html->url('/')?>" title="SUPER SOCCER - FANTASY FOOTBALL LEAGUE">&nbsp;</a>
+                     <?php if(!isset($disable_login)):?>
                     <div id="loginbox">
                         <a href="<?=$this->Html->url('/login');?>" class="boxButton loginBtn">&nbsp;</a>
                         <a href="<?=$this->Html->url('/login/register');?>" class="boxButton createAccount">&nbsp;</a>
                     </div>
+                    <?php endif;?>
          		     </div><!-- end #header -->
           		<?php endif;?>
             <div id="container">

@@ -22,6 +22,7 @@
 App::uses('AppController', 'Controller');
 App::uses('Sanitize', 'Utility');
 App::uses('File', 'Utility');
+App::uses('CakeEmail', 'Network/Email');
 require_once APP . 'Vendor' . DS. 'Thumbnail.php';
 
 //we use password-hash for dealing with wordpress's password hash
@@ -644,12 +645,20 @@ class ProfileController extends AppController {
 			$data = $this->request->data_request;
 		}
 
-		$body = $view->element('email_activation',array(
-										'activation_code'=> $data['activation_code'],
-									));
+		$Email = new CakeEmail();
+		$result = $Email->template('email_activation')
+    			->emailFormat('html')
+    			->viewVars(array('activation_code'=> $data['activation_code']))
+    			->from(array('soccerdesk@supersoccer.co.id' => 'supersoccer '))
+			    ->to($data['email'])
+			    ->emailFormat('html')
+			    ->subject('Kode Aktivasi')
+			    ->send();
+
+		//Cakelog::write('debug', 'Email Result '.json_encode($result));
 
 		# Instantiate the client.
-		$mgClient = new Mailgun('key-9oyd1c7638c35gmayktmgeyjhtyth5w0');
+		/*$mgClient = new Mailgun('key-9oyd1c7638c35gmayktmgeyjhtyth5w0');
 		$domain = "mg.supersoccer.co.id";
 
 		# Make the call to the client.
@@ -658,11 +667,11 @@ class ProfileController extends AppController {
 		    'to'      => '<'.$data['email'].'>',
 		    'subject' => 'Kode Aktivasi',
 		    'html'    => $body
-		));
-		if($result->http_response_code == 200){
+		));*/
+		//if($result->http_response_code == 200){
 			return true;
-		}
+		//}
 
-		return false;
+		//return false;
 	}
 }

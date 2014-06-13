@@ -120,7 +120,7 @@ a.download-appstore{
     overflow: hidden;
     padding: 10px;
 	background:#fff;
-    margin: 0 0 20px 0;
+    margin: 20px 0 20px 0;
 }
 #header2{
 	height:120px;
@@ -143,9 +143,12 @@ a.download-appstore{
 }
 #brazil-edition{
     background: url(../images/worldcup/braziledition.png) no-repeat;
-    width: 519px; height: 47px;
-    margin: 20px auto;
-    display:block;
+    width: 400px;
+    height: 47px;
+    margin: 25px 0 0 80px;
+    display: block;
+    background-size: 400px;
+    float: left;
 }
 #user-info{
 	float:right;
@@ -383,13 +386,14 @@ a.download-appstore{
 	display:table;
 	width:100%;
 	padding:20px 0;
-	border-bottom:solid 1px #742d2d;
+	border-bottom:solid 1px #ddd;
+    margin: 0 0 10px 0;
 }
 .row-3{
 	clear:both;
 	padding:0 0 20px 0;
 	margin:0 0 20px 0;
-	border-bottom:solid 1px #742d2d;
+	border-bottom:solid 1px #ddd;
 }
 .whites{
 	color:#333;
@@ -580,7 +584,7 @@ a.download-appstore{
     font-size: 10px;
 }
 .jersey-player a{
-	color:#fff;
+	color:#333;
 }
 .jersey{
 	width:46px; height:46px;
@@ -786,7 +790,6 @@ a.download-appstore{
 }
 .row{
 	clear:both;
-    border-bottom: solid 1px #ddd;
 	padding:15px 0;
 	overflow:hidden;
 }
@@ -1841,7 +1844,7 @@ h3.tabtitle{
 }
 #starterTeam .flex-direction-nav .flex-prev{
 	background:url(../images/arrow_top.png) no-repeat;
-	top:85px;
+	top:70px;
 	left:122px;
 }
 #starterTeam .flex-direction-nav .flex-next{

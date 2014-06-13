@@ -40,7 +40,6 @@
    	<div id="flag"></div>
  	<div id="body">
         <div id="universal">
-                <a id="brazil-edition" href="<?=$this->Html->url('/manage/team')?>" title="BRAZIL EDITION">&nbsp;</a>
                 <?php if($USER_IS_LOGIN):?>
                      <?php
                         
@@ -48,6 +47,7 @@
                      ?>
           			 <div id="header">
              		  	<a id="logo" href="<?=$this->Html->url('/manage/team')?>" title="SUPER SOCCER - FANTASY FOOTBALL LEAGUE">&nbsp;</a>
+                         <a id="brazil-edition" href="<?=$this->Html->url('/manage/team')?>" title="BRAZIL EDITION">&nbsp;</a>
                         <div id="user-info">
                            
                             <a href="<?=$this->Html->url('/profile')?>" class="thumb40 fl">
@@ -77,6 +77,7 @@
                 <?php else:?>
           			 <div id="header">
             		 <a id="logo" href="<?=$this->Html->url('/')?>" title="SUPER SOCCER - FANTASY FOOTBALL LEAGUE">&nbsp;</a>
+                     <a id="brazil-edition" href="<?=$this->Html->url('/manage/team')?>" title="BRAZIL EDITION">&nbsp;</a>
                      <?php if(!isset($disable_login)):?>
                     <div id="loginbox">
                         <a href="<?=$this->Html->url('/login');?>" class="boxButton loginBtn">&nbsp;</a>

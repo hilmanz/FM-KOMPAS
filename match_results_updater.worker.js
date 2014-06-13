@@ -52,12 +52,11 @@ var pool = mysql.createPool({
 		});
 
 pool.getConnection(function(err,conn){
-	conn.query("SELECT * FROM ffgame.game_fixtures \
+	conn.query("SELECT * FROM ffgame_wc.game_fixtures \
 			WHERE is_processed=0 \
 			ORDER BY id ASC LIMIT 10;",[],function(err,games){
-				conn.end(function(err){
-					generateReports(games);
-			});
+				conn.release();
+				generateReports(games);
 	});
 });
 
@@ -89,7 +88,7 @@ function generateReports(games){
 
 
 /*
-@todo generate master player performance summary ( ffgame_stats.master_player_performance)
+@todo generate master player performance summary ( ffgame_stats_wc.master_player_performance)
 */
 function process_report(game_id,done){
 	console.log('process report #',game_id);
@@ -153,7 +152,7 @@ function distribute_jobs(game_id,done){
 	pool.getConnection(function(err,conn){
 		async.waterfall([
 			function(cb){
-				conn.query("SELECT COUNT(*) AS total FROM ffgame.game_teams;",[],
+				conn.query("SELECT COUNT(*) AS total FROM ffgame_wc.game_teams;",[],
 					function(err,rs){
 						cb(err,rs[0].total);
 				});
@@ -166,7 +165,7 @@ function distribute_jobs(game_id,done){
 				var queue = [];
 				async.doWhilst(
 					function(callback){
-						conn.query("SELECT id FROM ffgame.game_teams ORDER BY id ASC LIMIT ?,?",
+						conn.query("SELECT id FROM ffgame_wc.game_teams ORDER BY id ASC LIMIT ?,?",
 						[
 							start,
 							limit
@@ -197,7 +196,7 @@ function distribute_jobs(game_id,done){
 			function(queue,cb){
 				console.log(queue);
 				async.eachSeries(queue,function(q,next){
-					conn.query("INSERT IGNORE INTO ffgame_stats.job_queue\
+					conn.query("INSERT IGNORE INTO ffgame_stats_wc.job_queue\
 					(game_id,since_id,until_id,worker_id,queue_dt,finished_dt,current_id,n_done,n_status)\
 					VALUES\
 					(?,?,?,0,NOW(),NULL,0,0,0)",
@@ -214,10 +213,10 @@ function distribute_jobs(game_id,done){
 			}
 		],
 		function(err,total_queue){
-			conn.end(function(e){
-				console.log(total_queue,'distributed');
-				done(err);
-			});
+			conn.release();
+			console.log(total_queue,'distributed');
+			done(err);
+		
 		});
 	});
 }
@@ -243,9 +242,9 @@ function reduce_perks_usage(matchday,done){
 			},
 			function(canReduce,cb){
 				if(canReduce){
-					conn.query("UPDATE ffgame.digital_perks SET available = available - 1 \
+					conn.query("UPDATE ffgame_wc.digital_perks SET available = available - 1 \
 							WHERE master_perk_id IN (\
-							SELECT id FROM ffgame.master_perks\
+							SELECT id FROM ffgame_wc.master_perks\
 							WHERE perk_name \
 							IN \
 							(\
@@ -264,9 +263,9 @@ function reduce_perks_usage(matchday,done){
 			},
 			function(canReduce,cb){
 				if(canReduce){
-					conn.query("UPDATE ffgame.digital_perks SET n_status=0,available=0\
+					conn.query("UPDATE ffgame_wc.digital_perks SET n_status=0,available=0\
 							WHERE master_perk_id IN (\
-							SELECT id FROM ffgame.master_perks\
+							SELECT id FROM ffgame_wc.master_perks\
 							WHERE perk_name \
 							IN \
 							(\
@@ -304,10 +303,10 @@ function reduce_perks_usage(matchday,done){
 			}
 		],
 		function(err,rs){
-			conn.end(function(err){
-				console.log('reduce_perks_usage','done');
-				done(err,rs);
-			});
+			conn.release();
+			console.log('reduce_perks_usage','done');
+			done(err,rs);
+		
 			
 		});
 	});

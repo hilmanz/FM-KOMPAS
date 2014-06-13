@@ -336,3 +336,5 @@ ADD COLUMN `group_name` VARCHAR(3) NULL AFTER `match_date`;
 
 ALTER TABLE `fantasy`.`users` 
 ADD COLUMN `activation_code` VARCHAR(64) NULL AFTER `birthdate`;
+
+ALTER TABLE `fantasy`.`users` ADD UNIQUE `UNIQUE_EMAIL` (`email`);

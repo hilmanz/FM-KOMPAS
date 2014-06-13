@@ -240,11 +240,12 @@ function triggerEvents(newData,oldData,done){
 			method:'POST'
 		};
 		console.log('SENDING to ',options);
-		request(options,
+		done(null,newData);
+		/*request(options,
 				function(err,response,body){
 					console.log('response : ',body);
 					done(null,newData);
-				});
+				});*/
 	}else{
 		console.log(live_events);
 		done(null,newData);
@@ -738,8 +739,8 @@ function getMatchStats(conn,game_id,done){
 
 	conn.query(
 		"SELECT player_id,b.team_id,b.first_name,b.last_name,b.known_name,stats_name,SUM(stats_value) AS total\
-		FROM optadb_wc.player_stats a\
-		INNER JOIN optadb_wc.master_player b\
+		FROM optadb.player_stats a\
+		INNER JOIN optadb.master_player b\
 		ON a.player_id = b.uid\
 		WHERE \
 		game_id = ?\
@@ -771,12 +772,12 @@ function getGoals(conn,match_info,done){
 				c.last_name AS assist_last_name,\
 				d.uid AS team_id,\
 				d.name AS team_name\
-				FROM optadb_wc.goals a \
-				INNER JOIN optadb_wc.master_player b\
+				FROM optadb.goals a \
+				INNER JOIN optadb.master_player b\
 				ON a.player_id = b.uid\
-				LEFT JOIN optadb_wc.master_player c\
+				LEFT JOIN optadb.master_player c\
 				ON a.assist_player_id = c.uid\
-				INNER JOIN optadb_wc.master_team d\
+				INNER JOIN optadb.master_team d\
 				ON a.team_id = d.uid\
 				WHERE a.game_id= ? LIMIT 30",
 					[match_info.game_id],
@@ -819,10 +820,10 @@ function getSubstitutions(conn,match_info,done){
 				conn.query("SELECT a.*,\
 					b.first_name AS suboff_first_name,b.last_name AS suboff_last_name,b.known_name AS suboff_known_name,\
 					c.first_name AS subon_first_name,c.last_name AS subon_last_name,c.known_name AS subon_known_name \
-					FROM optadb_wc.substitutions a\
-					INNER JOIN optadb_wc.master_player b\
+					FROM optadb.substitutions a\
+					INNER JOIN optadb.master_player b\
 					ON a.SubOff = b.uid \
-					INNER JOIN optadb_wc.master_player c\
+					INNER JOIN optadb.master_player c\
 					ON a.SubOn = c.uid \
 					WHERE game_id=? LIMIT 10;",
 					[match_info.game_id],
@@ -886,7 +887,7 @@ function getLineup(conn,match_info,done){
 	
 }
 function getLineupByTeamId(conn,game_id,team_id,cb){
-	conn.query("SELECT * FROM optadb_wc.playerrefs\
+	conn.query("SELECT * FROM optadb.playerrefs\
 				 WHERE game_id=? AND team_id=? ORDER BY position;",
 				 [game_id,team_id],
 				 function(err,rs){
@@ -899,10 +900,10 @@ function getMatchInfo(conn,game_id,cb){
 				SELECT a.game_id,a.home_team as home_id,a.away_team as away_id,\
 				a.home_score,a.away_score,a.period,a.matchtime,a.matchdate,\
 				a.venue_name,b.name AS home_name,c.name AS away_name,a.referee\
-				FROM optadb_wc.matchinfo a\
-				INNER JOIN optadb_wc.master_team b\
+				FROM optadb.matchinfo a\
+				INNER JOIN optadb.master_team b\
 				ON a.home_team = b.uid\
-				INNER JOIN optadb_wc.master_team c\
+				INNER JOIN optadb.master_team c\
 				ON a.away_team = c.uid\
 				WHERE a.game_id = ? LIMIT 1;",
 				[game_id],
@@ -915,7 +916,7 @@ function getMatchInfo(conn,game_id,cb){
 }
 function getCurrentMatchday(conn,done){
 	conn.query("SELECT matchday FROM \
-				optadb_wc.game_fixtures \
+				optadb.game_fixtures \
 				WHERE is_processed = 0 \
 				ORDER BY id ASC LIMIT 1;",
 				[],function(err,rs){
@@ -930,7 +931,7 @@ function getCurrentMatchday(conn,done){
 
 function getGameIdsByMatchday(conn,matchday,done){
 	conn.query("SELECT game_id,period FROM \
-				optadb_wc.game_fixtures \
+				optadb.game_fixtures \
 				WHERE competition_id = ? AND session_id = ? AND matchday = ? \
 				ORDER BY id ASC LIMIT 10;",
 				[config.competition.id,config.competition.year,matchday],function(err,rs){
@@ -1014,8 +1015,8 @@ function populateData(conn,modifiers,game_id,done){
 		},
 		function(next){
 			conn.query("SELECT a.*,b.name,b.position,b.team_id \
-						FROM optadb_wc.player_stats a\
-						INNER JOIN optadb_wc.master_player b\
+						FROM optadb.player_stats a\
+						INNER JOIN optadb.master_player b\
 						ON a.player_id = b.uid \
 						WHERE game_id=? \
 						ORDER BY a.id ASC \
@@ -1253,10 +1254,10 @@ function storeMatchInfoToRedis(conn,matchday,done){
 		function(cb){
 			conn.query("SELECT a.game_id,a.home_score,a.away_score,a.period,a.matchtime,a.matchdate,\
 						a.venue_name,b.name AS home_name,c.name AS away_name,a.referee\
-						FROM optadb_wc.matchinfo a\
-						INNER JOIN optadb_wc.master_team b\
+						FROM optadb.matchinfo a\
+						INNER JOIN optadb.master_team b\
 						ON a.home_team = b.uid\
-						INNER JOIN optadb_wc.master_team c\
+						INNER JOIN optadb.master_team c\
 						ON a.away_team = c.uid\
 						WHERE a.matchday=? LIMIT 10;",
 						[matchday],
@@ -1295,7 +1296,7 @@ function storeGameIdPlayerPointsToRedis(conn,game_id,done){
 						a.atk,a.def,a.error,\
 						a.ts,b.name,b.team_id \
 						FROM ffgame_stats_wc.master_player_progress a\
-						INNER JOIN optadb_wc.master_player b\
+						INNER JOIN optadb.master_player b\
 						ON a.player_id = b.uid \
 						WHERE game_id = ? LIMIT 10000;",
 						[game_id],
@@ -1344,8 +1345,8 @@ function storeGameIdPlayerPointsToRedis(conn,game_id,done){
 		function(cb){
 			//save the goal stats into redis cache
 			conn.query("SELECT a.time,a.team_id,a.player_id,b.name \
-						FROM optadb_wc.goals a\
-						INNER JOIN optadb_wc.master_player b \
+						FROM optadb.goals a\
+						INNER JOIN optadb.master_player b \
 						ON a.player_id = b.uid\
 						WHERE game_id = ? LIMIT 20;",
 						[game_id],function(err,rs){
@@ -1366,8 +1367,8 @@ function storeGameIdPlayerPointsToRedis(conn,game_id,done){
 		function(cb){
 			//save the playerrefs stats into redis cache
 			conn.query("SELECT a.*,b.first_name,b.last_name,b.known_name \
-						FROM optadb_wc.playerrefs a \
-						INNER JOIN optadb_wc.master_player b\
+						FROM optadb.playerrefs a \
+						INNER JOIN optadb.master_player b\
 						ON a.player_id = b.uid\
 						WHERE a.game_id=? ORDER BY a.position LIMIT 100;",
 						[game_id],
@@ -1388,7 +1389,7 @@ function storeGameIdPlayerPointsToRedis(conn,game_id,done){
 		},
 		function(cb){
 			//save the team stats into redis cache
-			conn.query("SELECT * FROM optadb_wc.team_stats WHERE game_id=? LIMIT 10000;",
+			conn.query("SELECT * FROM optadb.team_stats WHERE game_id=? LIMIT 10000;",
 						[game_id],
 						function(err,rs){
 							console.log(S(this.sql).collapseWhitespace().s);
@@ -1409,7 +1410,7 @@ function storeGameIdPlayerPointsToRedis(conn,game_id,done){
 			//save the match info into redis cache
 			conn.query("SELECT game_id,matchday,period,timezone,matchdate,\
 						matchtime,home_team,home_score,away_team,away_score \
-						FROM optadb_wc.matchinfo WHERE game_id=? LIMIT 1;",
+						FROM optadb.matchinfo WHERE game_id=? LIMIT 1;",
 						[game_id],
 						function(err,rs){
 							console.log(S(this.sql).collapseWhitespace().s);
@@ -1429,8 +1430,8 @@ function storeGameIdPlayerPointsToRedis(conn,game_id,done){
 		function(cb){
 			//save the player accumulative stats
 			conn.query("SELECT a.team_id,a.stats_name,SUM(a.stats_value) AS total\
-						FROM optadb_wc.player_stats a\
-						INNER JOIN optadb_wc.master_player b\
+						FROM optadb.player_stats a\
+						INNER JOIN optadb.master_player b\
 						ON a.player_id = b.uid \
 						WHERE game_id=? \
 						GROUP BY a.team_id,stats_name\

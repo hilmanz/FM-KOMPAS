@@ -33,7 +33,7 @@ var stat_maps = require('./libs/stats_map').getStats();
 var http = require('http');
 
 
-var match_results = require('./libs/match_results_dummy');
+var match_results = require('./libs/match_results');
 var lineup_stats = require('./libs/gamestats/lineup_stats.worker');
 var business_stats = require('./libs/gamestats/business_stats.worker');
 var ranks = require(path.resolve('./libs/gamestats/ranks'));

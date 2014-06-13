@@ -11,7 +11,7 @@ var S = require('string');
 
 //adding cash
 function adding_cash(conn,game_team_id,transaction_name,amount,details,callback){
-	conn.query("INSERT INTO ffgame.game_transactions\
+	conn.query("INSERT INTO ffgame_wc.game_transactions\
 				(game_team_id,transaction_dt,transaction_name,amount,details)\
 				VALUES\
 				(?,NOW(),?,?,?)\
@@ -28,10 +28,10 @@ exports.adding_cash = adding_cash;
 
 //updating the team's cash wallet by summing all cash amounts
 function update_cash_summary(conn,game_team_id,callback){
-	conn.query("INSERT INTO ffgame.game_team_cash\
+	conn.query("INSERT INTO ffgame_wc.game_team_cash\
 				(game_team_id,cash)\
 				SELECT game_team_id,SUM(amount) AS cash \
-				FROM ffgame.game_transactions\
+				FROM ffgame_wc.game_transactions\
 				WHERE game_team_id = ?\
 				GROUP BY game_team_id\
 				ON DUPLICATE KEY UPDATE\

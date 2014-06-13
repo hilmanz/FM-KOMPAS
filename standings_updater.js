@@ -1,5 +1,5 @@
 /*
-INSERT INTO ffgame.master_standings
+INSERT INTO ffgame_wc.master_standings
 (
 team_id,
 AGAINST,
@@ -79,29 +79,56 @@ var conn = mysql.createConnection({
 var the_file = FILE_PREFIX+'-standings.xml';
 open_the_file(the_file,function(err,doc){
 		//console.log(xmlparser.toJson(doc.toString()));
-		console.log('opening file');
+		console.log('opening file',the_file);
+		//console.log(doc.toString());
 		update_standings(JSON.parse(xmlparser.toJson(doc.toString())),onDataProcessed);
 });
 function update_standings(data,callback){
-	var teams = data.SoccerFeed.SoccerDocument.Competition.TeamStandings.TeamRecord;
-	async.eachSeries(teams,function(team,next){
-		update_data(team,function(err,rs){
-			next();	
+	console.log(data.SoccerFeed.SoccerDocument.Competition.TeamStandings[0].Round.Name.id);
+	
+	if(Array.isArray(data.SoccerFeed.SoccerDocument.Competition.TeamStandings)){
+		//kalo team record ada lebih dari satu. berarti standingsnya dibagi berdasarkan group.
+		//group A - H misalnya
+		async.eachSeries(data.SoccerFeed.SoccerDocument.Competition.TeamStandings,
+				function(record,next){
+					var teams = record.TeamRecord;
+					update_table_data(teams,record.Round.Name.id,function(err){
+						next();
+					});
+				},function(err){
+					conn.end(function(err){
+						callback(null,[]);
+						console.log('finished');
+					});
+				});
+	}else{
+		var teams = data.SoccerFeed.SoccerDocument.Competition.TeamStandings.TeamRecord;
+		console.log(teams);
+		update_table_data(teams,'',function(err){
+			conn.end(function(err){
+				callback(null,teams);
+				console.log('finished');
+			});
 		});
-	},function(err){
-		conn.end(function(err){
-			callback(null,teams);
-			console.log('finished');
-		});
-	});
+	}
+	
 }
-function update_data(team,done){
+function update_table_data(teams,group_name,done){
+	async.eachSeries(teams,function(team,next){
+			update_data(team,group_name,function(err,rs){
+				next();	
+			});
+		},function(err){
+			done(err);
+		});
+}
+function update_data(team,group_name,done){
 
 	var d = team.Standing;
 	var team_id = team.TeamRef;
 	
 	
-	conn.query("INSERT INTO ffgame.master_standings\
+	conn.query("INSERT INTO ffgame_wc.master_standings\
 				(\
 				team_id,\
 				t_against,\
@@ -128,9 +155,10 @@ function update_data(team,done){
 				points,\
 				t_position,\
 				startday_position,\
-				won\
+				won,\
+				group_name\
 				)\
-				VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)\
+				VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)\
 				ON DUPLICATE KEY UPDATE\
 				t_against = VALUES(t_against),\
 				away_against = VALUES(away_against),\
@@ -183,7 +211,8 @@ function update_data(team,done){
 				d.Points,
 				d.Position,
 				d.StartDayPosition,
-				d.Won
+				d.Won,
+				group_name
 			],
 			function(err,rs){
 				if(!err){

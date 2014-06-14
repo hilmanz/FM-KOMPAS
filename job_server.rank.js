@@ -172,9 +172,9 @@ function isUpdaterIdle(done){
 						if(rs!=null && rs.length > 0){
 							is_idle = false;
 						}
-						conn.end(function(e){
-							done(err,is_idle);
-						});
+						conn.release();
+						done(err,is_idle);
+						
 					});
 	});
 }
@@ -183,9 +183,9 @@ function assignQueue(bot_id,queue,done){
 	pool.getConnection(function(err,conn){
 		conn.query("UPDATE ffgame_stats_wc.job_queue_rank SET n_done=0,worker_id=?,n_status=1 WHERE id=?",
 					[bot_id,queue.id],function(err,rs){
-						conn.end(function(e){
+						conn.release();
 							done(err);
-						});
+						
 					});
 	});
 }
@@ -194,9 +194,9 @@ function getQueues(done){
 	pool.getConnection(function(err,conn){
 		conn.query("SELECT * FROM ffgame_stats_wc.job_queue_rank WHERE n_status=0 ORDER BY id ASC LIMIT 100;",
 					[],function(err,rs){
-						conn.end(function(e){
-							done(err,rs);
-						});
+						conn.release();
+						done(err,rs);
+						
 					});
 	});
 }
@@ -208,9 +208,9 @@ function getActiveJobs(done){
 	pool.getConnection(function(err,conn){
 		conn.query("SELECT * FROM ffgame_stats_wc.job_queue_rank WHERE n_status=1 ORDER BY id ASC LIMIT 1;",
 					[],function(err,rs){
-						conn.end(function(e){
-							done(err,rs);
-						});
+						conn.release();
+						done(err,rs);
+						
 					});
 	});
 }

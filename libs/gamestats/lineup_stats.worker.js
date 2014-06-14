@@ -556,9 +556,9 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 																		cb(err,rooster_overlimit,overlimit_penalty);
 																	});
 													}else{
-														console.log('OVERLIMIT_CHECK',
-																	total_game_players);
-														cb(null,rooster_overlimit);
+														console.log('ISSUE','OVERLIMIT_CHECK',
+																	total_game_players,'OK');
+														cb(null,rooster_overlimit,overlimit_penalty);
 													}
 												},
 												function(rooster_overlimit,penalty,cb){
@@ -600,9 +600,11 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 								],
 
 								function(err,wf_result){
+									console.log('linup_stats','done');
 									conn.query("UPDATE ffgame_stats_wc.job_queue SET current_id=?,n_done=n_done+1\
 												WHERE id = ?",
 												[item.id,queue_id],function(err,rs){
+													console.log(S(this.sql).collapseWhitespace().s);
 													callback();
 												});
 									

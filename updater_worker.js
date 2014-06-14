@@ -89,7 +89,7 @@ http.request(options, function(response){
 				console.log('DONE');
 				async.waterfall([
 					function(cb){
-						conn.query("UPDATE ffgame_stats.job_queue SET finished_dt = NOW(),n_status=2 WHERE id = ?",
+						conn.query("UPDATE ffgame_stats_wc.job_queue SET finished_dt = NOW(),n_status=2 WHERE id = ?",
 							[queue_id],function(err,rs){
 								console.log('flag queue as done');
 								cb(err);
@@ -97,7 +97,7 @@ http.request(options, function(response){
 					},
 					function(cb){
 						conn.query("INSERT IGNORE INTO\
-									ffgame_stats.job_queue_rank\
+									ffgame_stats_wc.job_queue_rank\
 									(game_id,since_id,until_id,worker_id,queue_dt,current_id,n_done,n_status)\
 									VALUES\
 									(?,?,?,0,NOW(),0,0,0);",
@@ -131,7 +131,7 @@ http.request(options, function(response){
 
 
 /*
-@todo generate master player performance summary ( ffgame_stats.master_player_performance)
+@todo generate master player performance summary ( ffgame_stats_wc.master_player_performance)
 */
 function process_report(queue_id,game_id,since_id,until_id,done){
 	console.log('process report #',game_id);

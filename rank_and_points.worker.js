@@ -20,7 +20,7 @@ var stat_maps = require('./libs/stats_map').getStats();
 var http = require('http');
 
 
-var match_results = require('./libs/match_results_dummy');
+var match_results = require('./libs/match_results');
 var lineup_stats = require('./libs/gamestats/lineup_stats.worker');
 var business_stats = require('./libs/gamestats/business_stats');
 var ranks = require(path.resolve('./libs/gamestats/ranks.worker'));
@@ -76,7 +76,7 @@ http.request(options, function(response){
 					function(err,rs){
 					
 					console.log('FINISHED');
-					conn.query("UPDATE ffgame_stats.job_queue_rank \
+					conn.query("UPDATE ffgame_stats_wc.job_queue_rank \
 								SET finished_dt = NOW(),\
 									n_status = 2 \
 								WHERE id = ?",
@@ -122,7 +122,7 @@ function process_report(conn,job,done){
 function update_points_and_ranks(job,conn,done){
 	
 	conn.query("SELECT id as game_team_id,team_id as original_team_id \
-				FROM ffgame.game_teams \
+				FROM ffgame_wc.game_teams \
 				WHERE id BETWEEN ? AND ?\
 				ORDER BY id ASC LIMIT ?;",
 				[
@@ -174,7 +174,7 @@ function apply_perks(conn,teams,done){
 			function(cb){
 				conn.query("SELECT matchday \
 							FROM \
-							ffgame_stats.game_team_player_weekly \
+							ffgame_stats_wc.game_team_player_weekly \
 							WHERE game_team_id=? ORDER BY matchday DESC LIMIT 1;",
 							[team.game_team_id],function(err,rs){
 								console.log('PERK',console.log(S(this.sql).collapseWhitespace().s));
@@ -192,7 +192,7 @@ function apply_perks(conn,teams,done){
 			},
 			function(matchday,cb){
 				//get the game id
-				conn.query("SELECT game_id FROM ffgame.game_fixtures \
+				conn.query("SELECT game_id FROM ffgame_wc.game_fixtures \
 							WHERE matchday=? \
 							AND (home_id = ? OR away_id = ?) \
 							LIMIT 1;",
@@ -209,7 +209,7 @@ function apply_perks(conn,teams,done){
 							});
 			},
 			function(game_id,matchday,cb){
-				conn.query("SELECT * FROM ffgame.game_perks \
+				conn.query("SELECT * FROM ffgame_wc.game_perks \
 					WHERE game_team_id=? \
 					AND matchday=? \
 					AND n_status=0 \
@@ -269,13 +269,13 @@ function process_perks(conn,team,perks,game_id,done){
 	}
 }
 function flagPerkAsDone(conn,perk_id,done){
-	conn.query("UPDATE ffgame.game_perks SET n_status=1 WHERE id = ?",
+	conn.query("UPDATE ffgame_wc.game_perks SET n_status=1 WHERE id = ?",
 				[perk_id],function(err,rs){
 					done(err);
 				});
 }
 function perk_money_reward(conn,game_team_id,perk,game_id,done){
-	conn.query("INSERT IGNORE INTO ffgame.game_team_expenditures\
+	conn.query("INSERT IGNORE INTO ffgame_wc.game_team_expenditures\
 				(game_team_id,item_name,item_type,\
 				 amount,game_id,match_day,item_total,base_price)\
 				VALUES\
@@ -291,10 +291,10 @@ function update_team_points(conn,teams,done){
 	for(var i=0; i < teams.length;i++){
 		game_team_id.push(teams[i].game_team_id);
 	}
-	conn.query("INSERT INTO ffgame_stats.game_team_points\
+	conn.query("INSERT INTO ffgame_stats_wc.game_team_points\
 					(game_team_id,points)\
 					(SELECT game_team_id,SUM(points) AS total_points\
-					FROM ffgame_stats.game_team_player_weekly\
+					FROM ffgame_stats_wc.game_team_player_weekly\
 					WHERE game_team_id IN (?)\
 					GROUP BY game_team_id)\
 					ON DUPLICATE KEY UPDATE\

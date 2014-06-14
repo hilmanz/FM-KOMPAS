@@ -138,6 +138,7 @@ class AppController extends Controller {
 
 				
 				$next_match_ts = $this->nextMatch['match']['match_date_ts'];
+				
 				try{
 					$last_matchday = @$this->nextMatch['match']['matchday'] - 1;
 				

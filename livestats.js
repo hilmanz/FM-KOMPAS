@@ -98,7 +98,7 @@ function getGameIdsByMatchday(conn,matchday,done){
 	conn.query("SELECT game_id,period FROM \
 				optadb.game_fixtures \
 				WHERE matchday = ? \
-				ORDER BY id ASC LIMIT 10;",
+				ORDER BY id ASC LIMIT 40;",
 				[matchday],function(err,rs){
 					if(rs != null
 						 && rs.length > 0){
@@ -418,6 +418,21 @@ function storeMatchInfoToRedis(conn,matchday,done){
 							console.log(S(this.sql).collapseWhitespace().s);
 							cb(err,rs);
 						});
+		},
+		function(matches,cb){
+			conn.query("SELECT * FROM ffgame_wc.master_standings LIMIT 100;",[],function(err,rs){
+				cb(err,matches,rs);
+			});
+		},
+		function(matches,standings,cb){
+			redisClient.set('standings',JSON.stringify(standings),function(err,rs){
+				if(!err){
+					console.log('standings successfully stored');
+				}else{
+					console.log(err.message);
+				}
+				cb(err,matches);
+			});
 		},
 		function(matches,cb){
 			redisClient.set('matchinfo_'+matchday,JSON.stringify(matches),function(err,rs){

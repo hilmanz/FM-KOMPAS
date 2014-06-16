@@ -519,6 +519,14 @@ function getPlayerTeamStats(game_team_id,player_id,callback){
 	
 	
 }
+function isEmptyObject(obj) {
+  for(var prop in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+      return false;
+    }
+  }
+  return true;
+}
 /**get player daily stats relative to game_team
 */
 function getPlayerDailyTeamStats(game_team_id,player_id,player_pos,done){
@@ -526,7 +534,7 @@ function getPlayerDailyTeamStats(game_team_id,player_id,player_pos,done){
 		
 		rs = JSON.parse(rs);
 		console.log('getPlayerDailyTeamStats',typeof rs);
-		if(rs == null || (typeof rs === 'string')){
+		if(rs == null || (typeof rs === 'string') || isEmptyObject(rs)){
 			console.log('getPlayerDailyTeamStats','query data from db');
 			var pos = 'g';
 			switch(player_pos){
@@ -617,7 +625,7 @@ function getPlayerDailyTeamStats(game_team_id,player_id,player_pos,done){
 								
 							}
 						}
-						console.log(daily);
+						console.log('player daily stats ',player_id,daily);
 						callback(null,daily);
 					}
 				],
@@ -634,6 +642,7 @@ function getPlayerDailyTeamStats(game_team_id,player_id,player_pos,done){
 			});
 		}else{
 			console.log('getPlayerDailyTeamStats','query data from redis');
+			console.log('getPlayerDailyTeamStats_'+game_team_id+'_'+player_id);
 			done(err,rs);
 		}
 

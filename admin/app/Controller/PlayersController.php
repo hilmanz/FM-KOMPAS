@@ -75,7 +75,7 @@ class PlayersController extends AppController {
 
 		$matches = $this->User->query("SELECT COUNT(game_id) AS total_matches FROM 
 										(SELECT game_id 
-											FROM ffgame_stats.game_match_player_points 
+											FROM ffgame_stats_wc.game_match_player_points 
 											WHERE game_team_id={$team_data[0]['b']['id']} 
 											GROUP BY game_id) a;");
 		
@@ -90,7 +90,7 @@ class PlayersController extends AppController {
 
 		foreach($squad as $n=>$v){
 		
-			$r = $this->Game->query("SELECT COUNT(*) AS total FROM (SELECT a.game_id FROM ffgame_stats.game_match_player_points a
+			$r = $this->Game->query("SELECT COUNT(*) AS total FROM (SELECT a.game_id FROM ffgame_stats_wc.game_match_player_points a
 								INNER JOIN ffgame_wc.game_fixtures b
 								ON a.game_id = b.game_id
 								WHERE game_team_id={$team_data[0]['b']['id']}  
@@ -136,7 +136,7 @@ class PlayersController extends AppController {
 
 		$matches = $this->User->query("SELECT COUNT(game_id) AS total_matches FROM 
 										(SELECT game_id 
-											FROM ffgame_stats.game_match_player_points 
+											FROM ffgame_stats_wc.game_match_player_points 
 											WHERE game_team_id={$team_data[0]['b']['id']} 
 											GROUP BY game_id) a;");
 		
@@ -170,7 +170,7 @@ class PlayersController extends AppController {
 		$away_score = $q[0]['a']['away_score'];
 		//get the points
 		$score = $this->Game->query("SELECT SUM(points) AS total 
-										FROM ffgame_stats.game_team_player_weekly 
+										FROM ffgame_stats_wc.game_team_player_weekly 
 										WHERE game_team_id = {$game_team_id} 
 										AND matchday = {$q[0]['a']['matchday']};",false);
 		
@@ -197,7 +197,7 @@ class PlayersController extends AppController {
 		//get squads
 		$squads = $this->Game->query("SELECT a.player_id,a.matchday,b.name,b.position,a.position_no,
 										a.stats_category,a.stats_name,a.stats_value,a.points 
-										FROM ffgame_stats.game_team_player_weekly a
+										FROM ffgame_stats_wc.game_team_player_weekly a
 										INNER JOIN ffgame_wc.master_player b 
 										ON a.player_id = b.uid
 										WHERE game_team_id={$game_team_id} AND matchday={$q[0]['a']['matchday']} 
@@ -251,7 +251,7 @@ class PlayersController extends AppController {
 	}
 	private function getPreviousMatches($game_team_id,$original_team_id){
 		$rs = $this->Game->query("SELECT DISTINCT matchday 
-								  FROM ffgame_stats.game_team_player_weekly a
+								  FROM ffgame_stats_wc.game_team_player_weekly a
 								  WHERE game_team_id={$game_team_id} ORDER BY matchday LIMIT 400;",false);
 		$matches = array();
 		foreach($rs as $r){
@@ -275,7 +275,7 @@ class PlayersController extends AppController {
 			$away_score = $q[0]['a']['away_score'];
 			//get the points
 			$score = $this->Game->query("SELECT SUM(points) AS total 
-											FROM ffgame_stats.game_team_player_weekly 
+											FROM ffgame_stats_wc.game_team_player_weekly 
 											WHERE game_team_id = {$game_team_id} 
 											AND matchday = {$r['a']['matchday']};",false);
 			
@@ -313,13 +313,13 @@ class PlayersController extends AppController {
 	private function getTeamPlayerDetail($game_team_id,$player_id){
 		$stats = $this->User->query("SELECT COUNT(DISTINCT game_id) AS total_plays,SUM(points) AS total_points,
 							SUM(performance) AS total_performance 
-							FROM ffgame_stats.game_match_player_points 
+							FROM ffgame_stats_wc.game_match_player_points 
 							WHERE game_team_id = {$game_team_id} AND player_id='{$player_id}';");
 
 		$last_performance = $this->User->query("
 								SELECT game_id,SUM(points) AS total_points,
 								SUM(performance) AS total_performance 
-								FROM ffgame_stats.game_match_player_points 
+								FROM ffgame_stats_wc.game_match_player_points 
 								WHERE game_team_id = {$game_team_id} 
 								AND player_id='{$player_id}' 
 								GROUP BY game_id ORDER BY game_id DESC LIMIT 1;
@@ -410,7 +410,7 @@ class PlayersController extends AppController {
 		$str_ids = implode(',',$game_id);
 		$stats = $this->Game->query("SELECT stats_name,SUM(stats_value) as stats_value 
 									FROM 
-									 ffgame_stats.master_player_stats a
+									 ffgame_stats_wc.master_player_stats a
 									 WHERE player_id='{$player['player_id']}' 
 									 AND game_id IN ({$str_ids}) GROUP BY stats_name;
 									");
@@ -541,7 +541,7 @@ class PlayersController extends AppController {
 		unset($games);
 
 		$sql = "SELECT player_id,stats_name,SUM(stats_value) AS total 
-				FROM ffgame_stats.master_player_stats s
+				FROM ffgame_stats_wc.master_player_stats s
 				WHERE player_id='{$player['uid']}' 
 				AND game_id IN (".implode(',',$game_ids).")
 				GROUP BY stats_name;";
@@ -587,7 +587,7 @@ class PlayersController extends AppController {
 		$map = $this->getStatsCategories();
 
 		$sql = "SELECT player_id,stats_name,SUM(stats_value) AS total 
-				FROM ffgame_stats.master_player_stats s
+				FROM ffgame_stats_wc.master_player_stats s
 				WHERE player_id='{$player['uid']}'
 				GROUP BY stats_name;";
 		$rs = $this->Game->query($sql);
@@ -642,81 +642,63 @@ class PlayersController extends AppController {
       );
 
       $passing_and_attacking = array(
-              'Freekick Goal'=>'att_freekick_goal',
-              'Goal inside the box'=>'att_ibox_goal',
-              'Goal Outside the Box'=>'att_obox_goal',
-              'Penalty Goal'=>'att_pen_goal',
-              'Freekick Shots'=>'att_freekick_post',
-              'On Target Scoring Attempt'=>'ontarget_scoring_att',
-              'Shot From Outside the Box'=>'att_obox_target',
-              'big_chance_created'=>'big_chance_created',
-              'big_chance_scored'=>'big_chance_scored',
-              'goal_assist'=>'goal_assist',
-              'total_assist_attempt'=>'total_att_assist',
-              'Second Goal Assist'=>'second_goal_assist',
-              'final_third_entries'=>'final_third_entries',
-              'fouled_final_third'=>'fouled_final_third',
-              'pen_area_entries'=>'pen_area_entries',
-              'won_contest'=>'won_contest',
-              'won_corners'=>'won_corners',
-              'penalty_won'=>'penalty_won',
-              'last_man_contest'=>'last_man_contest',
-              'accurate_corners_intobox'=>'accurate_corners_intobox',
-              'accurate_cross_nocorner'=>'accurate_cross_nocorner',
-              'accurate_freekick_cross'=>'accurate_freekick_cross',
-              'accurate_launches'=>'accurate_launches',
-              'long_pass_own_to_opp_success'=>'long_pass_own_to_opp_success',
-              'successful_final_third_passes'=>'successful_final_third_passes',
-              'accurate_flick_on'=>'accurate_flick_on'
+            'goals'=>'goals',
+			'att_freekick_goal'=>'att_freekick_goal',
+			'att_pen_goal'=>'att_pen_goal',
+			'att_ibox_target'=>'att_ibox_target',
+			'att_obox_target'=>'att_obox_target',
+			'goal_assist_openplay'=>'goal_assist_openplay',
+			'goal_assist_setplay'=>'goal_assist_setplay',
+			'att_assist_openplay'=>'att_assist_openplay',
+			'att_assist_setplay'=>'att_assist_setplay',
+			'second_goal_assist'=>'second_goal_assist',
+			'big_chance_created'=>'big_chance_created',
+			'accurate_through_ball'=>'accurate_through_ball',
+			'accurate_cross_nocorner'=>'accurate_cross_nocorner',
+			'accurate_pull_back'=>'accurate_pull_back',
+			'won_contest'=>'won_contest',
+			'long_pass_own_to_opp_success'=>'long_pass_own_to_opp_success',
+			'accurate_long_balls'=>'',
+			'accurate_flick_on'=>'accurate_flick_on',
+			'accurate_layoffs'=>'accurate_layoffs',
+			'penalty_won'=>'penalty_won',
+			'won_corners'=>'won_corners',
+			'fk_foul_won'=>'fk_foul_won'
           );
 
 
       $defending = array(
-              'aerial_won'=>'aerial_won',
-              'ball_recovery'=>'ball_recovery',
-              'duel_won'=>'duel_won',
-              'effective_blocked_cross'=>'effective_blocked_cross',
-              'effective_clearance'=>'effective_clearance',
-              'effective_head_clearance'=>'effective_head_clearance',
-              'interceptions_in_box'=>'interceptions_in_box',
-              'interception_won' => 'interception_won',
-              'possession_won_def_3rd' => 'poss_won_def_3rd',
-              'possession_won_mid_3rd' => 'poss_won_mid_3rd',
-              'possession_won_att_3rd' => 'poss_won_att_3rd',
-              'won_tackle' => 'won_tackle',
-              'offside_provoked' => 'offside_provoked',
-              'last_man_tackle' => 'last_man_tackle',
-              'outfielder_block' => 'outfielder_block'
+		'duel_won'	=>	'duel_won',
+		'aerial_won'	=>	'aerial_won',
+		'ball_recovery'	=>	'ball_recovery',
+		'won_tackle'	=>	'won_tackle',
+		'interception_won'	=>	'interception_won',
+		'interceptions_in_box'	=>	'interceptions_in_box',
+		'offside_provoked'	=>	'offside_provoked',
+		'outfielder_block'	=>	'outfielder_block',
+		'effective_blocked_cross'	=>	'effective_blocked_cross',
+		'effective_head_clearance'	=>	'effective_head_clearance',
+		'effective_clearance'	=>	'effective_clearance',
+		'clearance_off_line'  	=>	'clearance_off_line'  
+
+
           );
 
       $goalkeeper = array(
-                      'dive_catch'=> 'dive_catch',
-                      'dive_save'=> 'dive_save',
-                      'stand_catch'=> 'stand_catch',
-                      'stand_save'=> 'stand_save',
-                      'cross_not_claimed'=> 'cross_not_claimed',
                       'good_high_claim'=> 'good_high_claim',
-                      'punches'=> 'punches',
-                      'good_one_on_one'=> 'good_one_on_one',
-                      'accurate_keeper_sweeper'=> 'accurate_keeper_sweeper',
-                      'gk_smother'=> 'gk_smother',
                       'saves'=> 'saves',
-                      'goals_conceded'=>'goals_conceded'
+                     
                           );
 
 
       $mistakes_and_errors = array(
-                  'penalty_conceded'=>'penalty_conceded',
-                  'red_card'=>'red_card',
-                  'yellow_card'=>'yellow_card',
-                  'challenge_lost'=>'challenge_lost',
-                  'dispossessed'=>'dispossessed',
-                  'fouls'=>'fouls',
-                  'overrun'=>'overrun',
-                  'total_offside'=>'total_offside',
-                  'unsuccessful_touch'=>'unsuccessful_touch',
-                  'error_lead_to_shot'=>'error_lead_to_shot',
-                  'error_lead_to_goal'=>'error_lead_to_goal'
+					'penalty_conceded'=>	'penalty_conceded',
+					'fk_foul_lost'=>	'fk_foul_lost',
+					'poss_lost_all'=>	'poss_lost_all',
+					'challenge_lost'=>	'challenge_lost',
+					'error_lead_to_shot'=>	'error_lead_to_shot',
+					'error_lead_to_goal'=>	'error_lead_to_goal',
+					'total_offside'=>	'total_offside'
                   );
       $map = array('games'=>$games,
                     'passing_and_attacking'=>$passing_and_attacking,

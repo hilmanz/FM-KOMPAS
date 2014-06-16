@@ -17,13 +17,11 @@
                     <div class="row">
                         <label>Email</label>
                         <?php
-                            $readonly = 'READONLY';
                             if(isset($email_empty)):
                                 $error_email = '<span class="error">harap isi dahulu.</span>';
-                                $readonly = '';
                             endif;
                         ?>
-                        <input type="text" name="email" value="<?=h(@$user['email'])?>" <?=$readonly?>/>
+                        <input type="text" name="email" value="<?=h(@$user['email'])?>" />
                         <?=@$error_email?>
                     </div><!-- end .row -->
                     <?php
@@ -32,15 +30,36 @@
                     <div class="row">
                         <label>Tanggal Lahir</label>
                         <select name="bod_dt">
-                            <option value="<?=$birthdate[0]?>"><?=$birthdate[0]?></option>
+                            <option value="0">Tanggal</option>
+                            <?php for($i=1;$i<=31;$i++): ?>
+                                <?php if($i == intval($birthdate[0])): ?>
+                                    <option selected="selected" value="<?=$i?>"><?=$i?></option>
+                                <?php else: ?>
+                                    <option value="<?=$i?>"><?=$i?></option>
+                                <?php endif; ?>
+                            <?php endfor; ?>
                         </select>
                         -
                          <select name="bod_mt">
-                            <option value="<?=$birthdate[1]?>"><?=$birthdate[1]?></option>
+                            <option value="0">Bulan</option>
+                            <?php for($i=1;$i<=12;$i++): ?>
+                                <?php if($i == intval($birthdate[1])): ?>
+                                    <option selected="selected" value="<?=$i?>"><?=$i?></option>
+                                <?php else: ?>
+                                    <option value="<?=$i?>"><?=$i?></option>
+                                <?php endif; ?>
+                            <?php endfor; ?>
                         </select>
                         -
                          <select name="bod_yr">
-                            <option value="<?=$birthdate[2]?>"><?=$birthdate[2]?></option>
+                            <option value="0">Tahun</option>
+                            <?php for($i=1930;$i<(date("Y"));$i++): ?>
+                                <?php if($i == intval($birthdate[2])): ?>
+                                    <option selected="selected" value="<?=$i?>"><?=$i?></option>
+                                <?php else: ?>
+                                    <option value="<?=$i?>"><?=$i?></option>
+                                <?php endif; ?>
+                            <?php endfor; ?>
                         </select>
                     </div><!-- end .row -->
                     <div class="row">

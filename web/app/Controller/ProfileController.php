@@ -515,16 +515,23 @@ class ProfileController extends AppController {
 
 					$user_data = @$check2['User'];
 					if(isset($check['User']) && $check2['User']['register_completed'] != 0){
+						Cakelog::write('error', 'Mohon maaf, akun kamu sudah terdaftar sebelumnya. !');
+
 						$user_data = $check['User'];
 						$this->Session->destroy();
 						$this->Session->setFlash('Mohon maaf, akun kamu sudah terdaftar sebelumnya. !');
-						$this->redirect('/profile/error');
+						//$this->redirect('/profile/error');
 					}else if(isset($check2['User']) 
 								&& $check2['User']['email'] == $this->request->data['email']
 								&& $check2['User']['register_completed'] != 0){
+
+						Cakelog::write('error', 'Mohon maaf, akun email ini `'.Sanitize::html($this->request->data['email']).'` 
+										sudah terdaftar sebelumnya. Silahkan menggunakan alamat email yang lain !');
+
 						$this->Session->destroy();
-						$this->Session->setFlash('Mohon maaf, akun email ini `'.Sanitize::html($this->request->data['email']).'` sudah terdaftar sebelumnya. Silahkan menggunakan alamat email yang lain !');
-						$this->redirect('/profile/error');
+						$this->Session->setFlash('Mohon maaf, akun email ini `'.Sanitize::html($this->request->data['email']).'` 
+							sudah terdaftar sebelumnya. Silahkan menggunakan alamat email yang lain !');
+						//$this->redirect('/profile/error');
 					}else{
 						if(!isset($check2['User'])){
 							$this->User->create();
@@ -637,6 +644,36 @@ class ProfileController extends AppController {
 		die();
 	}
 
+	public function send_activation()
+	{
+		$user_fb = $this->Session->read('UserFBDetail');
+
+		$this->loadModel('User');
+		$rs_user = $this->User->findByFb_id($user_fb['id']);
+
+		$this->set('user_data', $rs_user['User']);
+
+		if($this->request->is("post"))
+		{
+			try{
+				$data['email'] = trim(Sanitize::clean($this->request->data['email']));
+
+				$this->User->id = $rs_user['User']['id'];
+				$rs = $this->User->save($data);
+
+				$this->send_mail($rs_user['User']);
+
+				$this->set('user_data', $rs_user['User']);
+				$this->render('activation');
+
+			}catch(Exception $e){
+				Cakelog::write('error', 
+						'profile.send_activation message : '.$e->getMessage().' data :'.json_encode($user_fb));
+				$this->Session->setFlash("Terjadi Kesalahan Silahkan Coba Lagi");
+			}
+		}
+	}
+
 	public function send_mail($data = array()){
 		$view = new View($this, false);
 
@@ -645,20 +682,12 @@ class ProfileController extends AppController {
 			$data = $this->request->data_request;
 		}
 
-		$Email = new CakeEmail();
-		$result = $Email->template('email_activation')
-    			->emailFormat('html')
-    			->viewVars(array('activation_code'=> $data['activation_code']))
-    			->from(array('soccerdesk@supersoccer.co.id' => 'supersoccer '))
-			    ->to($data['email'])
-			    ->emailFormat('html')
-			    ->subject('Kode Aktivasi')
-			    ->send();
-
-		//Cakelog::write('debug', 'Email Result '.json_encode($result));
+		$body = $view->element('email_activation',array(
+										'activation_code'=> $data['activation_code'],
+									));
 
 		# Instantiate the client.
-		/*$mgClient = new Mailgun('key-9oyd1c7638c35gmayktmgeyjhtyth5w0');
+		$mgClient = new Mailgun('key-9oyd1c7638c35gmayktmgeyjhtyth5w0');
 		$domain = "mg.supersoccer.co.id";
 
 		# Make the call to the client.
@@ -667,11 +696,11 @@ class ProfileController extends AppController {
 		    'to'      => '<'.$data['email'].'>',
 		    'subject' => 'Kode Aktivasi',
 		    'html'    => $body
-		));*/
-		//if($result->http_response_code == 200){
+		));
+		if($result->http_response_code == 200){
 			return true;
-		//}
+		}
 
-		//return false;
+		return false;
 	}
 }

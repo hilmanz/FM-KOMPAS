@@ -560,6 +560,19 @@ exports.livematches = function(req,res){
 		}
 	});
 }
+exports.standings = function(req,res){
+	var client = req.redisClient;
+	client.get('standings',function(err,rs){
+
+		if(!err){
+			console.log('standings',JSON.parse(rs));
+			res.json(200,{status:1,data:JSON.parse(rs)});
+		}else{
+			console.log('standings',err.message);
+			res.send(200,{status:0});
+		}
+	});
+}
 exports.matchstatus = function(req,res){
 	gameplay.matchstatus(req.params.matchday,function(err,rs){
 		if(!err){

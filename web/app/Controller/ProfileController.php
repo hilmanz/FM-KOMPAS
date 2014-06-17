@@ -660,7 +660,7 @@ class ProfileController extends AppController {
 
 				$this->User->id = $rs_user['User']['id'];
 				$rs = $this->User->save($data);
-
+				$rs_user = $this->User->findByFb_id($user_fb['id']);
 				$this->send_mail($rs_user['User']);
 
 				$this->set('user_data', $rs_user['User']);

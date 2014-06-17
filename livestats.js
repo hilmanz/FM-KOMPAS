@@ -60,6 +60,7 @@ pool.getConnection(function(err,conn){
 			function(matchday,game_id,cb){
 				//foreach game_ids load the stats into redis cache.
 				//if there's no playerstats, we skip it
+				console.log('ini game id',game_id);
 				if(game_id.length>0){
 					storeToRedis(conn,matchday,game_id,cb);
 				}else{
@@ -384,7 +385,8 @@ function storeToRedis(conn,matchday,game_id,done){
 			function(cb){
 				storeGameIdPlayerPointsToRedis(conn,item.game_id,function(err,rs){
 					cb(err);
-				});		
+				});
+				
 			},
 			function(cb){
 				storeMatchInfoToRedis(conn,matchday,function(err,rs){
@@ -420,8 +422,25 @@ function storeMatchInfoToRedis(conn,matchday,done){
 						});
 		},
 		function(matches,cb){
-			conn.query("SELECT * FROM ffgame_wc.master_standings LIMIT 100;",[],function(err,rs){
+			conn.query("SELECT\
+						a.team_id,\
+					    a.points,\
+						a.lost,\
+						a.drawn,\
+						a.won,\
+						a.t_for as goals,\
+						a.t_against as conceded,\
+						b.name,\
+						a.t_position as group_position,\
+						a.group_name\
+					FROM\
+					    ffgame_wc.master_standings a\
+					INNER JOIN\
+					    ffgame_wc.master_team b ON a.team_id = b.uid\
+					ORDER BY\
+						group_name,group_position LIMIT 100;",[],function(err,rs){
 				cb(err,matches,rs);
+				console.log(S(this.sql).collapseWhitespace().s);
 			});
 		},
 		function(matches,standings,cb){
@@ -429,7 +448,7 @@ function storeMatchInfoToRedis(conn,matchday,done){
 				if(!err){
 					console.log('standings successfully stored');
 				}else{
-					console.log(err.message);
+					console.log('Error',err.message);
 				}
 				cb(err,matches);
 			});

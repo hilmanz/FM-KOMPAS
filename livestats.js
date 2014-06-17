@@ -183,7 +183,7 @@ function populateData(conn,modifiers,game_id,done){
 								insertPlayerStats(conn,game_id,modifiers,rs,
 								function(err,result,atk,def,error){
 									//console.log(rs);
-									console.log(result,atk,def,error);
+									
 									start+=100;
 									//console.log(result);
 									for(var s in result){
@@ -196,6 +196,7 @@ function populateData(conn,modifiers,game_id,done){
 										players[s].def += def[s];
 										players[s].error += error[s];
 									}
+									
 									next();
 								});
 							}else{
@@ -209,6 +210,7 @@ function populateData(conn,modifiers,game_id,done){
 			var items = [];
 			//console.log(players);
 			for(var i in players){
+
 				items.push({
 							player_id:i,
 							points:players[i].overall,
@@ -217,6 +219,7 @@ function populateData(conn,modifiers,game_id,done){
 							error:players[i].error
 				});
 			}
+
 			async.each(items,function(item,next){
 				conn.query("INSERT INTO \
 							ffgame_stats_wc.master_player_progress\
@@ -249,9 +252,9 @@ function insertPlayerStats(conn,game_id,modifiers,data,done){
 	async.each(data,function(player,next){
 		for(var i in stats){
 			if(stats[i]==player.stats_name){
-				if(player.player_id=='p12297'){
-					//console.log(player.name,'---',stats[i],'------',player.stats_name,'->',modifiers[player.stats_name][player.position.toLowerCase()]);	
-				}
+				//if(player.player_id=='p12297'){
+					console.log('statsmod',player.name,'---',stats[i],'------',player.stats_name,'->',modifiers[player.stats_name][player.position.toLowerCase()]);	
+				//}
 				
 				if(typeof overall[player.player_id] === 'undefined'){
 					overall[player.player_id] = 0;

@@ -145,12 +145,14 @@ class AppController extends Controller {
 					$previous_match = @$this->nextMatch['match']['previous_setup'];
 					
 					$upcoming_match = @$this->nextMatch['match']['matchday_setup'];
+					$future_match = @$this->nextMatch['match']['future_setup'];
 				}catch(Exception $e){
 					$last_matchday = 0;
 					$previous_match = null;
 					$upcoming_match = null;
+					$future_match = null;
 				}
-				
+			
 				if($previous_match!=null && $upcoming_match !=null){
 					//check the previous match backend proccess status
 					$last_match_status = $this->Session->read('last_match_status');
@@ -175,6 +177,7 @@ class AppController extends Controller {
 												));
 					}
 					
+
 					//pr($matchstatus);
 					//pr(date("Y-m-d H:i:s",time()));
 					//pr( strtotime($previous_match['start_dt']));
@@ -213,11 +216,14 @@ class AppController extends Controller {
 							if(time() < $upcoming_match['start_dt']){
 								$open_time = time();
 								//pr('yey');
+							
 							}else{
 								$open_time = strtotime($previous_match['start_dt']);
 								//pr('disini');
 								//pr($open_time);
+								
 							}
+
 							$close_time = array("datetime"=>$upcoming_match['start_dt'],
 										"ts"=>strtotime($upcoming_match['start_dt']));
 						}
@@ -262,18 +268,42 @@ class AppController extends Controller {
 					$this->openTime = $open_time;
 					$this->set('open_time',$open_time);
 				}else{
-					$close_time = array("datetime"=>$upcoming_match['start_dt'],
+
+					if(strtotime($upcoming_match['end_dt']) >= strtotime($future_match['start_dt'])){
+						//ini artinya match sebelumnya berakhir di hari yg sama atau mundur diatas jadwal pertandingan berikutnya
+						
+						//pr($previous_match);
+						if(time() < $future_match['start_dt']){
+							$open_time = time();
+							pr($open_time);
+						
+						}else{
+							$open_time = strtotime($upcoming_match['start_dt']);
+							
+							pr($open_time);
+							
+						}
+
+						$close_time = array("datetime"=>$future_match['start_dt'],
+									"ts"=>strtotime($future_match['start_dt']));
+
+					}else{
+						$close_time = array("datetime"=>$upcoming_match['start_dt'],
 										"ts"=>strtotime($upcoming_match['start_dt']));
+						//formation open time
+						$open_time = time() - (24*60*60);
+					}
+					
+					
 
 					$this->closeTime = $close_time;
 					
 					$this->set('close_time',$close_time);
 
-					//formation open time
-					$open_time = time() - (24*60*60);
+					
 					$this->openTime = $open_time;
 					$this->set('open_time',$open_time);
-
+					//pr(date("Y-m-d H:i:s",$open_time));
 				}
 				
 

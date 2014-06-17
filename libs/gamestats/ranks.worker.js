@@ -798,8 +798,10 @@ function distribute_weekly_cash(conn,teams,done){
 									});
 					},
 					function(points,c){
+						var cash_bonus = 2.5;
 						console.log('Weekly_cash','adding #',team.game_team_id,' matchday#',last_matchday,
-									 'points:',points.total_points);
+									 'points:',points.total_points, 'cash bonus : ',cash_bonus);
+
 						if(points.total_points == null || points.total_points < 0){
 							points.total_points = 0;
 						}
@@ -807,7 +809,7 @@ function distribute_weekly_cash(conn,teams,done){
 						cash.adding_cash(conn,
 							team.game_team_id,
 							team.game_team_id+'_matchday_'+last_matchday,
-							Math.floor(parseFloat(points.total_points)),
+							Math.floor(parseFloat(points.total_points) * cash_bonus),
 							'weekly cash',
 							function(err,rs){
 								if(err){

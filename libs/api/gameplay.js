@@ -114,7 +114,8 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 								WHERE a.game_team_id = ? AND a.player_id IN (?) LIMIT 16",
 								[game_team_id,players],
 								function(err,rs){
-									console.log(S(this.sql).collapseWhitespace().s);
+									//console.log(S(this.sql).collapseWhitespace().s);
+									console.log('LINEUP','game_team_lineup_'+game_team_id,S(this.sql).collapseWhitespace().s);
 									console.log(rs);
 									callback(null,rs);
 								});
@@ -133,9 +134,11 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 									callback(err,rs);
 								});
 						}else{
+							console.log('LINEUP','game_team_lineup_'+game_team_id,'invalid positions');
 							callback(new Error('invalid player positions'),[]);
 						}
 					}else{
+						console.log('LINEUP','game_team_lineup_'+game_team_id,'one or more player doesnt belong to the team');
 						callback(new Error('one or more player doesnt belong to the team'),[]);
 					}
 				},
@@ -146,6 +149,7 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 								WHERE match_status = 0 ORDER BY matchday ASC LIMIT 1;",
 								[],
 								function(err,matchday){
+								console.log('LINEUP','game_team_lineup_'+game_team_id,'matchday : ',matchday[0].matchday);
 								callback(err,rs,matchday[0].matchday);
 					});	
 				},
@@ -166,6 +170,8 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 						data.push(upcoming_matchday);
 					}
 					conn.query(sql,data,function(err,rs){
+						console.log('LINEUP','game_team_lineup_'+game_team_id,' saving lineup for matchday : ',upcoming_matchday);
+						console.log('LINEUP','game_team_lineup_'+game_team_id,S(this.sql).collapseWhitespace().s);
 									callback(err,rs,upcoming_matchday);
 					});
 				},
@@ -179,6 +185,7 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 								last_update = VALUES(last_update)",
 								[game_team_id,formation],
 								function(err,rs){
+									console.log('LINEUP','game_team_lineup_'+game_team_id,S(this.sql).collapseWhitespace().s);
 									callback(err,result,upcoming_matchday);
 								});
 				},
@@ -883,6 +890,23 @@ function next_match(team_id,done){
 									[(rs[0].matchday - 1)],
 									function(err,setup){
 										rs[0].previous_setup = setup[0];
+										callback(err,rs);
+									});
+					}catch(e){
+						callback(null,rs);
+					}
+				},
+				function(rs,callback){
+					//get the manual formation closing time for previous match.
+					try{
+						conn.query("SELECT * \
+									FROM \
+									ffgame_wc.master_matchdays \
+									WHERE matchday = ? \
+									LIMIT 1;",
+									[(rs[0].matchday) + 1],
+									function(err,setup){
+										rs[0].future_setup = setup[0];
 										callback(err,rs);
 									});
 					}catch(e){

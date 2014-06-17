@@ -62,7 +62,7 @@ exports.setLineup = function(req,res){
 				if(rs!=null){
 					res.json(200,{status:1,lineup:rs,matchday:upcoming_matchday});
 				}else{
-					res.send(200,{status:0});
+					res.send(200,{status:0,err:err.message});
 				}
 			}
 	});

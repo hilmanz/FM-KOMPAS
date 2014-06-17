@@ -166,7 +166,7 @@ exports.player_stats_category = {
 		'effective_blocked_cross',
 		'effective_head_clearance',
 		'effective_clearance',
-		'clearance_off_line'  
+		'clearance_off_line'
     ],
     goalkeeper:[
         'good_high_claim',
@@ -179,7 +179,9 @@ exports.player_stats_category = {
 		'challenge_lost',
 		'error_lead_to_shot',
 		'error_lead_to_goal',
-		'total_offside'
+		'total_offside',
+		'yellow_card',
+		'red_card'
     ]
 };
 

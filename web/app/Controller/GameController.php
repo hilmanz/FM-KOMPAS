@@ -82,7 +82,7 @@ class GameController extends AppController {
 		//$time_limit = $this->nextMatch['match']['match_date_ts']-(4*60*60);
 		
 		$time_limit = $this->closeTime['ts'];
-
+		
 		if(time() < $time_limit || Configure::read('debug') > 0){
 			if(time() > $this->openTime){
 				$userData = $this->getUserData();

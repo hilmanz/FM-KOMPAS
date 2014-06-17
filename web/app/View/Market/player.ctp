@@ -97,7 +97,9 @@ $mistakes_and_errors = array(
             'challenge_lost'=>  'challenge_lost',
             'error_lead_to_shot'=>  'error_lead_to_shot',
             'error_lead_to_goal'=>  'error_lead_to_goal',
-            'total_offside'=>   'total_offside'
+            'total_offside'=>   'total_offside',
+            'yellow_card'=>   'yellow_card',
+            'red_card'=>   'red_card'
           );
       
 $map = array('games'=>$games,

@@ -952,8 +952,8 @@ function addToHistory(game_id,team,done){
 					ffgame_wc.game_team_lineups_history\
 					(game_id,game_team_id,player_id,position_no,last_update)\
 					SELECT ? AS game_id,game_team_id,player_id,position_no,NOW() AS last_update\
-					FROM ffgame_wc.game_team_lineups WHERE game_team_id=?;",
-					[the_game_id,team.id],
+					FROM ffgame_wc.game_team_lineups WHERE game_team_id=? AND matchday = ?;",
+					[the_game_id,team.id,matchday],
 					function(err,rs){
 						console.log('ISSUE1','update lineup history ',S(this.sql).collapseWhitespace().s);
 						callback(err,rs);

@@ -208,7 +208,7 @@ function isStaffExist($staff_token,$name){
 									<tr>
 									  <th width="50" align="center">Game</th>
 									  <th class="aligncenter" width="1" align="center">Points</th>
-									  <th class="alignright">Pendapatan</th>
+									 
 									</tr>
 								  </thead>
 								  <tbody id="myplayerlist">
@@ -230,9 +230,7 @@ function isStaffExist($staff_token,$name){
 									<tr id="p50004" class="odd">
 									  <td><a class="thumbClub" href="<?=$this->Html->url('/manage/matchinfo?game_id='.$game_id).'&r='.$hidden_params?>" title="<?=h($versus)?>"><img src="http://widgets-images.s3.amazonaws.com/football/team/badges_65/<?=$versus_id?>.png"/></a></td>
 									  <td class="aligncenter"><?=ceil($points)?></td>
-									  <td class="alignright"><?=number_format($income)?>
-                      <?php if(!$is_home_game): echo "(Away)";endif;?>
-                    </td>
+									 
 									</tr>
 									<?php endforeach;endif;?>
 		                          </tbody>

@@ -157,7 +157,8 @@ class AppController extends Controller {
 					if(is_array($last_match_status)){
 						
 						if($last_match_status['ts'] + (60 * 1) < time()){
-							$matchstatus = $this->Game->getMatchStatus($previous_match['matchday']);		
+							$matchstatus = $this->Game->getMatchStatus($previous_match['matchday']);	
+
 							$this->Session->write('last_match_status',array(
 														'matchstatus'=>$matchstatus,
 														'ts'=>time()
@@ -174,7 +175,11 @@ class AppController extends Controller {
 												));
 					}
 					
-					
+					//pr($matchstatus);
+					//pr(date("Y-m-d H:i:s",time()));
+					//pr( strtotime($previous_match['start_dt']));
+					//pr(strtotime($previous_match['end_dt']));
+					//pr(strtotime($upcoming_match['start_dt']));
 					if($matchstatus['is_finished']==0){
 
 						//if the backend process is not finished,
@@ -200,6 +205,21 @@ class AppController extends Controller {
 						$matchstatus = $this->Game->getMatchStatus($previous_match['matchday']);
 						if($matchstatus['is_finished']==0){
 							$open_time += (60*60*24*30);
+
+						}else if(strtotime($previous_match['end_dt']) >= strtotime($upcoming_match['start_dt'])){
+							//ini artinya match sebelumnya berakhir di hari yg sama atau mundur diatas jadwal pertandingan berikutnya
+							//pr('foo');
+							//pr($previous_match);
+							if(time() < $upcoming_match['start_dt']){
+								$open_time = time();
+								//pr('yey');
+							}else{
+								$open_time = strtotime($previous_match['start_dt']);
+								//pr('disini');
+								//pr($open_time);
+							}
+							$close_time = array("datetime"=>$upcoming_match['start_dt'],
+										"ts"=>strtotime($upcoming_match['start_dt']));
 						}
 						
 					}else{
@@ -208,14 +228,15 @@ class AppController extends Controller {
 							//jika pertandingan belum di mulai.. maka open time itu diset berdasarkan
 							//opentime minggu lalu
 							$open_time = strtotime($previous_match['end_dt']);
-
+							//pr('belum mulai');
 						}else if(time() > strtotime($upcoming_match['start_dt'])
 								 && time() <= strtotime($upcoming_match['end_dt'])){
+							//pr('uda mulai');
 							//jika tidak, menggunakan open time berikutnya
 							$open_time = strtotime($upcoming_match['end_dt']);
 
 						}else{
-
+							//pr('entah lah');
 							$open_time = strtotime($upcoming_match['end_dt']);
 							$matchstatus = $this->Game->getMatchStatus($upcoming_match['matchday']);
 							
@@ -230,7 +251,8 @@ class AppController extends Controller {
 
 						
 					}
-
+					//pr(date('Y-m-d H:i:s',$open_time));
+					//pr($close_time);
 					$this->closeTime = $close_time;
 					
 					$this->set('close_time',$close_time);

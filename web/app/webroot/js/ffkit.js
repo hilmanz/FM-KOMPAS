@@ -167,7 +167,9 @@ function save_formation(){
 					api_post(api_url+'game/save_lineup',data,function(response){
 						if(typeof response.status !== 'undefined' &&
 								response.status==1){
-							$.fancybox.close();
+							//$.fancybox.close();
+							render_view(tplmsg,'#popup-messages .popupContent .entry-popup',
+							{title:'Formasi telah disimpan',result:'Formasi baru telah disimpan untuk pertandingan ke '+response.matchday});
 						}else if(typeof response.status !== 'undefined' &&
 								response.status==0){
 							$("#popup-messages .popupContent .entry-popup").html('');

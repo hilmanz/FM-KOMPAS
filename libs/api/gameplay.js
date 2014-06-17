@@ -140,8 +140,18 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 					}
 				},
 				function(rs,callback){
+					//get the upcoming matchday
+					conn.query("SELECT * FROM (SELECT matchday,MAX(is_processed) AS match_status \
+								FROM ffgame_wc.game_fixtures GROUP BY matchday) a \
+								WHERE match_status = 0 ORDER BY matchday ASC LIMIT 1;",
+								[],
+								function(err,matchday){
+								callback(err,rs,matchday[0].matchday);
+					});	
+				},
+				function(rs,upcoming_matchday,callback){
 					var sql = "INSERT INTO ffgame_wc.game_team_lineups\
-								(game_team_id,player_id,position_no)\
+								(game_team_id,player_id,position_no,matchday)\
 								VALUES\
 								";
 					var data = [];
@@ -149,17 +159,17 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 						if(i>0){
 							sql+=',';
 						}
-						sql+='(?,?,?)';
+						sql+='(?,?,?,?)';
 						data.push(game_team_id);
 						data.push(setup[i].player_id);
 						data.push(setup[i].no);
+						data.push(upcoming_matchday);
 					}
 					conn.query(sql,data,function(err,rs){
-									
-									callback(err,rs);
+									callback(err,rs,upcoming_matchday);
 					});
 				},
-				function(result,callback){
+				function(result,upcoming_matchday,callback){
 					//save formation
 					conn.query("INSERT INTO ffgame_wc.game_team_formation\
 								(game_team_id,formation,last_update)\
@@ -169,23 +179,23 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 								last_update = VALUES(last_update)",
 								[game_team_id,formation],
 								function(err,rs){
-									callback(err,result);
+									callback(err,result,upcoming_matchday);
 								});
 				},
-				function(result,callback){
+				function(result,upcoming_matchday,callback){
 					//reset the cache
 					redisClient.set(
 									'game_team_lineup_'+game_team_id
 									,JSON.stringify(null)
 									,function(err,lineup){
 										console.log('LINEUP','reset the cache',lineup);
-										callback(err,result);
+										callback(err,result,upcoming_matchday);
 									});
 				}
 			],
-			function(err,result){
+			function(err,result,upcoming_matchday){
 				conn.release();
-				done(err,result);	
+				done(err,result,upcoming_matchday);	
 				
 			}
 		);
@@ -1846,7 +1856,13 @@ function matchstatus(matchday,done){
 				},
 				function(matches,total_done,total_queue,callback){
 					var rs = 0;
+					/* ini cuman berlaku di EPL, di worldcup tidak berlaku */
+					/*
 					if(total_queue==0 && total_done==10){
+						rs = 1;
+					}
+					*/
+					if(total_queue==0 && total_done > 0){
 						rs = 1;
 					}
 					callback(null,rs);

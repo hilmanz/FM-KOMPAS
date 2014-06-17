@@ -53,14 +53,14 @@ exports.setLineup = function(req,res){
 	gameplay.setLineup(req.redisClient,req.body.team_id,
 						JSON.parse(req.body.players),
 						req.body.formation,
-		function(err,rs){
+		function(err,rs,upcoming_matchday){
 
 			if(err){
 				console.log(err.message);
 				handleError(res);
 			}else{
 				if(rs!=null){
-					res.json(200,{status:1,lineup:rs});
+					res.json(200,{status:1,lineup:rs,matchday:upcoming_matchday});
 				}else{
 					res.send(200,{status:0});
 				}

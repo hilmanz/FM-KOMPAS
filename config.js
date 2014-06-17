@@ -7,7 +7,7 @@ exports.config = {
 		password:'root',
 		database:'ffgame_wc',
 		frontend_schema:'fantasy',
-		optadb: 'optadb_wc'
+		optadb: 'optadb'
 	},
 	port: 3002,
 	redis:{

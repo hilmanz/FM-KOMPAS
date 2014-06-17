@@ -2206,10 +2206,10 @@ class ApiController extends AppController {
 		$response = $this->Game->livestats($game_id);
 		$data = json_decode($response,true);
 		$data['fixture']  = array(
-			'home'=>$rs[0]['b']['home_name'],
-			'away'=>$rs[0]['c']['away_name'],
-			'home_id'=>$rs[0]['a']['home_id'],
-			'away_id'=>$rs[0]['a']['away_id']
+			'home'=>@$rs[0]['b']['home_name'],
+			'away'=>@$rs[0]['c']['away_name'],
+			'home_id'=>@$rs[0]['a']['home_id'],
+			'away_id'=>@$rs[0]['a']['away_id']
 		);
 		
 		$this->set('response',$data);

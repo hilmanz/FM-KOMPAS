@@ -105,6 +105,19 @@
                         <input type="text" name="faveclub" value=""/>
                     </div><!-- end .row -->
                     <div class="row">
+                        <div>
+                          <?php echo $this->Html->image($this->Html->url(
+                              array('controller'=>'profile', 'action'=>'captcha'), true),
+                              array('id'=>'img-captcha','vspace'=>2))
+                          ?>
+                          <p><a href="#" id="a-reload">Gak kebaca? Muat ulang</a></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                      <label>Masukan kode diatas</label>
+                      <input type="text" name="captcha" value=""/>
+                    </div>
+                    <div class="row">
                         <input type="hidden" name="save" value="1"/>
                         <input type="hidden" name="step" value="1"/>
                         <input type="submit" value="Simpan &amp; Lanjutkan" class="button fr" />
@@ -144,3 +157,10 @@
 	</div><!-- end #sidebar -->
     </div><!-- end #thecontent -->
 </div><!-- end #fillDetailsPage -->
+<script>
+$('#a-reload').click(function() {
+  var $captcha = $("#img-captcha");
+    $captcha.attr('src', $captcha.attr('src')+'?'+Math.random());
+  return false;
+});
+</script>

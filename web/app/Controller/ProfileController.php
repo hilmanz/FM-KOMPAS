@@ -54,10 +54,13 @@ class ProfileController extends AppController {
  * @var array
  */
 	public $uses = array();
+	public $components = array('Captcha');
+
 	public function beforeFilter(){
 		parent::beforeFilter();
 		$userData = $this->getUserData();
 		$this->loadModel('ProfileModel');
+		$this->loadModel('Captchacode');
 		$this->ProfileModel->setAccessToken($this->getAccessToken());
 	}
 	public function hasTeam(){
@@ -66,6 +69,20 @@ class ProfileController extends AppController {
 			return true;
 		}
 	}
+
+	public function captcha(){
+		$this->autoRender = false;
+		$this->layout='ajax';
+		if(!isset($this->Captcha)){ //if Component was not loaded throug $components array()
+			$this->Captcha = $this->Components->load('Captcha', array(
+				'width' => 150,
+				'height' => 50,
+				'theme' => 'default', //possible values : default, random ; No value means 'default'
+			)); //load it
+		}
+		$this->Captcha->create();
+	}
+
 	public function index(){
 		if($this->hasTeam()){
 			$this->set('avatar_dir',Configure::read('avatar_web_dir'));
@@ -263,10 +280,10 @@ class ProfileController extends AppController {
 
 	public function activation()
 	{
-		$user_fb = $this->Session->read('UserFBDetail');
+		$user_fb = $this->Session->read('Userlogin.info');
 
 		$this->loadModel('User');
-		$rs_user = $this->User->findByFb_id($user_fb['id']);
+		$rs_user = $this->User->findByFb_id($user_fb['fb_id']);
 
 		$this->set('user_data', $rs_user['User']);
 
@@ -277,8 +294,8 @@ class ProfileController extends AppController {
 			if($act_code == $rs_user['User']['activation_code'])
 			{
 				try{
-					$this->User->query("UPDATE users SET n_status = 1 WHERE fb_id = '{$user_fb['id']}'");
-					$rs_user = $this->User->findByFb_id($user_fb['id']);
+					$this->User->query("UPDATE users SET n_status = 1 WHERE fb_id = '{$user_fb['fb_id']}'");
+					$rs_user = $this->User->findByFb_id($user_fb['fb_id']);
 					if($rs_user['User']['password'] == ''){
 						$this->Session->write('Userlogin.is_login', false);
 						$this->redirect('/profile/create_password');
@@ -449,16 +466,28 @@ class ProfileController extends AppController {
 	}
 	
 	public function register(){
-		
+
+		if($this->request->is('post'))
+		{
+			$this->Captchacode->set($this->request->data);
+			$this->Captchacode->setCaptcha($this->Captcha->getVerCode());
+
+			if(!$this->Captchacode->validates())
+			{
+				$this->Session->setFlash('Wrong Captcha Input');
+				$this->redirect('/profile/register');
+			}
+		}
+
 		if(@$this->userData['register_completed']!=1){
 			$this->loadModel('User');
 		
 			$this->set('INITIAL_BUDGET',Configure::read('INITIAL_BUDGET'));
-			$user_fb = $this->Session->read('UserFBDetail');
+			$user_fb = $this->Session->read('Userlogin.info');
 			$this->set('user',$user_fb);
 			$this->set('phone_empty',false);
 
-			if($user_fb['id']==null){
+			if($user_fb['fb_id']==null){
 				$this->Session->setFlash('Mohon maaf, tidak berhasil login menggunakan akun facebook kamu. 
 															Silahkan coba kembali beberapa saat lagi!');
 								$this->redirect('/profile/error');
@@ -477,13 +506,13 @@ class ProfileController extends AppController {
 					$secret		= md5(date("Ymdhis"));
 					$passHasher = new PasswordHash(8, true);
 					$user_pass 	= $passHasher->HashPassword($this->request->data['password'].$secret);
-					$fb_id_ori = $user_fb['id'];
+					$fb_id_ori = $user_fb['fb_id'];
 					if(isset($this->request->data['not_facebook'])){
 						$fb_id_ori = NULL;
 					}
 
 					$data = array('fb_id_ori'=>$fb_id_ori,
-								  'fb_id'=>$user_fb['id'],
+								  'fb_id'=>$user_fb['fb_id'],
 								  'name'=>$this->request->data['name'],
 								  'email'=>$this->request->data['email'],
 								  'password'=>$user_pass,
@@ -502,14 +531,14 @@ class ProfileController extends AppController {
 								  'activation_code' => date("Ymdhis").rand(100, 999)
 								  );
 
-					$this->Session->write('Userlogin.info',array('fb_id'=>$user_fb['id'],
+					$this->Session->write('Userlogin.info',array('fb_id'=>$user_fb['fb_id'],
 											'username'=>'',
 											'name'=>$this->request->data['name'],
 											'role'=>1,
 											'access_token'=>$this->getAccessToken()));
 
 					//make sure that the fb_id is unregistered
-					$check = $this->User->findByFb_id($user_fb['id']);
+					$check = $this->User->findByFb_id($user_fb['fb_id']);
 					//make sure that the email is not registered yet.
 					$check2 = $this->User->findByEmail($this->request->data['email']);
 
@@ -533,6 +562,7 @@ class ProfileController extends AppController {
 							sudah terdaftar sebelumnya. Silahkan menggunakan alamat email yang lain !');
 						//$this->redirect('/profile/error');
 					}else{
+
 						if(!isset($check2['User'])){
 							$this->User->create();
 							$rs = $this->User->save($data);
@@ -646,22 +676,36 @@ class ProfileController extends AppController {
 
 	public function send_activation()
 	{
-		$user_fb = $this->Session->read('UserFBDetail');
+		$user_fb = $this->Session->read('Userlogin.info');
 
 		$this->loadModel('User');
-		$rs_user = $this->User->findByFb_id($user_fb['id']);
+
+		$rs_user = $this->User->findByFb_id($user_fb['fb_id']);
 
 		$this->set('user_data', $rs_user['User']);
 
 		if($this->request->is("post"))
 		{
 			try{
+				$this->Captchacode->set($this->request->data);
+				$this->Captchacode->setCaptcha($this->Captcha->getVerCode());
+				$trxsess = $this->Session->read('trxsess_'.$this->request->data['trxsess']);
+				if(!$this->Captchacode->validates())
+				{
+					throw new Exception("Error Captcha Input");
+				}
+				
 				$data['email'] = trim(Sanitize::clean($this->request->data['email']));
 
 				$this->User->id = $rs_user['User']['id'];
 				$rs = $this->User->save($data);
-				$rs_user = $this->User->findByFb_id($user_fb['id']);
-				$this->send_mail($rs_user['User']);
+				$rs_user = $this->User->findByFb_id($user_fb['fb_id']);
+
+				if($trxsess != 1){
+					$this->send_mail($rs_user['User']);
+				}
+
+				$this->Session->write('trxsess_'.$this->request->data['trxsess'],1);
 
 				$this->set('user_data', $rs_user['User']);
 				$this->render('activation');

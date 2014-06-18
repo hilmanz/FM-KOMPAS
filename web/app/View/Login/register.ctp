@@ -77,6 +77,19 @@
                 <input type="text" name="faveclub" value=""/>
             </div><!-- end .row -->
             <div class="row">
+                <div>
+                  <?php echo $this->Html->image($this->Html->url(
+                      array('controller'=>'profile', 'action'=>'captcha'), true),
+                      array('id'=>'img-captcha','vspace'=>2))
+                  ?>
+                  <p><a href="#" id="a-reload">Gak kebaca? Muat ulang</a></p>
+                </div>
+            </div>
+            <div class="row">
+              <label>Masukan kode diatas</label>
+              <input type="text" name="captcha" value=""/>
+            </div>
+            <div class="row">
                 <input type="hidden" name="not_facebook" value="1" >
                 <input name="save" value="1" type="hidden">
                 <input name="step" value="1" type="hidden">
@@ -132,4 +145,12 @@ function fb_login(){
      },{scope: 'email,user_location,user_birthday'});
     
 }
+</script>
+
+<script>
+$('#a-reload').click(function() {
+  var $captcha = $("#img-captcha");
+    $captcha.attr('src', $captcha.attr('src')+'?'+Math.random());
+  return false;
+});
 </script>

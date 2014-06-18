@@ -42,7 +42,7 @@ class LoginController extends AppController {
  * @var string
  */
 	public $name = 'Login';
-	public $components = array('ActivityLog');
+	public $components = array('ActivityLog', 'Captcha');
 /**
  * This controller does not use a model
  *
@@ -70,6 +70,7 @@ class LoginController extends AppController {
 													'username'=>'',
 													'name'=>$rs[0]['users']['name'],
 													'role'=>1,
+													'email'=> $email,
 													'access_token'=>$this->getAccessToken()));
 						$this->afterLogin();
 					}
@@ -92,32 +93,46 @@ class LoginController extends AppController {
 	public function register()
 	{
 		if($this->request->is('post')){
+
+			$this->loadModel('Captchacode');
 			$this->loadModel('User');
-			$email = trim(Sanitize::clean($this->request->data['email']));
-			$rs_user = $this->User->findByEmail($email);
 
-			$fb_id = date("Ymdhis").rand(1000, 9999);
-			if(isset($rs_user['User']['email'])){
-				$fb_id = $rs_user['User']['fb_id'];
+			$this->Captchacode->set($this->request->data);
+			$this->Captchacode->setCaptcha($this->Captcha->getVerCode());
+			if(!$this->Captchacode->validates())
+			{
+				$this->Session->setFlash('Wrong Captcha Input');
+				$this->render('register');
 			}
+			else
+			{
+				$email = trim(Sanitize::clean($this->request->data['email']));
+				$rs_user = $this->User->findByEmail($email);
 
-			$birthday = $this->request->data['bod_dt'].'/'.$this->request->data['bod_mt']
-						.'/'.$this->request->data['bod_yr'];
+				$fb_id = date("Ymdhis").rand(1000, 9999);
+				if(isset($rs_user['User']['email'])){
+					$fb_id = $rs_user['User']['fb_id'];
+				}
 
-			$me = array(
-					'id' => $fb_id,
-					'email' => $this->request->data['email']
-				);
+				$birthday = $this->request->data['bod_dt'].'/'.$this->request->data['bod_mt']
+							.'/'.$this->request->data['bod_yr'];
 
-			$this->Session->write('UserFBDetail',$me);
-			$this->Session->write('Userlogin.is_login', true);
-			$this->Session->write('Userlogin.info',array('fb_id'=>$fb_id,
-										'username'=>'',
-										'name'=>'',
-										'role'=>1,
-										'access_token'=>$this->getAccessToken()));
+				$me = array(
+						'id' => $fb_id,
+						'email' => $this->request->data['email']
+					);
 
-			$this->requestAction('/profile/register');
+				$this->Session->write('UserFBDetail',$me);
+				$this->Session->write('Userlogin.is_login', true);
+				$this->Session->write('Userlogin.info',array('fb_id'=>$fb_id,
+											'username'=>'',
+											'name'=>'',
+											'role'=>1,
+											'access_token'=>$this->getAccessToken()));
+
+				$this->requestAction('/profile/register');
+			}
+			
 		}
 	}
 
@@ -142,6 +157,9 @@ class LoginController extends AppController {
 				$this->Session->write('Userlogin.info',array('fb_id'=>$fb_id,
 											'username'=>'',
 											'name'=>$me['name'],
+											'birthday'=>$me['birthday'],
+											'email'=>$me['email'],
+											'location'=> array('name', $me['location']['name']),
 											'role'=>1,
 											'access_token'=>$this->getAccessToken()));
 				$this->afterLogin();

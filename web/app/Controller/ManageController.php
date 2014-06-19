@@ -37,6 +37,15 @@ class ManageController extends AppController {
 		if(!$this->hasTeam()){
 			$this->redirect('/login/expired');
 		}
+
+
+		if(time()<strtotime($this->userDetail['User']['register_date'])+(24*60*60)){
+			$is_new_user = true;
+		}else{
+			$is_new_user = false;
+		}
+		$this->set('is_new_user',$is_new_user);	
+		
 		//$this->logTime($this->ActivityLog);
 	}
 	public function hasTeam(){

@@ -916,7 +916,7 @@ function getMatchInfo(conn,game_id,cb){
 }
 function getCurrentMatchday(conn,done){
 	conn.query("SELECT matchday FROM \
-				optadb.game_fixtures \
+				ffgame_wc.game_fixtures \
 				WHERE is_processed = 0 \
 				ORDER BY id ASC LIMIT 1;",
 				[],function(err,rs){
@@ -931,7 +931,7 @@ function getCurrentMatchday(conn,done){
 
 function getGameIdsByMatchday(conn,matchday,done){
 	conn.query("SELECT game_id,period FROM \
-				optadb.game_fixtures \
+				ffgame_wc.game_fixtures \
 				WHERE competition_id = ? AND session_id = ? AND matchday = ? \
 				ORDER BY id ASC LIMIT 40;",
 				[config.competition.id,config.competition.year,matchday],function(err,rs){

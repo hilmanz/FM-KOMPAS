@@ -2011,26 +2011,39 @@ function getCash(game_team_id,done){
 							WHERE game_team_id=? LIMIT 1;",
 				[game_team_id],
 				function(err,rs){
-
 					try{
 						if(rs.length==0){
-							conn.query("INSERT IGNORE INTO ffgame_wc.game_team_cash\
-										(game_team_id,cash)\
-										SELECT ?,cash \
+							//insert transactions
+							conn.query("INSERT IGNORE INTO ffgame_wc.game_transactions\
+										(game_team_id,transaction_dt,transaction_name,amount,details)\
+										SELECT ?,NOW(),'OLD_COINS',cash,'OLD COINS'\
 										FROM ffgame_wc.old_cash a \
 										WHERE EXISTS (SELECT 1 FROM ffgame_wc.game_teams b\
 										INNER JOIN ffgame_wc.game_users c ON b.user_id = c.id \
 										WHERE b.id = ? AND c.fb_id = a.fb_id LIMIT 1);",[game_team_id,game_team_id],function(err,rs){
-											conn.query("SELECT cash FROM ffgame_wc.game_team_cash \
-														WHERE game_team_id=? LIMIT 1;",
-														[game_team_id],function(err,last_rs){
-															if(last_rs.length > 0){
-																callback(err,{status:1,cash:last_rs[0].cash});
-															}else{
-																callback(err,{status:1,cash:0});
-															}
+											
+											//update total cash
+											conn.query("INSERT INTO ffgame_wc.game_team_cash\
+														(game_team_id,cash)\
+														SELECT game_team_id,SUM(amount) AS cash \
+														FROM ffgame_wc.game_transactions\
+														WHERE game_team_id = ?\
+														GROUP BY game_team_id\
+														ON DUPLICATE KEY UPDATE\
+														cash = VALUES(cash);",[game_team_id],function(err,rs){
 															
+															conn.query("SELECT cash FROM ffgame_wc.game_team_cash \
+																WHERE game_team_id=? LIMIT 1;",
+																[game_team_id],function(err,last_rs){
+																	if(last_rs.length > 0){
+																		callback(err,{status:1,cash:last_rs[0].cash});
+																	}else{
+																		callback(err,{status:1,cash:0});
+																	}
+																	
+																});
 														});
+											
 										});
 						}else{
 							callback(err,{status:1,cash:rs[0].cash});

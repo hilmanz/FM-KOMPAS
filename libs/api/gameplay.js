@@ -154,6 +154,41 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 					});	
 				},
 				function(rs,upcoming_matchday,callback){
+					//get the current running matchday
+					conn.query("SELECT * FROM (SELECT matchday,MIN(is_processed) AS match_status \
+								FROM ffgame_wc.game_fixtures GROUP BY matchday) a \
+								WHERE match_status = 0 ORDER BY matchday ASC LIMIT 1;",
+								[],
+								function(err,matchday){
+								console.log('LINEUP','game_team_lineup_'+game_team_id,'matchday : ',matchday[0].matchday);
+								callback(err,rs,upcoming_matchday,matchday[0].matchday);
+					});	
+				},
+				function(rs,upcoming_matchday,ongoing_matchday,callback){
+					//check the register date of the team
+					conn.query("SELECT UNIX_TIMESTAMP(created_date) AS ts \
+								FROM ffgame_wc.game_teams \
+								WHERE id = ? LIMIT 1",
+								[game_team_id],
+								function(err,team_info){
+						var created_ts = team_info[0].ts * 1000;
+						var current_ts = (new Date()).getTime();
+						var is_new_user = false;
+						if((current_ts - created_ts) < (24*60*60*1000)){
+							is_new_user = true;
+						}
+						callback(err,rs,upcoming_matchday,ongoing_matchday,is_new_user);
+					});
+				},
+				function(rs,upcoming_matchday,ongoing_matchday,is_new_user,callback){
+					var the_matchday = upcoming_matchday;
+					
+					//if new user, make sure they can use the ongoing matchday.
+					if(is_new_user){
+						the_matchday = ongoing_matchday;
+					}
+
+
 					var sql = "INSERT INTO ffgame_wc.game_team_lineups\
 								(game_team_id,player_id,position_no,matchday)\
 								VALUES\
@@ -167,12 +202,12 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 						data.push(game_team_id);
 						data.push(setup[i].player_id);
 						data.push(setup[i].no);
-						data.push(upcoming_matchday);
+						data.push(the_matchday);
 					}
 					conn.query(sql,data,function(err,rs){
 						console.log('LINEUP','game_team_lineup_'+game_team_id,' saving lineup for matchday : ',upcoming_matchday);
 						console.log('LINEUP','game_team_lineup_'+game_team_id,S(this.sql).collapseWhitespace().s);
-									callback(err,rs,upcoming_matchday);
+									callback(err,rs,the_matchday);
 					});
 				},
 				function(result,upcoming_matchday,callback){
@@ -2011,26 +2046,39 @@ function getCash(game_team_id,done){
 							WHERE game_team_id=? LIMIT 1;",
 				[game_team_id],
 				function(err,rs){
-
 					try{
 						if(rs.length==0){
-							conn.query("INSERT IGNORE INTO ffgame_wc.game_team_cash\
-										(game_team_id,cash)\
-										SELECT ?,cash \
+							//insert transactions
+							conn.query("INSERT IGNORE INTO ffgame_wc.game_transactions\
+										(game_team_id,transaction_dt,transaction_name,amount,details)\
+										SELECT ?,NOW(),'OLD_COINS',cash,'OLD COINS'\
 										FROM ffgame_wc.old_cash a \
 										WHERE EXISTS (SELECT 1 FROM ffgame_wc.game_teams b\
 										INNER JOIN ffgame_wc.game_users c ON b.user_id = c.id \
 										WHERE b.id = ? AND c.fb_id = a.fb_id LIMIT 1);",[game_team_id,game_team_id],function(err,rs){
-											conn.query("SELECT cash FROM ffgame_wc.game_team_cash \
-														WHERE game_team_id=? LIMIT 1;",
-														[game_team_id],function(err,last_rs){
-															if(last_rs.length > 0){
-																callback(err,{status:1,cash:last_rs[0].cash});
-															}else{
-																callback(err,{status:1,cash:0});
-															}
+											
+											//update total cash
+											conn.query("INSERT INTO ffgame_wc.game_team_cash\
+														(game_team_id,cash)\
+														SELECT game_team_id,SUM(amount) AS cash \
+														FROM ffgame_wc.game_transactions\
+														WHERE game_team_id = ?\
+														GROUP BY game_team_id\
+														ON DUPLICATE KEY UPDATE\
+														cash = VALUES(cash);",[game_team_id],function(err,rs){
 															
+															conn.query("SELECT cash FROM ffgame_wc.game_team_cash \
+																WHERE game_team_id=? LIMIT 1;",
+																[game_team_id],function(err,last_rs){
+																	if(last_rs.length > 0){
+																		callback(err,{status:1,cash:last_rs[0].cash});
+																	}else{
+																		callback(err,{status:1,cash:0});
+																	}
+																	
+																});
 														});
+											
 										});
 						}else{
 							callback(err,{status:1,cash:rs[0].cash});

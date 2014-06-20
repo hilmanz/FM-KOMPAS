@@ -153,6 +153,9 @@ function get_user_teams_by_idRange(since_id,until_id,limit,done){
 		});
 	});
 }
+//2014/06/19
+//we need to check if the user's team is created newer than the game_id match.
+//if so, we wont calculate the team's game_id stats.
 function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done){
 	//console.log(team,player_stats,team_summary);
 	console.log('team_summary',team_summary);
@@ -168,10 +171,38 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 						function(item,callback){
 							async.waterfall([
 									function(next){
-										update_individual_team_stats(game_id,item,summary,player_stats,
+										//check the game fixture date
+										conn.query("SELECT UNIX_TIMESTAMP(match_date) AS ts \
+													FROM ffgame_wc.game_fixtures WHERE game_id=? LIMIT 1;",
+													[game_id],function(err,rs){
+														next(err,rs[0].ts);
+													});
+									},
+									function(game_ts,next){
+										//make sure that the team is created before the match
+										conn.query("SELECT UNIX_TIMESTAMP(created_date) AS ts \
+													FROM ffgame_wc.game_teams WHERE id = ? LIMIT 1;",
+													[item.id],function(err,rs){
+														//if the team is created at least 1 hour before the match. it's ok
+														if(rs[0].ts < (game_ts - (60*60))){
+															console.log('UPDATE',item.id,' #',game_id,'can be updated');
+															next(err,true);
+														}else{
+															console.log('UPDATE',item.id,' #',game_id,'can\'t be updated');
+															next(err,false);
+														}
+													});
+									},
+									function(can_get_stats,next){
+										if(can_get_stats){
+											update_individual_team_stats(game_id,item,summary,player_stats,
 											function(err,matched_players){
-											next(err,matched_players);	
-										});
+												next(err,matched_players);	
+											});	
+										}else{
+											next(null,[]);
+										}
+										
 									},
 									function(matched_players,next){
 										console.log('ISSUE1','check penalty if the club rooster is unbalance');
@@ -847,6 +878,7 @@ function getModifierValue(modifiers,stats_name,position){
 
 
 //update user's team stats individually. (currently we need to process each of 35000++ users)
+
 function update_individual_team_stats(game_id,team,summary,player_stats,done){
 		async.waterfall(
 			[
@@ -1027,6 +1059,7 @@ function getTeamLineups(game_id,team,done){
 		
 	});	
 }
+
 function updateLineupStats(game_id,lineups,summary,player_stats,in_game,done){
 	console.log('player stats : ',player_stats);
 	var matched_players = [];

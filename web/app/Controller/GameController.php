@@ -81,10 +81,18 @@ class GameController extends AppController {
 		//}
 		//$time_limit = $this->nextMatch['match']['match_date_ts']-(4*60*60);
 		
+		//time limit for setting up formation
 		$time_limit = $this->closeTime['ts'];
 		
-		if(time() < $time_limit || Configure::read('debug') > 0){
-			if(time() > $this->openTime){
+		//or is it new user ?
+		if(time()<strtotime($this->userDetail['User']['register_date'])+(24*60*60)){
+			$is_new_user = true;
+		}else{
+			$is_new_user = false;
+		}
+
+		if(time() < $time_limit || Configure::read('debug') > 0 || $is_new_user){
+			if(time() > $this->openTime || $is_new_user){
 				$userData = $this->getUserData();
 				$formation = $this->request->data['formation'];
 				$players = array();

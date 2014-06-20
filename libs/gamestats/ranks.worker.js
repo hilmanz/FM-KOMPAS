@@ -67,34 +67,34 @@ exports.update = function(conn,since_id,until_id,update_rank,game_id,done){
 						if(rs.length>0){
 							populate(conn,rs,matchday,function(err){
 								console.log('DONE POPULATING');
-								cb(err);
+								cb(err,matchday);
 							});
 						}else{
 
 							console.log('NO DATA AVAILABLE, WE SKIP IT');
-							cb(err);
+							cb(err,matchday);
 						}
 					});
 					
 			},
-			function(cb){
+			function(matchday,cb){
 				
 				if(update_rank){
 					console.log('NOW WE RECALCULATE THE RANKS');
 					recalculate_ranks(conn,function(err){
 						update_rank_history(conn,function(e){
-							cb(err);
+							cb(err,matchday);
 						});
 						
 					});
 				}else{
 					console.log('Not need to recalculate the ranks');
-					cb(null);
+					cb(null,matchday);
 				}
 			},
-			function(cb){
+			function(matchday,cb){
 				
-				give_weekly_cash(since_id,until_id,conn,function(err){
+				give_weekly_cash(since_id,until_id,matchday,conn,function(err){
 					cb(err,true);
 				});
 				//cb(err,true);
@@ -731,7 +731,7 @@ function generate_summary(conn,user,modifier,done){
 	});
 }
 
-function give_weekly_cash(since_id,until_id,conn,done){
+function give_weekly_cash(since_id,until_id,matchday,conn,done){
 	console.log('GIVING WEEKLY CASH');
 
 	conn.query("SELECT a.id AS game_team_id,b.fb_id \
@@ -744,7 +744,7 @@ function give_weekly_cash(since_id,until_id,conn,done){
 					console.log('CASH',S(this.sql).collapseWhitespace().s);
 					if(rs!=null && rs.length > 0){
 						
-						distribute_weekly_cash(conn,rs,function(err){
+						distribute_weekly_cash(conn,rs,matchday,function(err){
 							done(err);
 						});
 					}else{
@@ -759,7 +759,9 @@ function give_weekly_cash(since_id,until_id,conn,done){
 // jumlah koin selalu 1 poin lebih besar daripada poin.
 // ini karena kita round. jadi otomatis ke atas ternyata.
 // jadinya kita set pembulatan ke bawah saja.
-function distribute_weekly_cash(conn,teams,done){
+
+//we no longer last_matchday for the moment.
+function distribute_weekly_cash(conn,teams,matchday,done){
 	async.waterfall([
 		function(cb){
 			//get the latest matchday
@@ -769,7 +771,8 @@ function distribute_weekly_cash(conn,teams,done){
 						[],
 			function(err,rs){
 				console.log('CASH',S(this.sql).collapseWhitespace().s);
-				cb(err,rs[0].matchday);
+				//cb(err,rs[0].matchday);
+				cb(err,matchday); //ganti pake matchday sesuai game_id dulu.
 			});
 		},
 		function(last_matchday,cb){
@@ -798,7 +801,7 @@ function distribute_weekly_cash(conn,teams,done){
 									});
 					},
 					function(points,c){
-						var cash_bonus = 2.5;
+						var cash_bonus = 10;
 						console.log('Weekly_cash','adding #',team.game_team_id,' matchday#',last_matchday,
 									 'points:',points.total_points, 'cash bonus : ',cash_bonus);
 

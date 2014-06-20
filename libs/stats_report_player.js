@@ -34,6 +34,11 @@ var player_profile = {};
 
 function process_team_stats(stats,done){
 	var teams = [];
+	team_rawstats = {};
+	team_totalstats = {};
+	team_stats = {};//the final product of team statistics
+	player_profile = {};
+	
 	for(var i in stats){
 		var is_found = false;
 		for(var j in teams){

@@ -110,7 +110,7 @@ function getTotalStats(team_id){
 
 function checkValues(stats){
 	var ostats=[
-		'goal',
+		'goals',
 		'goals_openplay',
 		'att_freekick_goal',
 		'att_pen_goal',
@@ -231,8 +231,8 @@ function formulate_stats(team_id){
 		o[i] = parseInt(o[i]);
 	}
 
-	stats['Goals']= o.goal;
-	stats['open play / freekicks / penalties'] = o.goals_openplay +'/'+ o.att_freekick_goal +'/'+ o.att_pen_goal ;
+	stats['Goals']= o.goals;
+	stats['open play / freekicks / penalties / setpiece'] = o.goals_openplay +'/'+ o.att_freekick_goal +'/'+ o.att_pen_goal +'/'+ (o.goals - (o.goals_openplay + o.att_freekick_goal + o.att_pen_goal));
 	stats['Headed Goals'] = o.att_hd_goal ;
 	
 	stats['Shooting']= o.ontarget_scoring_att +'/'+ o.total_scoring_att ;

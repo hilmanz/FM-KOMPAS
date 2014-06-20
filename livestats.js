@@ -625,7 +625,7 @@ function storeGameIdPlayerPointsToRedis(conn,game_id,done){
 						ON a.player_id = b.uid \
 						WHERE game_id=? \
 						GROUP BY a.team_id,stats_name\
-						LIMIT 1000;",
+						LIMIT 10000;",
 						[game_id],
 						function(err,rs){
 							console.log(S(this.sql).collapseWhitespace().s);
@@ -650,7 +650,7 @@ function storeGameIdPlayerPointsToRedis(conn,game_id,done){
 						ON a.player_id = b.uid \
 						WHERE game_id=? \
 						GROUP BY a.player_id,stats_name\
-						LIMIT 1000;",
+						LIMIT 10000;",
 						[game_id],
 						function(err,rs){
 							console.log(S(this.sql).collapseWhitespace().s);

@@ -389,14 +389,20 @@ class Game extends AppModel {
 		$rs = $this->api_call('/fixtures');
 		$fixtures = $rs['matches'];
 		
-		$matchday = 0;
+		$matchday = 33;
+
+
 		for($i=0;$i<sizeof($fixtures);$i++){
 			//strtotime($fixtures[$i]['match_date']) > (time()-24*60*60*7)
 			if($fixtures[$i]['period']=='FullTime'){
-				$matchday = $fixtures[$i]['matchday'];
+				//$matchday = $fixtures[$i]['matchday'];
+			}else{
+				if($matchday > $fixtures[$i]['matchday']){
+					$matchday = $fixtures[$i]['matchday'];
+				}
 			}
 		}
-		$matchday+=1;
+		//$matchday+=1;
 
 		$response 	= $this->api_call('/livematches/'.$matchday);
 		$standings	= $this->api_call('/standings');

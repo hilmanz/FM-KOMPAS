@@ -718,6 +718,127 @@ class ProfileController extends AppController {
 		}
 	}
 
+	public function forgot_password()
+	{
+		if($this->request->is("post"))
+		{
+			try{
+				$this->loadModel("User");
+				$this->Captchacode->set($this->request->data);
+				$this->Captchacode->setCaptcha($this->Captcha->getVerCode());
+				$trxsess = $this->Session->read('trxsess_'.$this->request->data['trxsess']);
+				if(!$this->Captchacode->validates())
+				{
+					throw new Exception("Error Captcha Input");
+				}
+				
+				$email = trim(Sanitize::clean($this->request->data['email']));
+
+				$rs_user = $this->User->findByEmail($email);
+
+				if(count($rs_user) == 0)
+				{
+					throw new Exception("Akun Tersebut Belum Terdaftar");
+				}
+
+				//generate link activation
+				$data_user = array(
+								'fb_id' => $rs_user['User']['fb_id'],
+								'email' => $rs_user['User']['email'],
+								'secret' => $rs_user['User']['secret']
+							);
+
+				$params = encrypt_param(serialize($data_user));
+				$url = 'http://'.Configure::read('DOMAIN').'/profile/reset_password/?params='.$params;
+
+				$data = array(
+							'email' => $rs_user['User']['email'],
+							'url' => $url
+							);
+
+				if($trxsess != 1){
+					$this->send_reset_password($data);
+				}
+
+				$this->Session->write('trxsess_'.$this->request->data['trxsess'],1);
+
+				$this->set('user_data', $rs_user['User']);
+				$this->render('notice_resetpassword');
+
+			}catch(Exception $e){
+				Cakelog::write('error', 
+						'login.forgot_password message : '.$e->getMessage().' data :');
+				$this->Session->setFlash($e->getMessage());
+			}
+		}
+	}
+
+	public function reset_password()
+	{
+		$params = @$this->request->query['params'];
+		$this->set('trxcode', $params);
+
+		if($this->request->is("post"))
+		{
+			try{
+				$params = $this->request->data['trxcode'];
+				$this->set('trxcode', $params);
+
+				$data = unserialize(decrypt_param($params));
+				$password = $this->request->data['password'];
+				$password_repeat = $this->request->data['password_repeat'];
+
+				if(strlen($password) > 5 && $password == $password_repeat)
+				{
+					$this->loadModel('User');
+					$passHasher = new PasswordHash(8, true);
+					$user_pass = $passHasher->HashPassword($password.$data['secret']);
+					$this->User->query("UPDATE users SET password='{$user_pass}' WHERE email='{$data['email']}'");
+
+					$this->Session->setFlash("Berhasil, Silahkan Login Dengan Password yang Baru");
+				}
+				else
+				{
+					throw new Exception("Terjadi Kesalahan, Silahkan Coba Kembali");
+					
+				}
+			}catch(Exception $e){
+				$this->Session->setFlash($e->getMessage());
+			}
+		}
+	}
+
+	public function send_reset_password($data)
+	{
+		$view = new View($this, false);
+
+		if(isset($this->request->data_request))
+		{
+			$data = $this->request->data_request;
+		}
+
+		$body = $view->element('email_reset_password',array(
+										'url'=> $data['url'],
+									));
+
+		# Instantiate the client.
+		$mgClient = new Mailgun('key-9oyd1c7638c35gmayktmgeyjhtyth5w0');
+		$domain = "mg.supersoccer.co.id";
+
+		# Make the call to the client.
+		$result = $mgClient->sendMessage($domain, array(
+		    'from'    => 'supersoccer <postmaster@mg.supersoccer.co.id>',
+		    'to'      => '<'.$data['email'].'>',
+		    'subject' => 'Reset Password',
+		    'html'    => $body
+		));
+		if($result->http_response_code == 200){
+			return true;
+		}
+
+		return false;
+	}
+
 	public function send_mail($data = array()){
 		$view = new View($this, false);
 

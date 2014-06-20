@@ -10,6 +10,7 @@
             <div class="row">
                 <label>Password</label>
                 <input type="password" name="password" >
+                <a href="<?=$this->Html->url("/profile/forgot_password")?>">Lupa Password ?</a>
             </div>
             <div class="row">
                 <input value="Login" class="button" type="submit">

@@ -8,6 +8,7 @@ App::uses('AppModel', 'Model');
  * @property topics $topics
  */
 class Game extends AppModel {
+	public $useDbConfig = "ffgame";
 	public $useTable = false; //kita gak pake table database, karena nembak API langsung.
 
 	public function getTeam($fb_id){

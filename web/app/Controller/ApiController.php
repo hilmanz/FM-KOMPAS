@@ -23,6 +23,9 @@ App::uses('AppController', 'Controller');
 App::uses('Sanitize', 'Utility');
 require_once APP . 'Vendor' . DS. 'Thumbnail.php';
 
+//we use password-hash for dealing with wordpress's password hash
+require_once APP.DS.'Vendor'.DS.'password-hash.php';
+
 class ApiController extends AppController {
 
 /**
@@ -4462,13 +4465,259 @@ class ApiController extends AppController {
 		}
 		$this->render('default');
 	}
+
+	/*
+	* API for login user from supersoccer
+	* POST :  /api/login_supersoccer/
+	* PostData : ?email=[s]&password=[s]
+	* Response :JSON
+	*/
+	public function login_supersoccer()
+	{
+		$this->layout="ajax";
+		$email = Sanitize::clean($this->request->data['email']);
+		$password = Sanitize::clean($this->request->data['password']);
+
+		if(strlen($email) > 0 && strlen($password) > 0){
+			$this->loadModel('User');
+			$rs_user = $this->User->findByEmail($email);
+			$passHasher 	= new PasswordHash(8, true);
+			$check_password = $passHasher->CheckPassword($password.$rs_user['User']['secret'] ,
+									$rs_user['User']['password']);
+			if($check_password){
+				$this->loadModel("Game");
+				$status = 1;
+				$team = $this->Game->getTeam($rs_user['User']['fb_id']);
+
+				$cash = 0;
+				if(isset($team['id'])){
+					$cash = $this->Game->getCash($team['id']);
+				}
+
+				$need_password = ($rs_user['User']['password'] == "") ? 1 : 0;
+				$profile = array(
+								'fb_id' => $rs_user['User']['fb_id'],
+								'name'	=> $rs_user['User']['name'],
+								'email'	=> $rs_user['User']['email'],
+								'n_status' => $rs_user['User']['n_status'],
+								'register_completed' => $rs_user['User']['register_completed'],
+								'need_password' => $need_password
+							);
+
+				$this->set('response',array('status'=>1, 'data'=>array('profile'=>$profile,'team'=>$team,'coins'=>$cash)));
+			}
+			else
+			{
+				$this->set('response',array('status'=>0, 'message' => 'Wrong Username or Password'));
+			}
+
+			
+		}else{
+			$this->set('response',array('status'=>0, 'message' => 'Terjadi Kesalahan'));
+		}
+
+		$this->render('default');
+
+	}
+
+	/*
+	* API for login user from register_supersoccer
+	* POST :  /api/register_supersoccer/
+	* PostData : seee variable $data_save
+	* Response :JSON
+	*/
+	public function register_supersoccer()
+	{
+		$this->layout="ajax";
+		$data = $this->request->data;;
+
+		if($data['fb_id'] == "")
+		{
+			$fb_id = date("Ymdhis").rand(1000, 9999);
+		}
+
+		$secret		= md5(date("Ymdhis"));
+		$passHasher = new PasswordHash(8, true);
+		$user_pass 	= $passHasher->HashPassword($data['password'].$secret);
+
+		$data_save = array('fb_id_ori'=>NULL,
+					  'fb_id'=>$fb_id,
+					  'name'=>$data['name'],
+					  'email'=>$data['email'],
+					  'password'=>$user_pass,
+					  'secret'=>$secret,
+					  'location'=>$data['city'],
+					  'phone_number'=>$data['phone_number'],
+					  'register_date'=>date("Y-m-d H:i:s"),
+					  'survey_about'=>$data['hearffl'],
+					  'survey_daily_email'=>$data['daylyemail'],
+					  'survey_daily_sms'=>$data['daylysms'],
+					  'survey_has_play'=>$data['firstime'],
+					  'faveclub'=>Sanitize::clean($data['faveclub']),
+					  'birthdate'=>$data['birthdate'],
+					  'n_status'=>0,
+					  'register_completed'=>0,
+					  'activation_code' => date("Ymdhis").rand(100, 999)
+					  );
+
+		//make sure that the fb_id is unregistered
+		$check = $this->User->findByFb_id($data['fb_id']);
+		//make sure that the email is not registered yet.
+		$check2 = $this->User->findByEmail($data['email']);
+
+		if(isset($check['User']) && $check2['User']['register_completed'] != 0)
+		{
+			$this->set('response',array('status'=>0, 
+					'message' => 'Mohon maaf, akun kamu sudah terdaftar sebelumnya. !'));
+		}
+		else if(isset($check2['User']) 
+					&& $check2['User']['email'] == $data['email']
+					&& $check2['User']['register_completed'] != 0)
+		{
+
+			$this->set('response',array('status'=>0, 
+					'message' => 'Mohon maaf, akun email ini `'.Sanitize::html($data['email']).'` 
+				sudah terdaftar sebelumnya. Silahkan menggunakan alamat email yang lain !'));
+		}
+		else
+		{
+			if(!isset($check2['User'])){
+				$this->User->create();
+				$rs = $this->User->save($data_save);
+				$user_data = $rs['User'];
+			}
+			
+			if(isset($rs['User']) || isset($check2['User'])){
+				//register user into gameAPI.
+				$this->loadModel('ProfileModel');
+				$response = $this->ProfileModel->setProfile($data_save);
+
+				if($response['status']==1 || $check2['User']['register_completed'] == 0)
+				{
+					if(@$rs['User']['n_status'] == 0 || $user_data['n_status'] == 0)
+					{
+						$this->set('response',
+									array('status'=>1, 
+										'profile' => $rs['User']
+									));
+					}
+					else
+					{
+						$this->set('response',
+									array('status'=>1, 
+										'profile' => $check2['User']
+									));
+					}
+				}
+				else
+				{
+					$this->User->delete($this->User->id);
+					$this->set('response',
+									array('status'=>0, 
+										'message' => 'Terjadi Kesalahan, Silahkan coba beberapa saat lagi'
+									));
+				}
+			}
+		}
+
+		$this->render('default');
+	}
+
+	/*
+	* API for login user from send_activation
+	* POST :  /api/send_activation/
+	* PostData : ?fb_id=[s]&email=[s]
+	* Response :JSON
+	*/
+	public function send_activation()
+	{
+		if($this->request->is("post"))
+		{
+			$this->loadModel('User');
+			$fb_id = Sanitize::clean($this->request->data['fb_id']);
+			$email = Sanitize::clean($this->request->data['email']);
+
+			$this->User->query("UPDATE users SET email='{$email}' WHERE fb_id='{$fb_id}'");
+			$rs_user = $this->User->findByFb_id($fb_id);
+			if(count($rs_user) != 0)
+			{
+				$data_request['email'] = $rs_user['User']['email'];
+				$data_request['activation_code'] = $rs_user['User']['activation_code'];
+
+				$send_mail = $this->requestAction(
+													array(
+														'controller' => 'profile',
+														'action' => 'send_mail'
+													),
+													array('data_request' => $data_request)
+												);
+				if($send_mail)
+				{
+					$this->set('response', array('status'=>1));
+				}
+				else
+				{
+					$this->set('response', array('status'=>0));
+				}
+			}
+			else
+			{
+				$this->set('response', array('status'=>0));
+			}
+		}
+		else
+		{
+			$this->set('response', array('status'=>0));
+		}
+		$this->render('default');
+	}
+
+
+	/*
+	* API for login user from activation_user
+	* POST :  /api/activation_user/
+	* PostData : ?email=[s]&activation_code=[n]
+	* Response :JSON
+	*/
+	public function activation_user()
+	{
+		if($this->request->is("post"))
+		{
+			$this->loadModel('User');
+			$email = trim(Sanitize::clean($this->request->data['email']));
+			$activation_code = trim(Sanitize::clean($this->request->data['activation_code']));
+
+			$rs_user = $this->User->findByEmail($email);
+			if(count($rs_user) != 0)
+			{
+				if($rs_user['User']['activation_code'] == $activation_code)
+				{
+					$this->User->query("UPDATE users SET n_status = 1 WHERE email='{$email}'");
+					$this->set('response', array('status'=>1));
+				}
+				else
+				{
+					$this->set('response', array('status'=>0));
+				}
+			}
+			else
+			{
+				$this->set('response', array('status'=>0));
+			}
+		}
+		else
+		{
+			$this->set('response', array('status'=>0));
+		}
+		$this->render('default');
+	}
+
 	private function saveAgentOrder($agent_id,$po_number,$order_data){
 		$this->loadModel('MerchandiseItem');
 		$this->loadModel('AgentItem');
 		//sanitize
 		$order_data['item_id'] = intval($order_data['item_id']);
 		$order_data['qty'] = intval($order_data['qty']);
-		//
 
 		//item detail
 		$item = $this->MerchandiseItem->findById(intval($order_data['item_id']));
@@ -4581,6 +4830,7 @@ class ApiController extends AppController {
 		}
 		return $items;
 	}
+
 	/**
 	* basically it returns all the vouchers
 	*/

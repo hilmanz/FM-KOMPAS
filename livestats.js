@@ -417,7 +417,7 @@ function storeMatchInfoToRedis(conn,matchday,done){
 						ON a.home_team = b.uid\
 						INNER JOIN optadb.master_team c\
 						ON a.away_team = c.uid\
-						WHERE a.matchday=? LIMIT 10;",
+						WHERE a.matchday=? LIMIT 20;",
 						[matchday],
 						function(err,rs){
 							console.log(S(this.sql).collapseWhitespace().s);

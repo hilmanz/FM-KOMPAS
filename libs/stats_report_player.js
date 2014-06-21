@@ -210,7 +210,9 @@ function checkValues(stats){
 		'dangerous_play',
 		'total_yel_card',
 		'total_red_card',
-		'total_offside'
+		'total_offside',
+		'saves',
+		'good_high_claim'
 	];
 
 	for(var i in ostats){
@@ -314,6 +316,8 @@ function formulate_stats(team_id){
 	stats['Yellow Cards']= o.total_yel_card ;
 	stats['Red Cards']= o.total_red_card ;
 	stats['Caught Offside']= o.total_offside ;
+	stats['Saves']= o.saves ;
+	stats['Good High Claim']= o.good_high_claim ;
 	
 	return stats;
 }

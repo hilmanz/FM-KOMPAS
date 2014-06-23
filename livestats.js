@@ -1,7 +1,6 @@
 /*
 * livestats.js
 * Player Livestats updater
-
 */
 var crypto = require('crypto');
 var fs = require('fs');
@@ -21,7 +20,6 @@ var pool  = mysql.createPool({
    user     : config.database.username,
    password : config.database.password,
 });
-
 
 
 var redisClient = redis.createClient(config.redis.port,config.redis.host);

@@ -75,8 +75,8 @@ class RedeemController extends AppController {
 			if($this->redeemCode()){
 				$kode = Sanitize::clean($this->request->data['kode']);
 				$redeemed = $this->Game->query("SELECT coin_amount,ss_dollar 
-									FROM ffgame.coupons a
-									INNER JOIN ffgame.coupon_codes b
+									FROM ffgame_wc.coupons a
+									INNER JOIN ffgame_wc.coupon_codes b
 									ON a.id = b.coupon_id
 									WHERE 
 									b.coupon_code = '{$kode}' 

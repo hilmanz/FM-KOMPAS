@@ -367,12 +367,12 @@ Configure::write('competition_id','c8');
 Configure::write('stats_service_url','http://localhost/fantasy_stats/');
 Configure::write('avatar_img_dir','/home/duf/node_workspace/fantasy_fork/web/app/webroot/files/');
 Configure::write('avatar_web_dir','/files/');
-Configure::write('avatar_web_url','http://localhost/fantasy/files/');
-Configure::write('WWW_URL','http://localhost/fantasy');
+Configure::write('avatar_web_url','http://localhost/fm_wc/files/');
+Configure::write('WWW_URL','http://localhost/fm_wc');
 Configure::write('RANK_RANDOM_NUM',139670);
 
-Configure::write('CSV_DIR','/home/duf/node_workspace/fantasy_fork/admin/app/webroot/files/');
-Configure::write('CSV_WWW','http://localhost/fantasy_admin/files/');
+Configure::write('CSV_DIR','/home/duf/node_workspace/fantasy_wc/admin/app/webroot/files/');
+Configure::write('CSV_WWW','http://localhost/fantasy_wc/admin/files/');
 
 //Administration & Handling Fee
 Configure::write('PO_ADMIN_FEE',50000);

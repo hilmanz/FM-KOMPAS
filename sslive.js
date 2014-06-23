@@ -102,7 +102,12 @@ app.get('/get/:game_id',[],function(req,res){
 		res.send(200,{status:1,data:data});
 	});
 });
-
+app.get('/fm_playerstats/:game_id',[],function(req,res){
+	client.get('match_'+req.params.game_id,function(err,resp){
+		var data = JSON.parse(resp);
+		res.send(200,{status:1,data:data});
+	});
+});
 app.get('/livestats/:game_id',[],function(req,res){
 	
 	var game_id = req.params.game_id;

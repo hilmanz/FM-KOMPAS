@@ -16,7 +16,7 @@
       <tr>
         <td>
         	<div style="padding:20px; background:#b30009; box-shadow:0 0 25px rgba(0,0,0,0.4) inset">
-            	<div style="font-size:16px;">>
+            	<div style="font-size:16px; color:#fff; font-weight:bold;">
                 Klik <a href="<?=$url?>">disini</a> untuk mengatur ulang password anda.
               </div>
             </div>

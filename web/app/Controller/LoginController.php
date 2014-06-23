@@ -52,6 +52,7 @@ class LoginController extends AppController {
 
 	public function index()
 	{
+
 		if($this->request->is("post"))
 		{
 			$this->loadModel('User');

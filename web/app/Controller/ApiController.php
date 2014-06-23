@@ -41,6 +41,7 @@ class ApiController extends AppController {
 	private $finance_total_items_raw = null;
 	private $tickets_sold = null;
 	public function auth(){
+
 		$fb_id = $this->request->query('fb_id');
 		$user = $this->User->findByFb_id($fb_id);
 		$check_current_session = $this->Session->read('API_CURRENT_ACCESS_TOKEN');
@@ -49,6 +50,8 @@ class ApiController extends AppController {
 			$api_session = $this->readAccessToken();
 			$session_fb_id = $api_session['fb_id'];
 
+			CakeLog::write('debug', $fb_id.' == '.$session_fb_id);
+
 			if($fb_id==$session_fb_id){
 				$this->set('response',array('status'=>1,'access_token'=>$check_current_session));	
 			}else{
@@ -56,6 +59,7 @@ class ApiController extends AppController {
 			}
 			
 		}else{
+			CakeLog::write('debug', $fb_id);
 			if(strlen($fb_id)>2 && isset($user['User'])){
 				$rs = $this->Apikey->findByApi_key($this->request->query['api_key']);
 				if(isset($rs['Apikey']) && $rs['Apikey']['api_key']!=null){
@@ -4529,9 +4533,12 @@ class ApiController extends AppController {
 	public function register_supersoccer()
 	{
 		$this->layout="ajax";
-		$data = $this->request->data;;
+		$data = $this->request->data;
 
-		if($data['fb_id'] == "")
+		CakeLog::write('debug', 'datanya :'.json_encode($data));
+
+		$fb_id = $data['fb_id'];
+		if($fb_id == "")
 		{
 			$fb_id = date("Ymdhis").rand(1000, 9999);
 		}
@@ -4551,7 +4558,7 @@ class ApiController extends AppController {
 					  'register_date'=>date("Y-m-d H:i:s"),
 					  'survey_about'=>$data['hearffl'],
 					  'survey_daily_email'=>$data['daylyemail'],
-					  'survey_daily_sms'=>$data['daylysms'],
+					  'survey_daily_sms'=>@$data['daylysms'],
 					  'survey_has_play'=>$data['firstime'],
 					  'faveclub'=>Sanitize::clean($data['faveclub']),
 					  'birthdate'=>$data['birthdate'],
@@ -4561,7 +4568,7 @@ class ApiController extends AppController {
 					  );
 
 		//make sure that the fb_id is unregistered
-		$check = $this->User->findByFb_id($data['fb_id']);
+		$check = $this->User->findByFb_id($fb_id);
 		//make sure that the email is not registered yet.
 		$check2 = $this->User->findByEmail($data['email']);
 
@@ -4589,8 +4596,9 @@ class ApiController extends AppController {
 			
 			if(isset($rs['User']) || isset($check2['User'])){
 				//register user into gameAPI.
-				$this->loadModel('ProfileModel');
-				$response = $this->ProfileModel->setProfile($data_save);
+				//$this->loadModel('ProfileModel');
+				$response = $this->api_post('/user/register',$data_save);
+				CakeLog::write('debug', json_encode($response));
 
 				if($response['status']==1 || $check2['User']['register_completed'] == 0)
 				{
@@ -4709,6 +4717,34 @@ class ApiController extends AppController {
 		{
 			$this->set('response', array('status'=>0));
 		}
+		$this->render('default');
+	}
+
+	public function get_quiz()
+	{
+		try{
+			$this->loadModel('Game');
+			$rs_quiz = $this->Game->query("SELECT 
+											    question, question_id, is_answer, answer
+											FROM
+											    game_quiz_questions a
+											INNER JOIN
+											    game_quiz_answers b ON a.id = b.question_id
+											WHERE
+											    a.status = 1");
+
+			$data = array();
+			$i=0;
+			foreach ($rs_quiz as $keys => $values)
+			{
+				$data[$values['a']['question']][] = $values['b'];
+			}
+			$this->set('response', array('status'=>1, 'data' => json_encode($data)));
+
+		}catch(Exception $e){
+			$this->set('response', array('status'=>0, 'message' => $e->getMessage()));
+		}
+
 		$this->render('default');
 	}
 

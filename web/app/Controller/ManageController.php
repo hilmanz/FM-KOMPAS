@@ -626,7 +626,7 @@ class ManageController extends AppController {
 
 		
 		$players = $this->Game->getMatchDetailsByGameTeamId($userData['team']['id'],$game_id);
-
+		
 		$this->Session->write('PlayerStats_Matchinfo_'.$game_id,$players);
 		
 		$this->set('players',$players['data']);

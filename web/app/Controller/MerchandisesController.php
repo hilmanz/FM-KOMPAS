@@ -23,6 +23,7 @@ class MerchandisesController extends AppController {
 	public $uses = array();
 	
 	public function beforeFilter(){
+
 		parent::beforeFilter();
 		$this->loadModel('Team');
 		$this->loadModel('User');
@@ -1706,6 +1707,7 @@ class MerchandisesController extends AppController {
 		}
 		
 	}
+
 	public function status($order_id){
 
 	}

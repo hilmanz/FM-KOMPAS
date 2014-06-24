@@ -836,4 +836,60 @@ class MerchandisesController extends AppController {
 		
 		$this->redirect('/merchandises/agent');
 	}
+
+	public function export(){
+
+		$this->layout = 'csv/default';
+		// Stop Cake from displaying action's execution time
+        Configure::write('debug', 0);
+        $this->loadModel('Game');
+
+        try{
+        	$rs_report = $this->Game->query("SELECT *
+											FROM fantasy.merchandise_orders
+											WHERE payment_method IN ('ecash') 
+											AND n_status IN (2,3)
+											LIMIT 100000");
+
+	        $data = array();
+	        foreach ($rs_report as $key => $value)
+	        {
+	        	$data_unserial = unserialize($value['merchandise_orders']['data']);
+
+	        	$data[$key]['merchandise_orders']['po_number'] = $value['merchandise_orders']['po_number'];
+	        	$data[$key]['merchandise_orders']['order_date'] = $value['merchandise_orders']['order_date'];
+	        	$data[$key]['merchandise_orders']['first_name'] = $value['merchandise_orders']['first_name'];
+	        	$data[$key]['merchandise_orders']['last_name'] = $value['merchandise_orders']['last_name'];
+	        	$data[$key]['merchandise_orders']['item_name'] = $data_unserial[0]['data']['MerchandiseItem']['name'];
+	        	$data[$key]['merchandise_orders']['qty'] = $data_unserial[0]['qty'];
+	        	$data[$key]['merchandise_orders']['price'] = $data_unserial[0]['data']['MerchandiseItem']['price_money'];
+	        	$data[$key]['merchandise_orders']['total_sale'] = $value['merchandise_orders']['total_sale'];
+	        }
+
+	        // Define column headers for CSV file, in same array format as the data itself
+	        $headers = array(
+	            'merchandise_orders'=>array(
+	                'po_number' => 'PO NUMBER',
+	                'order_date' => 'ORDER DATE',
+	                'first_name' => 'First Name',
+	                'last_name' => 'Last Name',
+	                'item_name' => 'Item Name',
+	                'qty' => 'Quantity',
+	                'price' => 'Price',
+	                'total_sale' => 'Total Sale'
+	            )
+	        );
+	        // Add headers to start of data array
+	        array_unshift($data, $headers);
+	        // Make the data available to the view (and the resulting CSV file)
+	        $this->set(compact('data'));
+
+	        $this->set('filename', 'purchase-order-'.date("Y-m-d").'.csv');
+
+        }catch(Exception $e){
+        	Cakelog::write('debug', 'merchandises.export message : '.$e->getMessage());
+        	echo $e->getMessage();
+        }
+        
+	}
 }

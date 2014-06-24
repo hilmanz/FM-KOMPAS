@@ -15,7 +15,7 @@ $pic = Configure::read('avatar_web_url').
             <div class="rowd">
       				<div class="col-content">
                 
-                <h3 class="yellow">Maaf, <span class="white"><?=h($item['name'])?></span> tidak bisa dimasukkan ke keranjang belanja, Silahkan coba kembali beberapa saat lagi !</h3>
+                <h3 class="yellow">Maaf, <span class="points"><?=h($item['name'])?></span> tidak bisa dimasukkan ke keranjang belanja, Silahkan coba kembali beberapa saat lagi !</h3>
 
   						 <div class="rowButton">
   							<a href="<?=$this->Html->url('/merchandises')?>" class="button2">

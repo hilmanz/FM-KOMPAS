@@ -15,13 +15,13 @@ $pic = Configure::read('avatar_web_url').
             <div class="rowd">
       				<div class="col-content">
                 <?php if($canAddPerk):?>
-      					<h3  class="yellow"><span class="white"><?=h($item['name'])?></span> telah dimasukkan ke dalam keranjang belanja</h3>
+      					<h3  class="yellow"><span class="price"><?=h($item['name'])?></span> telah dimasukkan ke dalam keranjang belanja</h3>
 						 <div class="rowButton">
 						  <a href="<?=$this->Html->url('/merchandises')?>" class="button2"><span class="ico icon-undo-2">&nbsp;</span> Kembali Belanja</a>
 						  <a href="<?=$this->Html->url('/merchandises/cart')?>" class="button2"><span class="ico icon-cart">&nbsp;</span> Lihat Keranjang Belanja</a>
 						</div>
                 <?php else:?>
-                  		<h3  class="yellow">Maaf, Perk ini <span class="white"><?=h($item['name'])?></span> sedang aktif di klub loe, perk ini hanya bisa loe beli setelah masa berlakunya telah habis !</h3>
+                  		<h3  class="yellow">Maaf, Perk ini <span class="points"><?=h($item['name'])?></span> sedang aktif di klub loe, perk ini hanya bisa loe beli setelah masa berlakunya telah habis !</h3>
 
 						 <div class="rowButton">
 							<a href="<?=$this->Html->url('/merchandises')?>" class="button2">

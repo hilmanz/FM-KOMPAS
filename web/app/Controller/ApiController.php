@@ -2373,7 +2373,7 @@ class ApiController extends AppController {
 		$total = intval(@$this->request->query['total']);
 
 		if($total > 10){
-			$total = 10;
+			$total = 15;
 		}
 
 		$response = array();

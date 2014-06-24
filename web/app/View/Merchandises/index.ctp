@@ -52,7 +52,7 @@ if(isset($category_name)){
 							</p>
 							<?php endif;?>
 							<?php if(intval($r['MerchandiseItem']['price_money']) > 0):?>
-							<p class="idrprice">
+							<p class="points red">
 								Rp. <?=number_format($r['MerchandiseItem']['price_money'])?>
 							</p>
 							<?php endif;?>

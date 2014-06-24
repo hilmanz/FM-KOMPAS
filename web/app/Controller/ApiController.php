@@ -4492,10 +4492,12 @@ class ApiController extends AppController {
 				$this->loadModel("Game");
 				$status = 1;
 				$team = $this->Game->getTeam($rs_user['User']['fb_id']);
+				CakeLog::write('debug', 'Teams :'.json_encode($team));
 
 				$cash = 0;
 				if(isset($team['id'])){
 					$cash = $this->Game->getCash($team['id']);
+					CakeLog::write('debug', 'Cash :'.json_encode($cash));
 				}
 
 				$need_password = ($rs_user['User']['password'] == "") ? 1 : 0;

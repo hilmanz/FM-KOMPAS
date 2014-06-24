@@ -105,6 +105,10 @@
                         </li>
                     	<li>
                         	<a href="<?=$this->Html->url('/profile')?>">Profil Saya</a>
+                            <ul>
+                                <li><a href="<?=$this->Html->url('/profile')?>">Profil Saya</a></li>
+                                <li><a href="<?=$this->Html->url('/profile/booster')?>">Point Booster</a></li>
+                            </ul>
                         </li>
                     	<li>
                         	<a href="<?=$this->Html->url('/leaderboard/overall')?>">Papan Peringkat</a>

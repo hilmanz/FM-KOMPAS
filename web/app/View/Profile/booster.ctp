@@ -37,6 +37,8 @@
                                     $total = $value['a']['available']." Minggu";
                                     if($value['a']['available'] > 9000){
                                         $total = 'Sampai Musim Berakhir';
+                                    }else if($value['a']['available']==0){
+                                        $total = 'Sudah Habis Terpakai';
                                     }
                                 ?>
                                 <tr class="odd">
@@ -47,7 +49,7 @@
                             <?php $i++; endforeach; ?>
                         <?php else: ?>
                             <tr class="odd">
-                                <td colspan="3">Lo belom punya poin booster</td>
+                                <td colspan="3">Lo belom punya poin booster.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -58,7 +60,7 @@
 	    <div class="widget">
 	        <div class="cash-left">
 	            <h3 class="red">SISA UANG</h3>
-	            <h1>SS$ <?=number_format($team_bugdet)?></h1>
+	            <h1><?=number_format($team_bugdet)?> STAR</h1>
 	            <h3 class="red">JUMLAH POINT</h3>
 	            <h1><?=number_format($USER_POINTS)?> pts</h1> 
                 <h3 class="red">JUMLAH COINS</h3>

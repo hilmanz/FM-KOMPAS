@@ -19,7 +19,7 @@ exports.config = {
 	job_server:{host:'localhost',port:3099},
 	ecash :  {
 		protocol:'https',
-		host:'182.253.203.90:9443',
+		host:'mandiri-ecash.com',
 		username:'supersoccer',
 		password: '123456',
 		returnUrl: 'http://localhost/fantasy_wc/merchandises/payment',

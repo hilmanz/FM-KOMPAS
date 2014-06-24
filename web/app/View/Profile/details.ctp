@@ -35,6 +35,7 @@
                         </div>
 
                         <a href="#popup-upload" class="button" id="btn_upload">Ganti Logo Klab</a>
+
                     </div>
                     <div class="row">
                         <label>Nama Lengkap</label>
@@ -78,6 +79,7 @@
                 <h1><?=number_format($USER_RANK)?></h1> 
 	        </div>
 	    </div><!-- end .widget -->
+       
 	</div><!-- end #sidebar -->
     </div><!-- end #thecontent -->
 </div><!-- end #fillDetailsPage -->

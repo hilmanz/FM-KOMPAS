@@ -137,6 +137,7 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
       </div>
     <div id="thecontent">
         <div class="box4 fl" id="bannerBox">
+           
         	<div class="banner250x250">
 			<?=$this->element('sponsor_banner',array('slot'=>'TEAM_SMALL','game_team_id'=>$game_team_id));?>
             </div>

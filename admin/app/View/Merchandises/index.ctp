@@ -8,6 +8,7 @@
 	<a href="<?=$this->Html->url('/merchandises/ticketorders')?>" class="button">Ticket Orders</a>
 	<a href="<?=$this->Html->url('/merchandises/agent')?>" class="button">Ticket Agent</a>
 	<a href="<?=$this->Html->url('/merchandises/ongkir')?>" class="button">Ongkos Kirim</a>
+	<a href="<?=$this->Html->url('/merchandises/report')?>" class="button">Report CSV</a>
 </div>
 
 <div class="row">

@@ -818,7 +818,6 @@ class MerchandisesController extends AppController {
 		$this->loadModel('Agent');
 
 
-
 		$data = array(
 			'email'=>trim($this->request->data['email']),
 			'password'=>trim($this->request->data['password']),
@@ -837,59 +836,130 @@ class MerchandisesController extends AppController {
 		$this->redirect('/merchandises/agent');
 	}
 
+	public function report()
+	{
+		$this->loadModel('MerchandiseItemPerks');
+		$date_range = $this->MerchandiseItemPerks->query("SELECT 
+											    DATE_FORMAT(MIN(order_date), '%d-%m-%Y') AS order_date
+											FROM
+											    fantasy_wc.merchandise_orders 
+											UNION SELECT 
+											    DATE_FORMAT(MAX(order_date), '%d-%m-%Y') AS order_date
+											FROM
+											    fantasy_wc.merchandise_orders
+											limit 100000");
+
+		$date_start = $date_range[0][0]['order_date'];
+		$date_end 	= $date_range[1][0]['order_date'];
+
+		$this->set('date_start', $date_start);
+		$this->set('date_end', $date_end);
+	}
+
 	public function export(){
+		if($this->request->is('post'))
+		{
+	        try{
+	        	//prepare $_POST data
+	        	$payment_method = @$this->request->data['payment_method'];
+				$n_status = @$this->request->data['n_status'];
 
-		$this->layout = 'csv/default';
-		// Stop Cake from displaying action's execution time
-        Configure::write('debug', 0);
-        $this->loadModel('Game');
+				if(!isset($payment_method) || !isset($n_status))
+				{
+					throw new Exception("Select Payment Method or Order Status");
+				}
+				else
+				{
+					$in_payment	= rtrim(implode('","', $payment_method), ',');
+					$in_status	= rtrim(implode(',', $n_status), ',');
 
-        try{
-        	$rs_report = $this->Game->query("SELECT *
-											FROM fantasy.merchandise_orders
-											WHERE payment_method IN ('ecash') 
-											AND n_status IN (2,3)
-											LIMIT 100000");
+					$start_date = $this->request->data['year_from']
+								.'-'.$this->request->data['month_from']
+								.'-'.$this->request->data['date_from'];
 
-	        $data = array();
-	        foreach ($rs_report as $key => $value)
-	        {
-	        	$data_unserial = unserialize($value['merchandise_orders']['data']);
+					$end_date = $this->request->data['year_end']
+									.'-'.$this->request->data['month_end']
+									.'-'.$this->request->data['date_end'];
+				}
+				//end of prepare $_POST data
 
-	        	$data[$key]['merchandise_orders']['po_number'] = $value['merchandise_orders']['po_number'];
-	        	$data[$key]['merchandise_orders']['order_date'] = $value['merchandise_orders']['order_date'];
-	        	$data[$key]['merchandise_orders']['first_name'] = $value['merchandise_orders']['first_name'];
-	        	$data[$key]['merchandise_orders']['last_name'] = $value['merchandise_orders']['last_name'];
-	        	$data[$key]['merchandise_orders']['item_name'] = $data_unserial[0]['data']['MerchandiseItem']['name'];
-	        	$data[$key]['merchandise_orders']['qty'] = $data_unserial[0]['qty'];
-	        	$data[$key]['merchandise_orders']['price'] = $data_unserial[0]['data']['MerchandiseItem']['price_money'];
-	        	$data[$key]['merchandise_orders']['total_sale'] = $value['merchandise_orders']['total_sale'];
+				$this->layout = 'csv/default';
+				// Stop Cake from displaying action's execution time
+		        Configure::write('debug', 0);
+		        $this->loadModel('Game');
+
+	        	$rs_report = $this->Game->query('SELECT *
+												FROM merchandise_orders
+												WHERE payment_method IN ("'.$in_payment.'") 
+												AND n_status IN ('.$in_status.') AND
+												DATE(order_date) >= "'.$start_date.'" AND 
+												DATE(order_date) <= "'.$end_date.'"
+												LIMIT 100000');
+
+		        $data = array();
+		        foreach ($rs_report as $key => $value)
+		        {
+		        	$data_unserial = unserialize($value['merchandise_orders']['data']);
+
+		        	$data[$key]['merchandise_orders']['po_number'] = $value['merchandise_orders']['po_number'];
+		        	$data[$key]['merchandise_orders']['order_date'] = $value['merchandise_orders']['order_date'];
+		        	$data[$key]['merchandise_orders']['first_name'] = $value['merchandise_orders']['first_name'];
+		        	$data[$key]['merchandise_orders']['last_name'] = $value['merchandise_orders']['last_name'];
+		        	$data[$key]['merchandise_orders']['item_name'] = str_replace('"', '', $data_unserial[0]['data']['MerchandiseItem']['name']);
+		        	$data[$key]['merchandise_orders']['qty'] = $data_unserial[0]['qty'];
+
+		        	$data[$key]['merchandise_orders']['price_coins'] = $data_unserial[0]['data']['MerchandiseItem']
+		        														['price_credit'];
+		        	$data[$key]['merchandise_orders']['price_money'] = $data_unserial[0]['data']['MerchandiseItem']
+		        														['price_money'];
+		        	$data[$key]['merchandise_orders']['payment_method'] = $value['merchandise_orders']['payment_method'];
+		        	$data[$key]['merchandise_orders']['ongkir'] = $value['merchandise_orders']['ongkir_value'];
+		        	$data[$key]['merchandise_orders']['total_sale'] = $value['merchandise_orders']['total_sale'];
+		        }
+
+		        // Define column headers for CSV file, in same array format as the data itself
+		        $headers = array(
+		            'merchandise_orders'=>array(
+		                'po_number' => 'PO NUMBER',
+		                'order_date' => 'ORDER DATE',
+		                'first_name' => 'First Name',
+		                'last_name' => 'Last Name',
+		                'item_name' => 'Item Name',
+		                'qty' => 'Quantity',
+		                'price_coins' => 'Price Coins',
+		                'price_money' => 'Price Money',
+		                'payment_method' => 'Payment Method',
+		                'ongkir' => 'Ongkir',
+		                'total_sale' => 'Total Sale'
+		            )
+		        );
+		        // Add headers to start of data array
+		        array_unshift($data, $headers);
+		        // Make the data available to the view (and the resulting CSV file)
+		        $this->set(compact('data'));
+
+		        $this->set('filename', 'purchase-order-'.date("Y-m-d").'.csv');
+		        Cakelog::write('debug', 'merchandises.export SELECT *
+												FROM merchandise_orders
+												WHERE payment_method IN ("'.$in_payment.'") 
+												AND n_status IN ('.$in_status.') AND
+												DATE(order_date) >= "'.$start_date.'" AND 
+												DATE(order_date) <= "'.$end_date.'"
+												LIMIT 100000');
+
+	        }catch(Exception $e){
+	        	Cakelog::write('debug', 'merchandises.export message : '.$e->getMessage());
+
+	        	Cakelog::write('debug', 'merchandises.export SELECT *
+												FROM merchandise_orders
+												WHERE payment_method IN ("'.$in_payment.'") 
+												AND n_status IN ('.$in_status.') AND
+												DATE(order_date) >= "'.$start_date.'" AND 
+												DATE(order_date) <= "'.$end_date.'"
+												LIMIT 100000');
+	        	$this->Session->setFlash($e->getMessage());
+	        	$this->redirect('/merchandises/report');
 	        }
-
-	        // Define column headers for CSV file, in same array format as the data itself
-	        $headers = array(
-	            'merchandise_orders'=>array(
-	                'po_number' => 'PO NUMBER',
-	                'order_date' => 'ORDER DATE',
-	                'first_name' => 'First Name',
-	                'last_name' => 'Last Name',
-	                'item_name' => 'Item Name',
-	                'qty' => 'Quantity',
-	                'price' => 'Price',
-	                'total_sale' => 'Total Sale'
-	            )
-	        );
-	        // Add headers to start of data array
-	        array_unshift($data, $headers);
-	        // Make the data available to the view (and the resulting CSV file)
-	        $this->set(compact('data'));
-
-	        $this->set('filename', 'purchase-order-'.date("Y-m-d").'.csv');
-
-        }catch(Exception $e){
-        	Cakelog::write('debug', 'merchandises.export message : '.$e->getMessage());
-        	echo $e->getMessage();
-        }
-        
+    	}
 	}
 }

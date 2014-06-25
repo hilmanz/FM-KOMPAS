@@ -1,3 +1,4 @@
+
 <div id="leaderboardPage">
       <div class="rowd">
      	 <?php echo $this->element('infobar'); ?>
@@ -18,6 +19,7 @@
        					 </a>
     					</td>
                         <td>
+  
                             <span>Rank: <strong><?=number_format($USER_RANK)?></strong></span>
                             <span>Stars: <strong><?=number_format($team_bugdet)?> Star</strong></span>
                             <span>Point: <strong><?=number_format($USER_POINTS)?></strong></span>

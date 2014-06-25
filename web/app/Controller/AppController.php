@@ -152,7 +152,7 @@ class AppController extends Controller {
 					$upcoming_match = null;
 					$future_match = null;
 				}
-			
+				
 				if($previous_match!=null && $upcoming_match !=null){
 					//check the previous match backend proccess status
 					$last_match_status = $this->Session->read('last_match_status');

@@ -59,7 +59,10 @@ class MarketController extends AppController {
 															($v['stats']['draws']);
 		}
 		$this->set('teams',$this->sortTeamByPoints($teams['data']));
-
+		//budget
+		$userData = $this->getUserData();
+		$budget = $this->Game->getBudget($userData['team']['id']);
+		$this->set('team_bugdet',$budget);
 	}
 	private function sortTeamByPoints($teams){
 		
@@ -138,6 +141,7 @@ class MarketController extends AppController {
 
 		//budget
 		$budget = $this->Game->getBudget($userData['team']['id']);
+
 		$this->set('team_bugdet',$budget);
 
 		//club

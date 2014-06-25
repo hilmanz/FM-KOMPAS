@@ -876,7 +876,8 @@ function next_match(team_id,done){
 				},
 				function(rs,callback){
 					try{
-						conn.query("SELECT match_date \
+						if(rs.length > 0){
+							conn.query("SELECT match_date \
 									FROM \
 									ffgame_wc.game_fixtures \
 									WHERE matchday = ? \
@@ -893,6 +894,33 @@ function next_match(team_id,done){
 										
 										callback(err,rs);
 									});
+						}else{
+							rs = [];
+							conn.query("SELECT matchday \
+										FROM ffgame_wc.master_matchdays \
+										WHERE UNIX_TIMESTAMP(NOW()) BETWEEN UNIX_TIMESTAMP(start_dt) \
+										AND UNIX_TIMESTAMP(end_dt);",[],function(err,m){
+											rs.push({next_match:null,matchday:m[0].matchday+1});				
+										
+							
+									conn.query("SELECT match_date \
+											FROM \
+											ffgame_wc.game_fixtures \
+											WHERE matchday = ? \
+											ORDER BY match_date DESC \
+											LIMIT 1;",
+											[m[0].matchday],
+											function(err,last_match){
+												if(last_match!=null && last_match.length > 0){
+													rs[0].last_match = last_match[0].match_date;
+												}else{
+													rs[0].last_match = '';
+												}
+												callback(err,rs);
+											});
+							});
+						}
+						
 					}catch(e){
 						callback(null,rs);
 					}
@@ -1743,7 +1771,20 @@ function buy(redisClient,window_id,game_team_id,player_id,done){
 								LIMIT 1;\
 								",[team_id,team_id],function(err,rs){
 									//console.log(this.sql);
-									callback(err,name,transfer_value,rs[0]['game_id'],rs[0]['matchday']);
+									if(rs.length==0){
+										rs = [];
+										conn.query("SELECT matchday \
+													FROM ffgame_wc.master_matchdays \
+													WHERE UNIX_TIMESTAMP(NOW()) \
+													BETWEEN UNIX_TIMESTAMP(start_dt) \
+													AND UNIX_TIMESTAMP(end_dt);",[],function(err,m){
+														rs.push({matchday:m[0].matchday+1,game_id:''});
+														callback(err,name,transfer_value,rs[0]['game_id'],rs[0]['matchday']);
+													});
+									}else{
+										callback(err,name,transfer_value,rs[0]['game_id'],rs[0]['matchday']);
+									}
+									
 								});
 							},
 							function(name,transfer_value,game_id,matchday,callback){

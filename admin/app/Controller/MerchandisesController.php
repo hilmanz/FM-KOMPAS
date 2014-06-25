@@ -842,7 +842,7 @@ class MerchandisesController extends AppController {
 		$date_range = $this->MerchandiseItemPerks->query("SELECT 
 											    DATE_FORMAT(MIN(order_date), '%d-%m-%Y') AS order_date
 											FROM
-											    fantasy_wc.merchandise_orders 
+											    merchandise_orders 
 											UNION SELECT 
 											    DATE_FORMAT(MAX(order_date), '%d-%m-%Y') AS order_date
 											FROM

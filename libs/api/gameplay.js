@@ -1485,7 +1485,20 @@ function sale(redisClient,window_id,game_team_id,player_id,done){
 								ORDER BY a.matchday\
 								LIMIT 1;\
 								",[team_id,team_id],function(err,rs){
-									callback(err,name,transfer_value,rs[0]['game_id'],rs[0]['matchday']);
+									if(rs.length==0){
+										rs = [];
+										conn.query("SELECT matchday \
+													FROM ffgame_wc.master_matchdays \
+													WHERE UNIX_TIMESTAMP(NOW()) \
+													BETWEEN UNIX_TIMESTAMP(start_dt) \
+													AND UNIX_TIMESTAMP(end_dt);",[],function(err,m){
+														rs.push({matchday:m[0].matchday+1,game_id:''});
+														callback(err,name,transfer_value,rs[0]['game_id'],rs[0]['matchday']);
+													});
+									}else{
+										callback(err,name,transfer_value,rs[0]['game_id'],rs[0]['matchday']);
+									}
+									
 								});
 							},
 							function(name,transfer_value,game_id,matchday,callback){

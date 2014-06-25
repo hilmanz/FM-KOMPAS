@@ -846,7 +846,7 @@ class MerchandisesController extends AppController {
 											UNION SELECT 
 											    DATE_FORMAT(MAX(order_date), '%d-%m-%Y') AS order_date
 											FROM
-											    fantasy_wc.merchandise_orders
+											    merchandise_orders
 											limit 100000");
 
 		$date_start = $date_range[0][0]['order_date'];

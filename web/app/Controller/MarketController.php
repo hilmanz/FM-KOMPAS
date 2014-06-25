@@ -58,6 +58,7 @@ class MarketController extends AppController {
 			$teams['data'][$n]['stats']['points_earned'] = ($v['stats']['wins'] * 3) + 
 															($v['stats']['draws']);
 		}
+		
 		$this->set('teams',$this->sortTeamByPoints($teams['data']));
 		//budget
 		$userData = $this->getUserData();
@@ -123,7 +124,8 @@ class MarketController extends AppController {
 		}
 		
 		$this->set('players',$player_list);
-
+		$budget = $this->Game->getBudget($userData['team']['id']);
+		$this->set('team_bugdet',$budget);
 	}
 	private function isMyPlayer($player_id,$my_players){
 		foreach($my_players as $m){

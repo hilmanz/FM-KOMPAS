@@ -249,6 +249,7 @@ function formulate_stats(team_id){
 	}
 
 	//GOALS
+	stats['goals']	= o.goals;
 	stats['goals inside / outside the box'] = o.att_ibox_goal +'/'+ o.att_obox_goal;
 	stats['goals from open play / freekicks / penalties'] = o.goals_openplay +'/'+ o.att_freekick_goal +'/'+ o.att_pen_goal;
 	stats['goals From counter attacks'] = o.goal_fastbreak 
@@ -281,7 +282,7 @@ function formulate_stats(team_id){
 	stats['Final 3rd Entry'] = o.final_third_entries 
 	stats['Penalty area entry'] = o.pen_area_entries 
 	stats['Passes in the final 3rd'] = o.successful_final_third_passes +'/'+ o.total_final_third_passes;
-	stats['Take ons'] = o.won_contest +'/'+ o.total_contest;
+	stats['Dribble Attempts'] = o.won_contest +'/'+ o.total_contest;
 
 	//['BUILD UP
 	stats['Long passes from own half'] = o.long_pass_own_to_opp_success +'/'+ o.long_pass_own_to_opp;
@@ -291,8 +292,8 @@ function formulate_stats(team_id){
 	stats['Layoffs'] = o.accurate_layoffs +'/'+ o.total_layoffs 
 
 	//['SET PIECES EFFICIENCY'] = 
-	stats['Corners'] = o.accurate_corners_intobox +'/'+ o.total_corners_intobox;
-	stats['Free kicks'] = o.accurate_freekick_cross +'/'+ o.freekick_cross;
+	stats['Corners Accuracy'] = o.accurate_corners_intobox +'/'+ o.total_corners_intobox;
+	stats['Free kicks crossing accuracy'] = o.accurate_freekick_cross +'/'+ o.freekick_cross;
 	stats['Direct free kicks'] = (o.att_freekick_goal + o.att_freekick_target) +'/'+ o.att_freekick_total;
 
 	stats['Penalties - Goal'] = o.att_pen_goal;

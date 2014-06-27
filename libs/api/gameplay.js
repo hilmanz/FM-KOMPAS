@@ -896,14 +896,12 @@ function next_match(team_id,done){
 									});
 						}else{
 							rs = [];
-							conn.query("SELECT matchday \
-										FROM ffgame_wc.master_matchdays \
-										WHERE UNIX_TIMESTAMP(NOW()) BETWEEN UNIX_TIMESTAMP(start_dt) \
-										AND UNIX_TIMESTAMP(end_dt);",[],function(err,m){
-											rs.push({next_match:null,matchday:m[0].matchday+1});				
-										
-							
-									conn.query("SELECT match_date \
+							console.log('next_match','no match for these team, se we guessing the matchday');
+							conn.query("SELECT matchday FROM ffgame_wc.game_fixtures \
+										WHERE period IN ('FullTime') ORDER BY matchday DESC LIMIT 1;",
+										[],function(err,m){
+											rs.push({next_match:null,matchday:m[0].matchday+1});
+											conn.query("SELECT match_date \
 											FROM \
 											ffgame_wc.game_fixtures \
 											WHERE matchday = ? \
@@ -1487,12 +1485,10 @@ function sale(redisClient,window_id,game_team_id,player_id,done){
 								",[team_id,team_id],function(err,rs){
 									if(rs.length==0){
 										rs = [];
-										conn.query("SELECT matchday \
-													FROM ffgame_wc.master_matchdays \
-													WHERE UNIX_TIMESTAMP(NOW()) \
-													BETWEEN UNIX_TIMESTAMP(start_dt) \
-													AND UNIX_TIMESTAMP(end_dt);",[],function(err,m){
-														rs.push({matchday:m[0].matchday+1,game_id:''});
+										conn.query("SELECT matchday FROM ffgame_wc.game_fixtures \
+										WHERE period NOT IN ('FullTime') ORDER BY matchday ASC LIMIT 1;",
+													[],function(err,m){
+														rs.push({matchday:m[0].matchday,game_id:''});
 														callback(err,name,transfer_value,rs[0]['game_id'],rs[0]['matchday']);
 													});
 									}else{
@@ -1786,12 +1782,10 @@ function buy(redisClient,window_id,game_team_id,player_id,done){
 									//console.log(this.sql);
 									if(rs.length==0){
 										rs = [];
-										conn.query("SELECT matchday \
-													FROM ffgame_wc.master_matchdays \
-													WHERE UNIX_TIMESTAMP(NOW()) \
-													BETWEEN UNIX_TIMESTAMP(start_dt) \
-													AND UNIX_TIMESTAMP(end_dt);",[],function(err,m){
-														rs.push({matchday:m[0].matchday+1,game_id:''});
+										conn.query("SELECT matchday FROM ffgame_wc.game_fixtures \
+										WHERE period NOT IN ('FullTime') ORDER BY matchday ASC LIMIT 1;",
+										[],function(err,m){
+														rs.push({matchday:m[0].matchday,game_id:''});
 														callback(err,name,transfer_value,rs[0]['game_id'],rs[0]['matchday']);
 													});
 									}else{
@@ -1817,7 +1811,7 @@ function buy(redisClient,window_id,game_team_id,player_id,done){
 											 matchday
 											],
 											function(err,rs){
-												//console.log(this.sql);
+												console.log(this.sql);
 												callback(err,{name:name,transfer_value:transfer_value});
 								});
 							},

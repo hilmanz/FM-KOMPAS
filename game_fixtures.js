@@ -75,6 +75,8 @@ function process_match_data(conn,competition_id,session_id,data,done){
 						VALUES\
 						(?,?,?,?,?,?,?,?,?,?,?,?,?)\
 						ON DUPLICATE KEY UPDATE\
+						home_id = VALUES(home_id),\
+						away_id = VALUES(away_id),\
 						session_id = VALUES(session_id),\
 						match_date = VALUES(match_date),\
 						attendance = VALUES(attendance);",

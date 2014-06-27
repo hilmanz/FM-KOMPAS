@@ -341,3 +341,5 @@ ALTER TABLE `fantasy`.`users` ADD UNIQUE `UNIQUE_EMAIL` (`email`);
 
 
 ALTER TABLE `ffgame_wc`.`game_team_lineups`     ADD COLUMN `matchday` INT(3) DEFAULT '1' NULL AFTER `position_no`;
+
+ALTER TABLE `ffgame_wc`.`game_transfer_history` ENGINE = INNODB;

@@ -21,7 +21,7 @@ exports.config = {
 		protocol:'https',
 		host:'mandiri-ecash.com',
 		username:'supersoccer',
-		password: '123456',
+		password: 'pass123456',
 		returnUrl: 'http://localhost/fantasy_wc/merchandises/payment',
 		returnUrl2: 'http://localhost/duf/supersoccer_fork/onlinecatalog/complete',
 		returnUrl3: 'http://localhost/fantasy_wc/merchandises/pay/return',

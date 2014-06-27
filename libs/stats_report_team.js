@@ -249,7 +249,7 @@ function formulate_stats(team_id){
 	}
 
 	//GOALS
-	stats['goals']	= o.goals;
+
 	stats['goals inside / outside the box'] = o.att_ibox_goal +'/'+ o.att_obox_goal;
 	stats['goals from open play / freekicks / penalties'] = o.goals_openplay +'/'+ o.att_freekick_goal +'/'+ o.att_pen_goal;
 	stats['goals From counter attacks'] = o.goal_fastbreak 
@@ -348,6 +348,7 @@ function formulate_stats(team_id){
 	stats['Red Cards'] = o.total_red_card; 
 	stats['Caught Offside'] = o.total_offside; 
 	
+	stats['goals']	= o.goals;
 	return stats;
 }
 

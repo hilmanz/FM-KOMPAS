@@ -177,6 +177,9 @@ exports.check_violation = function(conn,game_id,game_team_id,original_team_id,ca
 			
 		},
 		function(check,game_type,cb){
+			//rule dicabut dulu
+			//untuk babak knockout Worldcup
+			/*
 			if((check.original/check.total) < 0.5){
 				
 				add_rules(conn,game_id,game_team_id,game_type,function(err){
@@ -186,7 +189,8 @@ exports.check_violation = function(conn,game_id,game_team_id,original_team_id,ca
 				
 			}else{
 				cb(null,null);
-			}
+			}*/
+			cb(null,null);
 		}
 	],
 	function(err,rs){

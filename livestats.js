@@ -536,7 +536,7 @@ function storeGameIdPlayerPointsToRedis(conn,game_id,done){
 						FROM optadb.goals a\
 						INNER JOIN optadb.master_player b \
 						ON a.player_id = b.uid\
-						WHERE game_id = ? LIMIT 20;",
+						WHERE game_id = ? AND  goal_type='Goal' LIMIT 20;",
 						[game_id],function(err,rs){
 							cb(err,rs);
 						});

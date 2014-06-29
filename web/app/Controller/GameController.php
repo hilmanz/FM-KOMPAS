@@ -297,7 +297,9 @@ class GameController extends AppController {
 
 
 	public function check_team_name(){
+	
 		$team_name = Sanitize::clean($this->request->query['name']);
+
 		$this->loadModel('Team');
 		
 		$club = $this->Team->findByTeam_name($team_name);

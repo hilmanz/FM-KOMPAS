@@ -18,7 +18,7 @@ class CaptchaComponent extends Component{
 		)
 	);
 	public $settings = array(
-		'font' => 'monofont.ttf', //arial.ttf - place font file somewhere and specify path here.
+		'font' => './monofont.ttf', //arial.ttf - place font file somewhere and specify path here.
 		'width' => 120,
 		'height' => 40,
 		'characters' => 6,

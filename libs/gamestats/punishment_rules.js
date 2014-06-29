@@ -190,6 +190,7 @@ exports.check_violation = function(conn,game_id,game_team_id,original_team_id,ca
 			}else{
 				cb(null,null);
 			}*/
+			console.log('ORIGINAL_TEAM_CHECK',game_id,'#',game_team_id,check.original,'of',check.total,'SKIPPED FOR KO STAGE');
 			cb(null,null);
 		}
 	],

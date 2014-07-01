@@ -435,6 +435,9 @@ class MerchandisesController extends AppController {
 		$po_number = $this->userData['team']['id'].'-'.date("ymdhis");
 		$this->Session->write('PO_NUMBER',$po_number);
 
+		Cakelog::write('debug', 'Merchandise.buy - write po_number:'.$po_number.' 
+									team id:'.$this->userData['team']['id']);
+
 		if($stock_status){
 
 			$this->set('shopping_cart',$shopping_cart);
@@ -568,6 +571,9 @@ class MerchandisesController extends AppController {
 		$no_fund = false;
 
 		$po_number = $this->Session->read('PO_NUMBER');
+		
+		Cakelog::write('debug', 'Merchandise.order - read po_number:'.$po_number.' 
+									team id:'.$this->userData['team']['id']);
 
 		//recheck the stock of all items.
 		$stock_status = $this->recheckStockBeforePayment();
@@ -740,6 +746,12 @@ class MerchandisesController extends AppController {
 
 		$this->set('transaction_id',$transaction_id);
 		$hashed_url = encrypt_param($rs['data']);
+
+		if($hashed_url == '')
+		{
+			$this->render('ecash_error');
+		}
+		
 		$view = new View();
 		$this->set('ecash_url',$view->Html->url('/merchandises/ecash?r='.$hashed_url));
 	}

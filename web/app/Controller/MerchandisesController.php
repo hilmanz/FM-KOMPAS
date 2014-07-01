@@ -435,8 +435,7 @@ class MerchandisesController extends AppController {
 		$po_number = $this->userData['team']['id'].'-'.date("ymdhis");
 		$this->Session->write('PO_NUMBER',$po_number);
 
-		Cakelog::write('debug', 'Merchandise.buy - write po_number:'.$po_number.' 
-									team id:'.$this->userData['team']['id']);
+		Cakelog::write('debug', 'Merchandise.buy - write po_number:'.$po_number.' team id:'.$this->userData['team']['id']);
 
 		if($stock_status){
 
@@ -571,9 +570,8 @@ class MerchandisesController extends AppController {
 		$no_fund = false;
 
 		$po_number = $this->Session->read('PO_NUMBER');
-		
-		Cakelog::write('debug', 'Merchandise.order - read po_number:'.$po_number.' 
-									team id:'.$this->userData['team']['id']);
+
+		Cakelog::write('debug', 'Merchandise.order - read po_number:'.$po_number.' team id:'.$this->userData['team']['id']);
 
 		//recheck the stock of all items.
 		$stock_status = $this->recheckStockBeforePayment();

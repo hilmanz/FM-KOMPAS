@@ -339,9 +339,9 @@ ADD COLUMN `activation_code` VARCHAR(64) NULL AFTER `birthdate`;
 
 ALTER TABLE `fantasy`.`users` ADD UNIQUE `UNIQUE_EMAIL` (`email`);
 
-
 ALTER TABLE `ffgame_wc`.`game_team_lineups`     ADD COLUMN `matchday` INT(3) DEFAULT '1' NULL AFTER `position_no`;
-
 
 ALTER TABLE `fantasy`.`merchandise_orders` 
 ADD INDEX `IDX_ORDER_DATE` (`order_date` ASC);
+
+ALTER TABLE `ffgame_wc`.`game_transfer_history` ENGINE = INNODB;

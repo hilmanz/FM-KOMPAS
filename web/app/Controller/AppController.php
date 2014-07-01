@@ -46,6 +46,7 @@ class AppController extends Controller {
 	
 	
 	public function beforeFilter(){
+
 		if(isset($this->request->query['email'])
 			&& isset($this->request->query['osign'])){
 			$this->Session->write('pending_redirect',
@@ -275,12 +276,12 @@ class AppController extends Controller {
 						//pr($previous_match);
 						if(time() < $future_match['start_dt']){
 							$open_time = time();
-							pr($open_time);
+							//pr($open_time);
 						
 						}else{
 							$open_time = strtotime($upcoming_match['start_dt']);
 							
-							pr($open_time);
+							//pr($open_time);
 							
 						}
 

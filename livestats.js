@@ -119,18 +119,28 @@ function populateIntoMasterPlayerProgress(conn,matchday,game_id,done){
 				});
 			},
 			function(modifiers,cb){
-				//only populate data if the match isnt FullTime Yet
-				redisClient.get('livestats_ft_'+item.game_id,function(err,fulltime){
-					if(fulltime==null){
-						console.log('livestats','not fulltime yet',item.game_id);
-						populateData(conn,modifiers,item.game_id,function(err){
-							cb(err);
-						});		
-					}else{
-						console.log('livestats','has reached fulltime, we not proceed',item.game_id);
-						cb(null);
-					}
-				});
+				if(item.period=='ExtraFirstHalf' 
+						|| item.period=='ExtraSecondHalf' 
+						|| item.period=='ShootOut'){
+					//kita anggap belum full time karena ternyata ada extra time.
+					populateData(conn,modifiers,item.game_id,function(err){
+						cb(err);
+					});		
+				}else{
+					//only populate data if the match isnt FullTime Yet
+					redisClient.get('livestats_ft_'+item.game_id,function(err,fulltime){
+						if(fulltime==null){
+							console.log('livestats','not fulltime yet',item.game_id);
+							populateData(conn,modifiers,item.game_id,function(err){
+								cb(err);
+							});		
+						}else{
+							console.log('livestats','has reached fulltime, we not proceed',item.game_id);
+							cb(null);
+						}
+					});
+				}
+				
 				//console.log(modifiers);
 				
 			},
@@ -536,7 +546,7 @@ function storeGameIdPlayerPointsToRedis(conn,game_id,done){
 						FROM optadb.goals a\
 						INNER JOIN optadb.master_player b \
 						ON a.player_id = b.uid\
-						WHERE game_id = ? LIMIT 20;",
+						WHERE game_id = ? AND  goal_type='Goal' LIMIT 20;",
 						[game_id],function(err,rs){
 							cb(err,rs);
 						});

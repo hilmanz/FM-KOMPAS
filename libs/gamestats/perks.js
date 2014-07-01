@@ -47,7 +47,19 @@ exports.apply_player_perk = function(conn,game_team_id,player_id,new_stats,match
 					matchday,game_team_id,game_team_id
 				],
 				function(err,rs){
-					cb(err,perks,extra_points,additional_points,rs[0].game_id);
+					try{
+						cb(err,perks,extra_points,additional_points,rs[0].game_id);	
+					}catch(e){
+						conn.query("SELECT game_id FROM ffgame_wc.game_fixtures\
+								 WHERE matchday=? ORDER BY game_id ASC LIMIT 1",
+								 [matchday],function(err,match){
+								 	the_game_id = match[0]['game_id'];
+								 	console.log('the game id : ',the_game_id,' actually not found');
+								 	cb(err,perks,extra_points,additional_points,the_game_id);
+								 });
+						
+					}
+					
 				});
 			},
 			function(perks,extra_points,additional_points,the_game_id,cb){

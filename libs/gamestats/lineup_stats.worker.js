@@ -243,12 +243,19 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 																var the_game_id = '';
 																try{
 																	the_game_id = match[0]['game_id'];
+																	cb(err,the_game_id);
 																}catch(e){
-																	err = new Error('no game_id found');
+																	conn.query("SELECT game_id FROM ffgame_wc.game_fixtures\
+																	 WHERE matchday=? ORDER BY game_id ASC LIMIT 1",
+																	 [matchday],function(err,match){
+																	 	the_game_id = match[0]['game_id'];
+																	 	console.log('the game id : ',the_game_id,' actually not found');
+																	 	cb(err,the_game_id);
+																	 });
+																	//err = new Error('no game_id found');
 																}
-																//console.log('the game id : ',the_game_id);
 
-																cb(err,the_game_id);
+																
 															});
 												},
 												function(t_game_id,cb){
@@ -260,12 +267,12 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 																AND a.game_team_id=? LIMIT 16;",
 																[t_game_id,item.id],
 																function(err,rs){
-																	//console.log('ISSUE1',S(this.sql).collapseWhitespace().s);
+																	console.log('ISSUE1',S(this.sql).collapseWhitespace().s);
 																	cb(err,rs);
 																});
 												},
 												function(lineup_players,cb){
-													//console.log('ISSUE1',lineup_players);
+													console.log('ISSUE1',lineup_players);
 													async.eachSeries(lineup_players,function(lp,nx){
 														var is_sub = false;
 														if(lp.position_no>11){
@@ -357,12 +364,18 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 																		if(!err){
 																			try{
 																				the_game_id = r[0].game_id;
+																				cb(err,the_game_id);
 																			}catch(e){
-																				the_game_id = '';
+																				conn.query("SELECT game_id FROM ffgame_wc.game_fixtures\
+																				 WHERE matchday=? ORDER BY game_id ASC LIMIT 1",
+																				 [matchday],function(err,match){
+																				 	the_game_id = match[0]['game_id'];
+																				 	console.log('the game id : ',the_game_id,' actually not found');
+																				 	cb(err,the_game_id);
+																				 });
 																			}
-																			
 																		}
-																		cb(err,the_game_id);
+																		
 																	});
 													}
 												],
@@ -953,12 +966,18 @@ function addToHistory(game_id,team,done){
 								var the_game_id = '';
 								try{
 									the_game_id = match[0]['game_id'];
+									console.log('the game id : ',the_game_id);
+									callback(err,the_game_id);
 								}catch(e){
-									err = new Error('no game_id found');
+									conn.query("SELECT game_id FROM ffgame_wc.game_fixtures\
+												 WHERE matchday=? ORDER BY game_id ASC LIMIT 1",
+												 [matchday],function(err,match){
+												 	the_game_id = match[0]['game_id'];
+												 	console.log('the game id : ',the_game_id,' actually not found');
+												 	callback(err,the_game_id);
+												 });
+									
 								}
-								console.log('the game id : ',the_game_id);
-
-								callback(err,the_game_id);
 							});
 			},
 			function(the_game_id,callback){
@@ -1028,12 +1047,19 @@ function getTeamLineups(game_id,team,done){
 								var the_game_id = '';
 								try{
 									the_game_id = match[0]['game_id'];
+									console.log('the game id : ',the_game_id);
+									callback(err,the_game_id);
 								}catch(e){
-									err = new Error('no game_id found');
+									//err = new Error('no game_id found');
+									conn.query("SELECT game_id FROM ffgame_wc.game_fixtures\
+												 WHERE matchday=? ORDER BY game_id ASC LIMIT 1",
+												 [matchday],function(err,match){
+												 	the_game_id = match[0]['game_id'];
+												 	console.log('the game id : ',the_game_id,' actually not found');
+												 	callback(err,the_game_id);
+												 });
 								}
-								console.log('the game id : ',the_game_id);
-
-								callback(err,the_game_id);
+								
 							});
 			},
 			function(the_game_id,callback){

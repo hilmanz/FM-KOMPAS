@@ -340,6 +340,21 @@ class ManageController extends AppController {
 								AND d.game_team_id = {$this->userData['team']['id']} LIMIT 1)
 					ORDER BY a.matchday DESC";
 			*/
+		
+			//get the game_id stored in lineup history
+
+			$sql = "SELECT game_id FROM ffgame_wc.game_team_lineups_history a
+					WHERE game_team_id={$this->userData['team']['id']} GROUP BY game_id;";
+					
+			$current_game_ids = $this->Game->query($sql,false);
+
+			$gids = array();
+			for($i=0;$i<sizeof($current_game_ids);$i++){
+				$gids[] = "'".$current_game_ids[$i]['a']['game_id']."'";
+			}
+		
+			$gids = implode(",",$gids);
+
 			$sql = "SELECT game_id,home_id,away_id,b.name AS home_name,c.name AS away_name,
 					a.matchday,a.match_date,a.home_score,a.away_score
 					FROM ffgame_wc.game_fixtures a
@@ -347,11 +362,13 @@ class ManageController extends AppController {
 					ON a.home_id = b.uid
 					INNER JOIN ffgame_wc.master_team c
 					ON a.away_id = c.uid
-					WHERE (a.home_id = '{$this->userData['team']['team_id']}' 
-							OR a.away_id = '{$this->userData['team']['team_id']}')
+					WHERE a.game_id IN ({$gids})
 					AND a.is_processed = 1
 					ORDER BY a.matchday DESC";
+
+
 			$rs = $this->Game->query($sql);
+			
 			
 
 			foreach($rs as $n=>$r){

@@ -145,7 +145,7 @@ class Stats extends AppModel {
 		return $this->query($sql,false);
 	}
 	public function getTeams(){
-		$teams = $this->query("SELECT uid as team_id,name FROM ".Configure::read('optadb').".master_team LIMIT 20");
+		$teams = $this->query("SELECT uid as team_id,name FROM ".Configure::read('optadb').".master_team LIMIT 40");
 		$rs = array();
 		while(sizeof($teams)>0){
 			$t = array_shift($teams);

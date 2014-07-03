@@ -121,7 +121,8 @@ function populateIntoMasterPlayerProgress(conn,matchday,game_id,done){
 			function(modifiers,cb){
 				if(item.period=='ExtraFirstHalf' 
 						|| item.period=='ExtraSecondHalf' 
-						|| item.period=='ShootOut'){
+						|| item.period=='ShootOut' 
+						|| argv.refresh == '1'){
 					//kita anggap belum full time karena ternyata ada extra time.
 					populateData(conn,modifiers,item.game_id,function(err){
 						cb(err);
@@ -465,6 +466,7 @@ function storeMatchInfoToRedis(conn,matchday,done){
 			});
 		},
 		function(matches,cb){
+			console.log(matches);
 			redisClient.set('matchinfo_'+matchday,JSON.stringify(matches),function(err,rs){
 				if(!err){
 					console.log('matchinfo successfully stored');

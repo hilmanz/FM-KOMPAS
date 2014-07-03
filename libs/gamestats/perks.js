@@ -196,6 +196,7 @@ function process_player_stats_perks(conn,game_team_id,matchday,perks,new_stats,c
 }
 /**
 * those who has jersey perk, will get additional points every match
+* @perk jersey di nerve jadi +10
 */
 function apply_jersey_perks(conn,game_id,matchday,game_team_id,callback){
 	console.log('apply_jersey_perks','starting');
@@ -225,7 +226,7 @@ function apply_jersey_perks(conn,game_id,matchday,game_team_id,callback){
 								matchday,
 								game_team_id,
 								'jersey_perk',
-								100,
+								10,
 								function(err,rs){
 									cb(err,rs);
 								});

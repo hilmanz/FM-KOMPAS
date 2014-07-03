@@ -77,11 +77,13 @@ function process_match_data(conn,competition_id,session_id,data,done){
 						ON DUPLICATE KEY UPDATE\
 						home_id = VALUES(home_id),\
 						away_id = VALUES(away_id),\
+						home_score = VALUES(home_score),\
+						away_score = VALUES(away_score),\
 						session_id = VALUES(session_id),\
 						match_date = VALUES(match_date),\
 						attendance = VALUES(attendance);",
 						[game_id,team.home_id,team.away_id,period,matchday,competition_id,
-						session_id,0,0,0,0,0,match_date],
+						session_id,team.home_score,team.away_score,0,0,0,match_date],
 						function(err,rs){
 							callback();
 						});
@@ -94,15 +96,21 @@ function process_match_data(conn,competition_id,session_id,data,done){
 function getTeam(team){
 	var home_id = '';
 	var away_id = '';
+	var home_score = 0;
+	var away_score = 0;
 	for(var i in team){
 		if(team[i].Side == 'Home'){
 			home_id = team[i].TeamRef;
+			home_score = team[i].Score;
 		}else{
 			away_id = team[i].TeamRef;
+			away_score = team[i].Score;
 		}
 	}
 	return {home_id:home_id,
-			away_id:away_id};
+			home_score:home_score,
+			away_id:away_id,
+			away_score:away_score};
 }
 function open_match_file(the_file,done){
 	var filepath = path.resolve('./data/'+the_file);

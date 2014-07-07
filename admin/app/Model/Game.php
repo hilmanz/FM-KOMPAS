@@ -297,5 +297,17 @@ class Game extends AppModel {
 		$rs = $this->api_call('/getFromTmp',array('name'=>$input_name));
 		return $rs;
 	}
+
+	public function getMatchDetailsByGameTeamId($game_team_id,$game_id){
+		$response = $this->api_call('/match/user_match_results/'.$game_team_id.'/'.$game_id);
+		return $response;
+	}
+	
+	public function getCash($team_id){
+		$response = $this->api_call('/cash/'.$team_id);
+		if($response['status']==1){
+			return $response['cash'];
+		}
+	}
 	//end of redis wrapper
 }

@@ -1,45 +1,48 @@
+<div class="row">
+	<a href="<?=$this->Html->url('/players/banned/'.$user['User']['id'])?>" class="button">Banned User</a>
+</div>
 <div class="theContainer">
 <h3 class="titles">Player Info</h3>
 <table width="100%" border="0" cellspacing="0" cellpadding="0" class="dataTable">
-		<tbody>
-			<tr>
-				<td><strong>Name</strong></td><td><?=h($user['User']['name'])?></td>
-				<td><strong>Team</strong></td><td><?=h($user['Team']['team_name'])?> (<?=$team_data['c']['name']?>)</td>
-				<td><strong>Budget</strong></td><td>SS$ <?=number_format($budget)?></td>
-			</tr>
-			<tr>
-				<td><strong>FBID/USERID</strong></td><td><?=h($user['User']['fb_id'])?> / <?=h($user['User']['id'])?></td><td><strong>Joined</strong></td>
-				<td><?=date("d-m-Y H:i:s",strtotime($user['User']['register_date']))?></td>
-				<td><strong>Points</strong></td><td><?=@number_format($point['points'])?></td>
-			</tr>
-			<tr>
-				<td><strong>Email</strong></td><td><?=h($user['User']['email'])?></td>
-				<td><strong>Reg.Status</strong></td>
-				<td>
-					<?php if($user['User']['register_completed']==1):?>
-						Completed
-					<?php else:?>
-						In Progress
-					<?php endif;?>
-				</td>
-				<td><strong>Rank</strong></td><td><?=@number_format($point['rank'])?></td>
-			</tr>
-			<tr>
-				<td><strong>Mobile</strong></td><td><?=h($user['User']['phone_number'])?></td>
-				<td><strong>Total Coin</strong></td>
-				<td>
-					<?=number_format($cash)?>
-					<a href="<?=$this->Html->url('/players/transaction/'.$user['User']['id'].'/'.$team_data['b']['id'])?>">
-						View Transaction
-					</a>
-				</td>
-				<td><strong>Total Matches</strong></td><td><?=number_format($total_matches)?></td>
-			</tr>
-			<tr>
-				<td><strong>Location</strong></td><td><?=h($user['User']['location'])?></td>
-				<td></td><td></td><td></td><td></td>
-			</tr>
-		</tbody>
+	<tbody>
+		<tr>
+			<td><strong>Name</strong></td><td><?=h($user['User']['name'])?></td>
+			<td><strong>Team</strong></td><td><?=h($user['Team']['team_name'])?> (<?=$team_data['c']['name']?>)</td>
+			<td><strong>Budget</strong></td><td>SS$ <?=number_format($budget)?></td>
+		</tr>
+		<tr>
+			<td><strong>FBID/USERID</strong></td><td><?=h($user['User']['fb_id'])?> / <?=h($user['User']['id'])?></td><td><strong>Joined</strong></td>
+			<td><?=date("d-m-Y H:i:s",strtotime($user['User']['register_date']))?></td>
+			<td><strong>Points</strong></td><td><?=@number_format($point['points'])?></td>
+		</tr>
+		<tr>
+			<td><strong>Email</strong></td><td><?=h($user['User']['email'])?></td>
+			<td><strong>Reg.Status</strong></td>
+			<td>
+				<?php if($user['User']['register_completed']==1):?>
+					Completed
+				<?php else:?>
+					In Progress
+				<?php endif;?>
+			</td>
+			<td><strong>Rank</strong></td><td><?=@number_format($point['rank'])?></td>
+		</tr>
+		<tr>
+			<td><strong>Mobile</strong></td><td><?=h($user['User']['phone_number'])?></td>
+			<td><strong>Total Coin</strong></td>
+			<td>
+				<?=number_format($cash)?>
+				<a href="<?=$this->Html->url('/players/transaction/'.$user['User']['id'].'/'.$team_data['b']['id'])?>">
+					View Transaction
+				</a>
+			</td>
+			<td><strong>Total Matches</strong></td><td><?=number_format($total_matches)?></td>
+		</tr>
+		<tr>
+			<td><strong>Location</strong></td><td><?=h($user['User']['location'])?></td>
+			<td></td><td></td><td></td><td></td>
+		</tr>
+	</tbody>
 </table>
 
 <h3 class="titles">Matches</h3>

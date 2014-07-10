@@ -586,7 +586,19 @@ class MerchandisesController extends AppController {
 			//  ){
 
 			if($this->request->data['payment_method']=='coins'){
-				$this->process_with_coins($po_number);
+				//cek user if CANT_USE_COIN 
+				$users = $this->User->findByFb_id($this->userData['fb_id']);
+				$rs_banned = $this->Game->query("SELECT * FROM fantasy_wc.banned_users
+												WHERE user_id = '{$users['User']['id']}'
+												AND banned_type = 'CANT_USE_COIN' LIMIT 1");
+				if(count($rs_banned) != 0)
+				{
+					$this->render('cant_use_coin');
+				}
+				else
+				{
+					$this->process_with_coins($po_number);
+				}
 			}else{
 				$this->pay_with_ecash($po_number);
 				$this->render('ecash');

@@ -4750,6 +4750,31 @@ class ApiController extends AppController {
 		$this->render('default');
 	}
 
+	public function check_banned()
+	{
+		try{
+			$this->loadModel('User');
+			$this->loadModel('MerchandiseItem');
+
+			$fb_id = Sanitize::clean($this->request->query('fb_id'));
+			$users = $this->User->findByFb_id($fb_id);
+			$rs_banned = $this->MerchandiseItem->query("SELECT * FROM banned_users
+														WHERE user_id = '{$users['User']['id']}' LIMIT 100");
+			Cakelog::write('debug', json_encode($rs_banned));
+			$data = array();
+			foreach ($rs_banned as $key => $value){
+				$data[] = $value['banned_users'];
+			}
+			$this->set('response', array('status'=>1,'data'=>$data));
+
+		}catch(Exception $e){
+			Cakelog::write('error', $e->getMessage());
+			$this->set('response', array('status'=>0,'msg'=>$e->getMessage()));
+		}
+
+		$this->render('default');
+	}
+
 	private function saveAgentOrder($agent_id,$po_number,$order_data){
 		$this->loadModel('MerchandiseItem');
 		$this->loadModel('AgentItem');

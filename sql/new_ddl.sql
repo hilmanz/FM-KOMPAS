@@ -345,3 +345,13 @@ ALTER TABLE `fantasy`.`merchandise_orders`
 ADD INDEX `IDX_ORDER_DATE` (`order_date` ASC);
 
 ALTER TABLE `ffgame_wc`.`game_transfer_history` ENGINE = INNODB;
+
+CREATE TABLE `fantasy`.`banned_users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) DEFAULT NULL,
+  `banned_type` varchar(100) DEFAULT NULL,
+  `reason` varchar(150) DEFAULT NULL,
+  `log_dt` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `COMPOUND` (`user_id`,`banned_type`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;

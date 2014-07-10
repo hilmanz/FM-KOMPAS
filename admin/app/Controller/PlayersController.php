@@ -213,9 +213,47 @@ class PlayersController extends AppController {
 	{
 		$rs_transaction = $this->Game->query("SELECT * FROM ffgame_wc.game_transactions 
 											WHERE game_team_id='{$game_team_id}' ORDER BY id DESC
-											LIMIT 30");
+											LIMIT 1000");
 		$this->set('user_id', $user_id);
 		$this->set('rs_transaction', $rs_transaction);
+	}
+
+	public function banned($user_id = "")
+	{
+		if($this->request->is("post"))
+		{
+			try{
+				$user_id = $this->request->data['user_id'];
+				$banned_type = $this->request->data['banned_type'];
+				$reason = $this->request->data['reason'];
+				if($banned_type == ""){
+					throw new Exception("Please Select Banned Type");
+				}else if($reason == ""){
+					throw new Exception("Please give a reason");
+				}
+				$users = $this->Game->query("INSERT INTO fantasy_wc.banned_users(user_id,banned_type,reason,log_dt)
+										VALUES('{$user_id}','{$banned_type}','{$reason}',now())
+										ON DUPLICATE KEY UPDATE reason='{$reason}', log_dt=now()");
+				$this->Session->setFlash("New banned user has been added successfully !");
+			}catch(Exception $e){
+				Cakelog::write('error', 'players.banned msg:'.$e->getMessage());
+				$this->Session->setFlash($e->getMessage());
+			}
+
+		}
+
+		$users = $this->Game->query("SELECT * FROM fantasy_wc.users a
+								INNER JOIN ffgame_wc.game_users b
+								ON a.fb_id = b.fb_id
+								INNER JOIN ffgame_wc.game_teams c
+								ON b.id = c.user_id
+								INNER JOIN ffgame_wc.master_team d
+								ON c.team_id = d.uid
+								WHERE a.id='{$user_id}' LIMIT 1");
+		if(count($users) == 0){
+			$this->redirect('/players/overall');
+		}
+		$this->set('users', $users);
 	}
 
 	/*private function getMatchDetail($game_team_id,$original_team_id,$game_id){

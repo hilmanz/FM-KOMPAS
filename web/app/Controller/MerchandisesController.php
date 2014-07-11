@@ -156,6 +156,34 @@ class MerchandisesController extends AppController {
 	}
 	public function pay($type,$order_id=0){
 
+		if($this->request->is("post"))
+		{
+			try{
+				$this->getOngkirList();
+				$this->loadModel("MerchandiseOrder");
+
+				$city_id = $this->request->data['city_id'];
+				$order_id = $this->request->data['order_id'];
+				$fb_id = $this->userData['fb_id'];
+
+				foreach($this->ongkirList as $ongkir){
+					if($ongkir['Ongkir']['id'] == intval($city_id)){
+						$ongkir_value = intval($ongkir['Ongkir']['cost']);
+						break;
+					}
+				}
+				$this->MerchandiseOrder->query("UPDATE merchandise_orders 
+												SET ongkir_id='{$city_id}',ongkir_value='{$ongkir_value}'
+												WHERE id='{$order_id}' AND fb_id='{$fb_id}'");
+				$this->redirect('/merchandises/pay/ongkir/'.$order_id);
+
+			}catch(Exception $e){
+				CakeLog::write("error", "merchandises.pay msg:".$e->getMessage());
+			}
+			
+
+		}
+
 		if($type=='ongkir'){
 			$this->payOngkirPage($order_id);
 		}else{
@@ -222,9 +250,16 @@ class MerchandisesController extends AppController {
 
 	}
 	private function payOngkirPage($order_id){
-		$ongkir = $this->Ongkir->find('all',array('limit'=>10000));
+		$ongkir = $this->Ongkir->find('all',
+									array('limit'=>10000,
+									'order'=>array('Ongkir.kecamatan'=>'ASC')));
 		$rs = $this->MerchandiseOrder->findById($order_id);
-		
+
+		if($rs['MerchandiseOrder']['ongkir_id'] == 0)
+		{
+			$this->set('ongkir', $ongkir);
+		}
+
 		$items = unserialize($rs['MerchandiseOrder']['data']);
 
 		$kg = 0;
@@ -243,9 +278,9 @@ class MerchandisesController extends AppController {
 				$city = $ok['Ongkir'];
 			}
 		}
-		$total_ongkir = $kg * $city['cost'];
+		$total_ongkir = $kg * @$city['cost'];
 
-		$this->set('city',$city);
+		$this->set('city',@$city);
 		$this->set('total_ongkir',$total_ongkir);
 
 		//add suffix -1 to define that its the payment for shipping for these po number.

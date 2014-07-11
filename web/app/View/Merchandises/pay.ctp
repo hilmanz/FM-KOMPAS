@@ -1,4 +1,3 @@
-
 <div id="catalogPage">
       <div class="rowd">
      	 <?php echo $this->element('infobar'); ?>
@@ -22,6 +21,7 @@
 						<?php
 							$shopping_cart = unserialize($rs['MerchandiseOrder']['data']);
 						?>
+						<?php if(!isset($ongkir)): ?>
 						<table width="100%" border="0" cellspacing="0" cellpadding="0" class="theTable footable">
 							<thead>
                                 <tr>
@@ -48,6 +48,47 @@
                             </tbody>
 		                    
 		                </table>
+		            	<?php else: ?>
+		            	<form action="<?=$this->Html->url('')?>" method="post" 
+                		enctype="application/x-www-form-urlencoded">
+		            	<table width="100%" border="0" cellspacing="0" cellpadding="0" class="theTable footable">
+							<thead>
+                                <tr>
+                                   
+                                    <th>Item</th>
+                                    <th>Kota Tujuan</th>
+                                    <th>Biaya</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Ongkos Kirim</td>
+                                    <td>
+                                    	<select name="city_id" style="width:150px;">
+                                    		<option value="">PILIH KOTA</option>
+                                    		<?php foreach($ongkir as $value): ?>
+                                    			<option value="<?=$value['Ongkir']['id']?>" 
+                                    				data-cost="<?=$value['Ongkir']['cost']?>">
+                                    				<?=$value['Ongkir']['kecamatan']?> - 
+                                    				<?=$value['Ongkir']['city']?>
+                                    			</option>
+                                    		<?php endforeach; ?>
+                                    	</select>
+                                    </td>
+                                    <td>
+                                        <span id="t_ongkir"></span>
+                                    </td>
+                                    <td>
+                                    	<input type="hidden" name="order_id" 
+                                    	value="<?=$rs['MerchandiseOrder']['id']?>">
+                                    	<input type="submit" class="button" value="Submit">
+                                    </td>
+                                </tr>
+                            </tbody>
+		                </table>
+		                </form>
+		            	<?php endif; ?>
  
 					</div><!-- end .widget -->
 					<div class="tr widgets">
@@ -80,5 +121,10 @@
 var browse_url = "<?=$browse_url?>";
 $("select[name=cid]").change(function(e){
 	document.location = browse_url+''+parseInt($(this).val());
+});
+
+$("select[name=city_id]").on('change',function(e){
+	var cost_ongkir = $(this).find(':selected').data('cost');
+	$('#t_ongkir').html(number_format(cost_ongkir));
 });
 </script>

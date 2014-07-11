@@ -66,7 +66,11 @@ if ('development' == app.get('env')) {
 app.get('/', function(req,res){
 	res.send(200,{status:1});
 });
-
+app.get('/fixtures',[],function(req,res){
+	getFixtures(function(err,rs){
+		res.send(200,{status:1,data:rs});
+	});
+});
 app.get('/simulator/reset', [], function(req,res){
 	resetData(function(err,rs){
 		res.send(200,{status:1});	
@@ -321,7 +325,16 @@ function resetData(done){
 		});
 	});
 }
-
+function getFixtures(done){
+	pool.getConnection(function(err,conn){
+		conn.query("SELECT game_id,home_id,away_id,home_score,away_score,period,matchday,match_date \
+					FROM ffgame_wc.game_fixtures\
+					LIMIT 1000;",[],function(err,rs){
+						conn.release();
+						done(err,rs);
+					});
+	});
+}
 function accessDenied(req,res){
 	res.send(401,'Access Denied');
 }

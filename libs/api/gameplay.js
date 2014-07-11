@@ -875,6 +875,7 @@ function next_match(team_id,done){
 							});
 				},
 				function(rs,callback){
+					rs = [];
 					try{
 						if(rs.length > 0){
 							conn.query("SELECT match_date \

@@ -3176,14 +3176,23 @@ class ApiController extends AppController {
 
 
 	private function ReduceStock($item_id,$qty=1){
-		$item_id = intval($item_id);
-		$sql = "UPDATE merchandise_items SET stock = stock - {$qty} WHERE id = {$item_id}  AND n_status = 1";
-		$this->MerchandiseItem->query($sql);
+		try{
+			$item_id = intval($item_id);
+			$sql1 = "UPDATE merchandise_items SET stock = stock - {$qty} WHERE id = {$item_id}  AND n_status = 1";
+			$this->MerchandiseItem->query($sql1);
 
-		$sql = "UPDATE merchandise_items SET stock = 0 WHERE id = {$item_id} AND stock < 0";
-		$this->MerchandiseItem->query($sql);
-		CakeLog::write('api_stock','stock '.$item_id." {$qty} reduced");
-		
+			$sql2 = "UPDATE merchandise_items SET stock = 0 WHERE id = {$item_id} AND stock < 0";
+			$this->MerchandiseItem->query($sql2);
+			CakeLog::write('api_stock','Api.ReduceStock sql1:'.$sql1);
+			CakeLog::write('api_stock','Api.ReduceStock sql2:'.$sql2);
+
+			CakeLog::write('api_stock','stock '.$item_id." {$qty} reduced");
+		}catch(Exception $e){
+			CakeLog::write('api_stock','Api.ReduceStock error sql1:'.$sql1);
+			CakeLog::write('api_stock','Api.ReduceStock error sql2:'.$sql2);
+			
+			CakeLog::write('api_stock','Api.ReduceStock error msg:'.$e->getMessage());
+		}
 	}
 
 	private function pay_with_coins($game_team_id,$shopping_cart){

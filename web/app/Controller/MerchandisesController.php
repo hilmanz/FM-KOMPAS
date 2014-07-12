@@ -1441,14 +1441,25 @@ class MerchandisesController extends AppController {
 		return $total_claimed_qty;
 	}
 	private function ReduceStock($item_id,$qty=1){
-		CakeLog::write('stock','stock '.$item_id." {$qty} reduced");
-		$item_id = intval($item_id);
-		$sql = "UPDATE merchandise_items SET stock = stock - {$qty} WHERE id = {$item_id} AND n_status = 1";
-		$this->MerchandiseItem->query($sql);
+		try{
+			$item_id = intval($item_id);
+			$sql1 = "UPDATE merchandise_items SET stock = stock - {$qty} WHERE id = {$item_id} AND n_status = 1";
+			$this->MerchandiseItem->query($sql1);
 
-		$sql = "UPDATE merchandise_items SET stock = 0 WHERE id = {$item_id} AND stock < 0";
-		$this->MerchandiseItem->query($sql);
-		
+			Cakelog::write('api_stock', 'Merchandise.ReduceStock type:sql1 sql:'.$sql1);
+
+			$sql2 = "UPDATE merchandise_items SET stock = 0 WHERE id = {$item_id} AND stock < 0";
+			$this->MerchandiseItem->query($sql2);
+
+			Cakelog::write('api_stock', 'Merchandise.ReduceStock type:sql2 sql:'.$sql2);
+
+			CakeLog::write('stock','stock '.$item_id." {$qty} reduced");
+		}catch(Exception $e){
+			Cakelog::write('api_stock', 'Merchandise.ReduceStock type:sql1 sql:'.$sql1);
+			Cakelog::write('api_stock', 'Merchandise.ReduceStock type:sql1 sql:'.$sql2);
+			
+			Cakelog::write('api_stock', 'Merchandise.ReduceStock type:error msg:'.$e->getMessage());
+		}	
 	}
 	private function pay_with_ingame_funds($item_id,$item){
 		//if valid, 

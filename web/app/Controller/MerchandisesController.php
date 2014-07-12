@@ -1443,12 +1443,12 @@ class MerchandisesController extends AppController {
 	private function ReduceStock($item_id,$qty=1){
 		try{
 			$item_id = intval($item_id);
-			$sql1 = "UPDATE merchandise_items SET stock = stock - {$qty} WHERE id = {$item_id} AND n_status = 1";
+			$sql1 = "UPDATE fantasy.merchandise_items SET stock = stock - {$qty} WHERE id = {$item_id} AND n_status = 1";
 			$this->MerchandiseItem->query($sql1);
 
 			Cakelog::write('api_stock', 'Merchandise.ReduceStock type:sql1 sql:'.$sql1);
 
-			$sql2 = "UPDATE merchandise_items SET stock = 0 WHERE id = {$item_id} AND stock < 0";
+			$sql2 = "UPDATE fantasy.merchandise_items SET stock = 0 WHERE id = {$item_id} AND stock < 0";
 			$this->MerchandiseItem->query($sql2);
 
 			Cakelog::write('api_stock', 'Merchandise.ReduceStock type:sql2 sql:'.$sql2);

@@ -2521,10 +2521,12 @@ class ApiController extends AppController {
 
 		
 		//parno mode.
-		$item_id = Sanitize::clean($item_id);
+		$item_id = intval(Sanitize::clean($item_id));
 
+
+		$where = array('conditions'=>array('id'=> $item_id, 'n_status'=>1));
 		//get the item detail
-		$item = $this->MerchandiseItem->findById($item_id);
+		$item = $this->MerchandiseItem->find('first', $where);
 		
 		
 			

@@ -354,4 +354,4 @@ CREATE TABLE `fantasy`.`banned_users` (
   `log_dt` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `COMPOUND` (`user_id`,`banned_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

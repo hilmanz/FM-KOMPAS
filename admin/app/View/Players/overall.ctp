@@ -22,7 +22,8 @@ $frames = array(
 		<input type="text" name="q" value=""/><input type="submit" name="btn" value="Search"/>
 	</form>
 	<div class="buttonShorter">
-		<a href="#profile" class="button btntoggle">Profile</a><a href="#summary" class="button btntoggle">Summary</a><a href="#stats" class="button btntoggle">Stats</a><a href="#stats" class="button btntoggle">Banned List</a>
+		<a href="#profile" class="button btntoggle">Profile</a><a href="#summary" class="button btntoggle">Summary</a><a href="#stats" class="button btntoggle">Stats</a>
+		<a href="<?=$this->Html->url('/players/banned_list')?>" class="button btntoggle">Banned List</a>
 	</div>
 	<div style="overflow:auto;" class="tableContainer">
 	<table width="100%" border="0" cellspacing="0" cellpadding="0" class="dataTable">

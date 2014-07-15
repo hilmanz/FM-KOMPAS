@@ -474,7 +474,7 @@ class PlayersController extends AppController {
 		$this->loadModel('BannedUser');
 		$start = intval(@$this->request->query['start']);
 		$limit = 20;
-		$rs = $this->BannedUser->query("SELECT 
+		$rs = $this->Game->query("SELECT 
 										a.user_id,b.fb_id,b.name,b.email,b.name,
 										b.phone_number,b.register_date,
 										c.team_name,f.name 
@@ -499,9 +499,8 @@ class PlayersController extends AppController {
 	{
 		if($type=="view" && $id != "")
 		{
-			$this->loadModel('BannedUser');
-			$rs_banned = $this->BannedUser->query("SELECT * FROM banned_users a WHERE a.user_id = '{$id}'");
-			$rs_user = $this->BannedUser->query("SELECT * FROM users a WHERE a.id = '{$id}'");
+			$rs_banned = $this->Game->query("SELECT * FROM banned_users a WHERE a.user_id = '{$id}'");
+			$rs_user = $this->Game->query("SELECT * FROM users a WHERE a.id = '{$id}'");
 
 			$this->set('rs', $rs_banned);
 			$this->set('rs_user', $rs_user);
@@ -512,8 +511,7 @@ class PlayersController extends AppController {
 
 	public function remove_banned($id, $user_id)
 	{
-		$this->loadModel('BannedUser');
-		$this->BannedUser->query("DELETE FROM banned_users WHERE id = '{$id}'");
+		$this->Game->query("DELETE FROM banned_users WHERE id = '{$id}'");
 
 		$this->redirect('/players/banned_list/view/'.$user_id);
 	}

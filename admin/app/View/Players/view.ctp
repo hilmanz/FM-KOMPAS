@@ -1,5 +1,5 @@
 <div class="row">
-	<a href="<?=$this->Html->url('/players/banned/'.$user['User']['id'])?>" class="button">Banned User</a>
+	<a href="<?=$this->Html->url('/players/overall')?>" class="button">Back</a><a href="<?=$this->Html->url('/players/banned/'.$user['User']['id'])?>" class="button">Banned User</a>
 </div>
 <div class="theContainer">
 <h3 class="titles">Player Info</h3>

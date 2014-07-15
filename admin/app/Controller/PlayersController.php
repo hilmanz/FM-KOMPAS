@@ -231,7 +231,7 @@ class PlayersController extends AppController {
 				}else if($reason == ""){
 					throw new Exception("Please give a reason");
 				}
-				$users = $this->Game->query("INSERT INTO fantasy_wc.banned_users(user_id,banned_type,reason,log_dt)
+				$users = $this->Game->query("INSERT INTO banned_users(user_id,banned_type,reason,log_dt)
 										VALUES('{$user_id}','{$banned_type}','{$reason}',now())
 										ON DUPLICATE KEY UPDATE reason='{$reason}', log_dt=now()");
 				$this->Session->setFlash("New banned user has been added successfully !");
@@ -242,7 +242,7 @@ class PlayersController extends AppController {
 
 		}
 
-		$users = $this->Game->query("SELECT * FROM fantasy_wc.users a
+		$users = $this->Game->query("SELECT * FROM users a
 								INNER JOIN ffgame_wc.game_users b
 								ON a.fb_id = b.fb_id
 								INNER JOIN ffgame_wc.game_teams c
@@ -466,6 +466,56 @@ class PlayersController extends AppController {
 		$this->set('total_users',$totalUser);
 		$this->set('rs',$rs);
 		$this->set('sort',@$this->request->params['named']['sort']);
+	}
+
+	public function get_banned_user()
+	{
+		$this->layout = 'ajax';
+		$this->loadModel('BannedUser');
+		$start = intval(@$this->request->query['start']);
+		$limit = 20;
+		$rs = $this->BannedUser->query("SELECT 
+										a.user_id,b.fb_id,b.name,b.email,b.name,
+										b.phone_number,b.register_date,
+										c.team_name,f.name 
+										FROM banned_users a 
+										INNER JOIN users b
+										ON a.user_id = b.id
+										INNER JOIN teams c
+										ON a.user_id = c.user_id
+										INNER JOIN ffgame_wc.game_users d
+										ON b.fb_id = d.fb_id
+										INNER JOIN ffgame_wc.game_teams e
+										ON d.id = e.user_id
+										INNER JOIN ffgame_wc.master_team f
+										ON e.team_id = f.uid
+										GROUP BY a.user_id LIMIT ".$start.",".$limit);
+
+		$this->set('response',array('status'=>1,'data'=>$rs,'next_offset'=>$start+$limit,'rows_per_page'=>$limit));
+		$this->render('response');
+	}
+
+	public function banned_list($type="", $id="")
+	{
+		if($type=="view" && $id != "")
+		{
+			$this->loadModel('BannedUser');
+			$rs_banned = $this->BannedUser->query("SELECT * FROM banned_users a WHERE a.user_id = '{$id}'");
+			$rs_user = $this->BannedUser->query("SELECT * FROM users a WHERE a.id = '{$id}'");
+
+			$this->set('rs', $rs_banned);
+			$this->set('rs_user', $rs_user);
+
+			$this->render('banned_detail');
+		}
+	}
+
+	public function remove_banned($id, $user_id)
+	{
+		$this->loadModel('BannedUser');
+		$this->BannedUser->query("DELETE FROM banned_users WHERE id = '{$id}'");
+
+		$this->redirect('/players/banned_list/view/'.$user_id);
 	}
 	/*
 	* the page that showing the master player's stats

@@ -43,7 +43,7 @@ exports.update = function(since_id,until_id,game_id,done){
 				//get total teams participated
 				pool.getConnection(function(err,conn){
 					console.log('open connection');
-					conn.query("SELECT COUNT(*) as total FROM ffgame_wc.game_users",
+					conn.query("SELECT COUNT(*) as total FROM ffgame.game_users",
 								[],
 								function(err,rs){
 										conn.release();
@@ -117,7 +117,7 @@ function calculateIncomeForAllHomeTeams(since_id,until_id,game_id,game,home_team
 		[
 			function(callback){
 				//getting home rank
-				conn.query("SELECT t_position AS rank FROM ffgame_wc.master_standings WHERE team_id=? LIMIT 1;",
+				conn.query("SELECT t_position AS rank FROM ffgame.master_standings WHERE team_id=? LIMIT 1;",
 						   	[team_id],
 							   function(err,rs){
 							   		if(!err){
@@ -131,7 +131,7 @@ function calculateIncomeForAllHomeTeams(since_id,until_id,game_id,game,home_team
 			},
 			function(rs,callback){
 				//getting away rank
-				conn.query("SELECT t_position AS rank FROM ffgame_wc.master_standings WHERE team_id=? LIMIT 1;",
+				conn.query("SELECT t_position AS rank FROM ffgame.master_standings WHERE team_id=? LIMIT 1;",
 						   	[away_team_id],
 							   function(err,rs){
 							   		if(!err){
@@ -167,8 +167,8 @@ function processHomeTeams(since_id,until_id,start,limit,team_id,game_id,rank,awa
 	
 	pool.getConnection(function(err,conn){
 		console.log('open connection, processing home team');
-		conn.query("SELECT a.*,e.rank FROM ffgame_wc.game_teams a\
-					INNER JOIN ffgame_wc.game_users b\
+		conn.query("SELECT a.*,e.rank FROM ffgame.game_teams a\
+					INNER JOIN ffgame.game_users b\
 					ON a.user_id = b.id\
 					INNER JOIN "+frontend_schema+".users c\
 					ON c.fb_id = b.fb_id\
@@ -220,8 +220,8 @@ function processHomeTeams(since_id,until_id,start,limit,team_id,game_id,rank,awa
 function processAwayTeams(since_id,until_id,start,limit,team_id,game_id,rank,away_rank,game,done){
 	pool.getConnection(function(err,conn){
 		console.log('open connection, processing away team');
-		conn.query("SELECT a.*,e.rank FROM ffgame_wc.game_teams a\
-					INNER JOIN ffgame_wc.game_users b\
+		conn.query("SELECT a.*,e.rank FROM ffgame.game_teams a\
+					INNER JOIN ffgame.game_users b\
 					ON a.user_id = b.id\
 					INNER JOIN "+frontend_schema+".users c\
 					ON c.fb_id = b.fb_id\
@@ -310,7 +310,7 @@ function calculate_home_revenue_stats(team,game_id,game,rank,away_rank,done){
 			[
 				function(callback){
 					//get the home stadium capacity
-					conn.query("SELECT stadium_capacity FROM ffgame_wc.master_team WHERE uid = ? LIMIT 1;",
+					conn.query("SELECT stadium_capacity FROM ffgame.master_team WHERE uid = ? LIMIT 1;",
 							[team.team_id],
 							function(err,rs){
 								//console.log(this.sql);
@@ -325,8 +325,8 @@ function calculate_home_revenue_stats(team,game_id,game,rank,away_rank,done){
 				function(callback){
 					//get team's officials
 					conn.query(
-						"SELECT b.* FROM ffgame_wc.game_team_officials a\
-						INNER JOIN ffgame_wc.game_officials b\
+						"SELECT b.* FROM ffgame.game_team_officials a\
+						INNER JOIN ffgame.game_officials b\
 						ON a.official_id = b.id WHERE game_team_id=?\
 						LIMIT 20;",
 						[team.id],
@@ -337,8 +337,8 @@ function calculate_home_revenue_stats(team,game_id,game,rank,away_rank,done){
 				},
 				function(officials,callback){
 					conn.query("SELECT SUM(salary) AS salaries \
-								FROM ffgame_wc.game_team_players a\
-								INNER JOIN ffgame_wc.master_player b\
+								FROM ffgame.game_team_players a\
+								INNER JOIN ffgame.master_player b\
 								ON a.player_id = b.uid\
 								WHERE a.game_team_id = ?;",
 								[team.id],
@@ -440,8 +440,8 @@ function calculate_home_revenue_stats(team,game_id,game,rank,away_rank,done){
 				function(officials,earnings,costs,callback){
 					//sponsorship bonuses
 					conn.query(
-						"SELECT b.*,a.valid_for FROM ffgame_wc.game_team_sponsors a\
-							INNER JOIN ffgame_wc.game_sponsorships b\
+						"SELECT b.*,a.valid_for FROM ffgame.game_team_sponsors a\
+							INNER JOIN ffgame.game_sponsorships b\
 							ON a.sponsor_id = b.id\
 							WHERE a.game_team_id = ? LIMIT 30",
 						[team.id],
@@ -491,7 +491,7 @@ function calculate_home_revenue_stats(team,game_id,game,rank,away_rank,done){
 				function(match_money,callback){
 					//save into database
 					console.log('match money',match_money);
-					var sql = "INSERT INTO ffgame_wc.game_team_expenditures\
+					var sql = "INSERT INTO ffgame.game_team_expenditures\
 								(game_team_id,item_name,item_type,amount,game_id,match_day,item_total)\
 								VALUES ";
 
@@ -569,8 +569,8 @@ function calculate_away_revenue_stats(team,game_id,game,rank,away_rank,done){
 				function(callback){
 					//get team's officials
 					conn.query(
-						"SELECT b.* FROM ffgame_wc.game_team_officials a\
-						INNER JOIN ffgame_wc.game_officials b\
+						"SELECT b.* FROM ffgame.game_team_officials a\
+						INNER JOIN ffgame.game_officials b\
 						ON a.official_id = b.id WHERE game_team_id=?\
 						LIMIT 20;",
 						[team.id],
@@ -580,8 +580,8 @@ function calculate_away_revenue_stats(team,game_id,game,rank,away_rank,done){
 				},
 				function(officials,callback){
 					conn.query("SELECT SUM(salary) AS salaries \
-								FROM ffgame_wc.game_team_players a\
-								INNER JOIN ffgame_wc.master_player b\
+								FROM ffgame.game_team_players a\
+								INNER JOIN ffgame.master_player b\
 								ON a.player_id = b.uid\
 								WHERE a.game_team_id = ?;",
 								[team.id],
@@ -610,8 +610,8 @@ function calculate_away_revenue_stats(team,game_id,game,rank,away_rank,done){
 				function(officials,earnings,costs,callback){
 					//sponsorship bonuses
 					conn.query(
-						"SELECT b.*,a.valid_for FROM ffgame_wc.game_team_sponsors a\
-							INNER JOIN ffgame_wc.game_sponsorships b\
+						"SELECT b.*,a.valid_for FROM ffgame.game_team_sponsors a\
+							INNER JOIN ffgame.game_sponsorships b\
 							ON a.sponsor_id = b.id\
 							WHERE a.game_team_id = ? LIMIT 30",
 						[team.id],
@@ -661,7 +661,7 @@ function calculate_away_revenue_stats(team,game_id,game,rank,away_rank,done){
 				function(match_money,callback){
 					//save into database
 					console.log(match_money);
-					var sql = "INSERT INTO ffgame_wc.game_team_expenditures\
+					var sql = "INSERT INTO ffgame.game_team_expenditures\
 								(game_team_id,item_name,item_type,amount,game_id,match_day,item_total)\
 								VALUES ";
 
@@ -771,7 +771,7 @@ function getQuadrant(rank){
 function getHomeTeams(team_id,start,limit,done){
 	pool.getConnection(function(err,conn){
 		console.log('open connection');
-		conn.query("SELECT * FROM ffgame_wc.game_fixtures WHERE game_id=?",
+		conn.query("SELECT * FROM ffgame.game_fixtures WHERE game_id=?",
 					[game_id],
 					function(err,rs){
 							conn.release();
@@ -786,7 +786,7 @@ function getGameFixture(game_id,done){
 	console.log('get info for game_id #'+game_id);
 	pool.getConnection(function(err,conn){
 		console.log('open connection');
-		conn.query("SELECT * FROM ffgame_wc.game_fixtures WHERE game_id=?",
+		conn.query("SELECT * FROM ffgame.game_fixtures WHERE game_id=?",
 					[game_id],
 					function(err,rs){
 							console.log(S(this.sql).collapseWhitespace().s);
@@ -805,8 +805,8 @@ function getTeamProfile(game,done){
 	pool.getConnection(function(err,conn){
 		async.parallel([
 				function(callback){
-					conn.query("SELECT b.*,a.rank FROM ffgame_wc.master_rank a\
-						INNER JOIN ffgame_wc.master_team b\
+					conn.query("SELECT b.*,a.rank FROM ffgame.master_rank a\
+						INNER JOIN ffgame.master_team b\
 						ON a.team_id = b.uid\
 						WHERE a.team_id = ?\
 						ORDER BY rank",
@@ -816,8 +816,8 @@ function getTeamProfile(game,done){
 						});
 				},
 				function(callback){
-					conn.query("SELECT b.*,a.rank FROM ffgame_wc.master_rank a\
-						INNER JOIN ffgame_wc.master_team b\
+					conn.query("SELECT b.*,a.rank FROM ffgame.master_rank a\
+						INNER JOIN ffgame.master_team b\
 						ON a.team_id = b.uid\
 						WHERE a.team_id = ?\
 						ORDER BY rank",

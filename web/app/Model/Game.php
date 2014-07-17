@@ -276,7 +276,7 @@ class Game extends AppModel {
 
 
 	///TEAM EXPENDITURES HELPER
-	//it's a helper to insert data to ffgame_wc.game_team_expenditures
+	//it's a helper to insert data to ffgame.game_team_expenditures
 	public function addTeamExpenditures(
 		$game_team_id,
 		$item_name,
@@ -286,7 +286,7 @@ class Game extends AppModel {
 		$match_day,
 		$item_total=1,
 		$base_price=1){
-		$sql = "INSERT IGNORE INTO ffgame_wc.game_team_expenditures
+		$sql = "INSERT IGNORE INTO ffgame.game_team_expenditures
 				(game_team_id,
 				item_name,
 				item_type,
@@ -356,7 +356,7 @@ class Game extends AppModel {
 	returns the hardcoded custom jersey CSS style
 	*/
 	public function getCustomJerseyStyle($jersey_id){
-		$rs = $this->query("SELECT css FROM ffgame_wc.master_jersey a 
+		$rs = $this->query("SELECT css FROM ffgame.master_jersey a 
 									WHERE id = {$jersey_id} LIMIT 1");
 		return "<style>".PHP_EOL.$rs[0]['a']['css'].PHP_EOL."</style>".PHP_EOL;
 	}
@@ -365,9 +365,9 @@ class Game extends AppModel {
 		$rs = $this->query("SELECT 
 							    a.available, b.name
 							FROM
-						    ffgame_wc.digital_perks a 
+						    ffgame.digital_perks a 
 								INNER JOIN
-						    ffgame_wc.master_perks b 
+						    ffgame.master_perks b 
 								ON 
 							a.master_perk_id = b.id
 								WHERE
@@ -440,7 +440,7 @@ class Game extends AppModel {
 	public function redeemCode($game_team_id,$coupon_code){
 		$game_team_id = intval($game_team_id);
 		if(strlen($coupon_code) > 10){
-			$rs = $this->query("SELECT * FROM ffgame_wc.coupon_codes a
+			$rs = $this->query("SELECT * FROM ffgame.coupon_codes a
 						WHERE coupon_code = '{$coupon_code}' 
 						AND game_team_id = 0 
 						AND n_status = 0 
@@ -451,7 +451,7 @@ class Game extends AppModel {
 				&& $rs[0]['a']['game_team_id'] == 0
 				&& $rs[0]['a']['n_status'] == 0){
 				//the code is available, then we claim the code for these user
-				$claim = $this->query("UPDATE ffgame_wc.coupon_codes
+				$claim = $this->query("UPDATE ffgame.coupon_codes
 										SET game_team_id = {$game_team_id},
 										n_status=1,
 										redeem_dt = NOW() 
@@ -466,7 +466,7 @@ class Game extends AppModel {
 					}else{
 						//if we failed to redeem the code,
 						//we set the coupon code to 0 again.
-						$reset = $this->query("UPDATE ffgame_wc.coupon_codes
+						$reset = $this->query("UPDATE ffgame.coupon_codes
 										SET game_team_id = {$game_team_id},
 										n_status=0,
 										redeem_dt = NOW() 

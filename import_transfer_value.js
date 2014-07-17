@@ -62,7 +62,7 @@ async.waterfall([
 			data,
 			function(item,next){
 				
-				conn.query("INSERT INTO ffgame_wc.master_player(uid,transfer_value)\
+				conn.query("INSERT INTO ffgame.master_player(uid,transfer_value)\
 							VALUES(?,?) ON DUPLICATE KEY UPDATE\
 							transfer_value = VALUES(transfer_value)",
 							[item.player_id,item.transfer_value],

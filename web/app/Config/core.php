@@ -353,7 +353,7 @@ Cache::config('_cake_model_', array(
 //Additional configurations
 Configure::write('FB.APP_ID','491900054220103');
 Configure::write('FB.SECRET','da627aba8b812be62ba21acc9d96965b');
-Configure::write('FB.AFTER_LOGIN_REDIRECT_URL','http://localhost/fm_wc/login/facebook_auth');
+Configure::write('FB.AFTER_LOGIN_REDIRECT_URL','http://localhost/fm_2014/login/facebook_auth');
 Configure::write('DOMAIN','localhost/fantasy');
 Configure::write('API_URL',array('http://localhost:3002'));
 Configure::write('API_KEY','1234567890');
@@ -364,7 +364,7 @@ Configure::write('REDIS.Port',6379);
 Configure::write('REDIS.Database','15');
 Configure::write('avatar_img_dir','/home/duf/node_workspace/fantasy_wc/web/app/webroot/files/');
 Configure::write('avatar_web_dir','/files/');
-Configure::write('avatar_web_url','http://localhost/fm_wc/files/');
+Configure::write('avatar_web_url','http://localhost/fm_2014/files/');
 Configure::write('OPTA_CUSTOMER_ID','c8bb60c8f6d0184c33a87e6f3041b9cc');
 Configure::write('STAGING',true);
 Configure::write('RANK_RANDOM_NUM',139670); //base_id for masking user_id  

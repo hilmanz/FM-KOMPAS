@@ -585,7 +585,7 @@ class ApiController extends AppController {
 										d as Defender,
 										m as Midfielder,
 										f as Forward
-										FROM ffgame_wc.game_matchstats_modifier as stats;");
+										FROM ffgame.game_matchstats_modifier as stats;");
 
 		$modifier = array();
 		foreach($rs as $r){
@@ -595,10 +595,10 @@ class ApiController extends AppController {
 		unset($rs);
 
 		$fixture  = $this->Game->query("SELECT a.*,b.name as home_name,c.name as away_name
-										FROM ffgame_wc.game_fixtures a
-										INNER JOIN ffgame_wc.master_team b
+										FROM ffgame.game_fixtures a
+										INNER JOIN ffgame.master_team b
 										ON a.home_id = b.uid
-										INNER JOIN ffgame_wc.master_team c
+										INNER JOIN ffgame.master_team c
 										ON a.away_id = c.uid
 										WHERE a.game_id='{$game_id}'
 										LIMIT 1");
@@ -712,7 +712,7 @@ class ApiController extends AppController {
 
 		
 		//stats modifier
-		$modifiers = $this->Game->query("SELECT * FROM ffgame_wc.game_matchstats_modifier as Modifier");
+		$modifiers = $this->Game->query("SELECT * FROM ffgame.game_matchstats_modifier as Modifier");
 		
 		if($rs['status']==1){
 
@@ -721,7 +721,7 @@ class ApiController extends AppController {
 				foreach($rs['data']['daily_stats'] as $n=>$v){
 					$fixture = $this->Team->query("SELECT matchday,match_date,
 										UNIX_TIMESTAMP(match_date) as ts
-										FROM ffgame_wc.game_fixtures 
+										FROM ffgame.game_fixtures 
 										WHERE game_id='{$n}' 
 										LIMIT 1");
 
@@ -1005,14 +1005,14 @@ class ApiController extends AppController {
 			$a_game_ids = implode(',',$game_ids);
 			$sql = "SELECT game_id,home_id,away_id,b.name AS home_name,c.name AS away_name,
 					a.matchday,a.match_date,a.home_score,a.away_score
-					FROM ffgame_wc.game_fixtures a
-					INNER JOIN ffgame_wc.master_team b
+					FROM ffgame.game_fixtures a
+					INNER JOIN ffgame.master_team b
 					ON a.home_id = b.uid
-					INNER JOIN ffgame_wc.master_team c
+					INNER JOIN ffgame.master_team c
 					ON a.away_id = c.uid
 					WHERE (a.home_id = '{$team_id}' 
 							OR a.away_id = '{$team_id}')
-					AND EXISTS (SELECT 1 FROM ffgame_stats_wc.game_match_player_points d
+					AND EXISTS (SELECT 1 FROM ffgame_stats.game_match_player_points d
 								WHERE d.game_id = a.game_id 
 								AND d.game_team_id = {$game_team_id} LIMIT 1)
 					ORDER BY a.game_id";
@@ -1902,7 +1902,7 @@ class ApiController extends AppController {
 		
 		
 		//stats modifier
-		$modifiers = $this->Game->query("SELECT * FROM ffgame_wc.game_matchstats_modifier as Modifier");
+		$modifiers = $this->Game->query("SELECT * FROM ffgame.game_matchstats_modifier as Modifier");
 
 		if($rs['status']==1){
 
@@ -1910,7 +1910,7 @@ class ApiController extends AppController {
 				foreach($rs['data']['daily_stats'] as $n=>$v){
 					$fixture = $this->Team->query("SELECT matchday,match_date,
 										UNIX_TIMESTAMP(match_date) as ts
-										FROM ffgame_wc.game_fixtures 
+										FROM ffgame.game_fixtures 
 										WHERE game_id='{$n}' 
 										LIMIT 1");
 					
@@ -2202,10 +2202,10 @@ class ApiController extends AppController {
 	public function livestats($game_id){
 		$game_id = Sanitize::paranoid($game_id);
 		$rs = $this->Game->query("SELECT home_id,away_id,b.name AS home_name,c.name AS away_name 
-							FROM ffgame_wc.game_fixtures a
-							INNER JOIN ffgame_wc.master_team b
+							FROM ffgame.game_fixtures a
+							INNER JOIN ffgame.master_team b
 							ON a.home_id = b.uid
-							INNER JOIN ffgame_wc.master_team c
+							INNER JOIN ffgame.master_team c
 							ON a.away_id = c.uid
 							WHERE a.game_id='{$game_id}'
 							LIMIT 1;");
@@ -3093,7 +3093,7 @@ class ApiController extends AppController {
 													'po_number'=>$po_number));
 		
 		$body = mysql_escape_string($body);
-		$rs = $this->Game->query("INSERT IGNORE INTO ffgame_wc.email_queue
+		$rs = $this->Game->query("INSERT IGNORE INTO ffgame.email_queue
 							(subject,email,plain_txt,html_text,queue_dt,n_status)
 							VALUES
 							('transaksi berhasil !','{$email}','{$body}','{$body}',NOW(),0) ;");
@@ -3274,7 +3274,7 @@ class ApiController extends AppController {
 				$result['order_id'] = $this->MerchandiseOrder->id;
 				//time to deduct the money
 				$this->Game->query("
-				INSERT IGNORE INTO ffgame_wc.game_transactions
+				INSERT IGNORE INTO ffgame.game_transactions
 				(game_team_id,transaction_name,transaction_dt,amount,
 				 details)
 				VALUES
@@ -3284,10 +3284,10 @@ class ApiController extends AppController {
 					'{$data['po_number']} - {$result['order_id']}');");
 				
 				//update cash summary
-				$this->Game->query("INSERT INTO ffgame_wc.game_team_cash
+				$this->Game->query("INSERT INTO ffgame.game_team_cash
 				(game_team_id,cash)
 				SELECT game_team_id,SUM(amount) AS cash 
-				FROM ffgame_wc.game_transactions
+				FROM ffgame.game_transactions
 				WHERE game_team_id = {$game_team_id}
 				GROUP BY game_team_id
 				ON DUPLICATE KEY UPDATE
@@ -3361,7 +3361,7 @@ class ApiController extends AppController {
 	}
 	private function apply_free_player_perk($game_team_id,$player_id,$unique_id,$amount){
 		//check if the user has the player
-		$my_player = $this->Game->query("SELECT * FROM ffgame_wc.game_team_players a
+		$my_player = $this->Game->query("SELECT * FROM ffgame.game_team_players a
 							WHERE game_team_id={$game_team_id} 
 							AND player_id='{$player_id}'",false);
 		if(@$my_player[0]['a']['player_id'] == $player_id){
@@ -3370,7 +3370,7 @@ class ApiController extends AppController {
 			return $this->apply_money_perk($game_team_id,$unique_id,$amount);
 		}else{
 			CakeLog::write('apply_digital_perk',date("Y-m-d H:i:s").' - '.$game_team_id.' - '.$unique_id.' - free player : '.$player_id);
-			return $this->Game->query("INSERT IGNORE INTO ffgame_wc.game_team_players
+			return $this->Game->query("INSERT IGNORE INTO ffgame.game_team_players
 								(game_team_id,player_id)
 								VALUES({$game_team_id},'{$player_id}')",false);
 		}
@@ -4029,7 +4029,7 @@ class ApiController extends AppController {
 						$val['coint'] = 0;
 					}
 
-					$sql = "INSERT INTO ffgame_wc.game_bets
+					$sql = "INSERT INTO ffgame.game_bets
 							(game_id,game_team_id,bet_name,home,away,coins,submit_dt)
 							VALUES
 							('{$game_id}',
@@ -4053,7 +4053,7 @@ class ApiController extends AppController {
 				}
 				$transaction_name = 'PLACE_BET_'.$game_id;
 				$bet_cost = abs(intval($total_bets)) * -1;
-				$sql = "INSERT INTO ffgame_wc.game_transactions
+				$sql = "INSERT INTO ffgame.game_transactions
 						(game_team_id,transaction_dt,transaction_name,amount,details)
 						VALUES
 						('{$game_team_id}',NOW(),'{$transaction_name}',{$bet_cost},'deduction')
@@ -4061,10 +4061,10 @@ class ApiController extends AppController {
 						amount = VALUES(amount);";
 				$this->Game->query($sql,false);
 				CakeLog::write('error',$sql);
-				$sql = "INSERT INTO ffgame_wc.game_team_cash
+				$sql = "INSERT INTO ffgame.game_team_cash
 						(game_team_id,cash)
 						SELECT game_team_id,SUM(amount) AS cash 
-						FROM ffgame_wc.game_transactions
+						FROM ffgame.game_transactions
 						WHERE game_team_id = {$game_team_id}
 						GROUP BY game_team_id
 						ON DUPLICATE KEY UPDATE
@@ -4123,7 +4123,7 @@ class ApiController extends AppController {
 			$can_place_bet = false;
 		}
 		//check if the user can place the bet
-		$sql = "SELECT * FROM ffgame_wc.game_bets a
+		$sql = "SELECT * FROM ffgame.game_bets a
 				WHERE game_id='{$game_id}' AND game_team_id='{$game_team_id}' LIMIT 10;";
 
 		
@@ -4207,8 +4207,8 @@ class ApiController extends AppController {
 				if(sizeof($winners)>0){
 					foreach($winners as $n=>$v){
 						$game_user = $this->Game->query("
-									SELECT fb_id FROM ffgame_wc.game_users a
-									INNER JOIN ffgame_wc.game_teams b
+									SELECT fb_id FROM ffgame.game_users a
+									INNER JOIN ffgame.game_teams b
 									ON a.id = b.user_id WHERE b.id = {$v['game_team_id']}
 									LIMIT 1;");
 						$winners[$n]['game_team_id'] = null;

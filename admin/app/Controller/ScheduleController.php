@@ -21,10 +21,10 @@ class ScheduleController extends AppController {
 									is_processed,attendance,match_date,
 									Home.name,Away.name,
 									Home.stadium_name 
-									FROM ffgame_wc.game_fixtures Fixture
-									INNER JOIN ffgame_wc.master_team Home
+									FROM ffgame.game_fixtures Fixture
+									INNER JOIN ffgame.master_team Home
 									ON Fixture.home_id = Home.uid
-									INNER JOIN ffgame_wc.master_team Away
+									INNER JOIN ffgame.master_team Away
 									ON Fixture.away_id = Away.uid
 									ORDER BY Fixture.matchday ASC,
 									Fixture.match_date ASC;");
@@ -35,7 +35,7 @@ class ScheduleController extends AppController {
 			$dt = $this->request->data['dt'];
 			$tm = $this->request->data['tm'];
 			$match_date = $dt." ".$tm;
-			$this->Schedule->query("UPDATE ffgame_wc.game_fixtures SET match_date='{$match_date}'
+			$this->Schedule->query("UPDATE ffgame.game_fixtures SET match_date='{$match_date}'
 									WHERE game_id='{$game_id}'");
 		}
 		//edit schedule page
@@ -44,10 +44,10 @@ class ScheduleController extends AppController {
 									is_processed,attendance,match_date,
 									Home.name,Away.name,
 									Home.stadium_name 
-									FROM ffgame_wc.game_fixtures Fixture
-									INNER JOIN ffgame_wc.master_team Home
+									FROM ffgame.game_fixtures Fixture
+									INNER JOIN ffgame.master_team Home
 									ON Fixture.home_id = Home.uid
-									INNER JOIN ffgame_wc.master_team Away
+									INNER JOIN ffgame.master_team Away
 									ON Fixture.away_id = Away.uid
 									WHERE Fixture.game_id='{$game_id}'
 									LIMIT 1");

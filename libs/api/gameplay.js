@@ -49,10 +49,10 @@ function getLineup(redisClient,game_team_id,callback){
 					}else{
 						conn.query("SELECT a.player_id,a.position_no,\
 						b.name,b.position,b.known_name \
-						FROM ffgame_wc.game_team_lineups a\
-						INNER JOIN ffgame_wc.master_player b\
+						FROM ffgame.game_team_lineups a\
+						INNER JOIN ffgame.master_player b\
 						ON a.player_id = b.uid\
-						INNER JOIN ffgame_wc.game_team_players c\
+						INNER JOIN ffgame.game_team_players c\
 						ON c.game_team_id = a.game_team_id AND\
 						c.player_id = a.player_id\
 						WHERE a.game_team_id=? \
@@ -72,7 +72,7 @@ function getLineup(redisClient,game_team_id,callback){
 					
 				},
 				function(result,callback){
-					conn.query("SELECT formation FROM ffgame_wc.game_team_formation\
+					conn.query("SELECT formation FROM ffgame.game_team_formation\
 								WHERE game_team_id = ? LIMIT 1",
 					[game_team_id],
 					function(err,rs){
@@ -108,8 +108,8 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 
 					//first, make sure that the players are actually owned by the team
 					conn.query("SELECT player_id,b.position \
-								FROM ffgame_wc.game_team_players a \
-								INNER JOIN ffgame_wc.master_player b\
+								FROM ffgame.game_team_players a \
+								INNER JOIN ffgame.master_player b\
 								ON a.player_id = b.uid\
 								WHERE a.game_team_id = ? AND a.player_id IN (?) LIMIT 16",
 								[game_team_id,players],
@@ -129,7 +129,7 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 						if(position_valid(players,setup,formation)){
 							//player exists
 							//then remove the existing lineup
-							conn.query("DELETE FROM ffgame_wc.game_team_lineups WHERE game_team_id = ? ",
+							conn.query("DELETE FROM ffgame.game_team_lineups WHERE game_team_id = ? ",
 								[game_team_id],function(err,rs){
 									callback(err,rs);
 								});
@@ -145,7 +145,7 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 				function(rs,callback){
 					//get the upcoming matchday
 					conn.query("SELECT * FROM (SELECT matchday,MAX(is_processed) AS match_status \
-								FROM ffgame_wc.game_fixtures GROUP BY matchday) a \
+								FROM ffgame.game_fixtures GROUP BY matchday) a \
 								WHERE match_status = 0 ORDER BY matchday ASC LIMIT 1;",
 								[],
 								function(err,matchday){
@@ -156,7 +156,7 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 				function(rs,upcoming_matchday,callback){
 					//get the current running matchday
 					conn.query("SELECT * FROM (SELECT matchday,MIN(is_processed) AS match_status \
-								FROM ffgame_wc.game_fixtures GROUP BY matchday) a \
+								FROM ffgame.game_fixtures GROUP BY matchday) a \
 								WHERE match_status = 0 ORDER BY matchday ASC LIMIT 1;",
 								[],
 								function(err,matchday){
@@ -167,7 +167,7 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 				function(rs,upcoming_matchday,ongoing_matchday,callback){
 					//check the register date of the team
 					conn.query("SELECT UNIX_TIMESTAMP(created_date) AS ts \
-								FROM ffgame_wc.game_teams \
+								FROM ffgame.game_teams \
 								WHERE id = ? LIMIT 1",
 								[game_team_id],
 								function(err,team_info){
@@ -189,7 +189,7 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 					}
 
 
-					var sql = "INSERT INTO ffgame_wc.game_team_lineups\
+					var sql = "INSERT INTO ffgame.game_team_lineups\
 								(game_team_id,player_id,position_no,matchday)\
 								VALUES\
 								";
@@ -212,7 +212,7 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 				},
 				function(result,upcoming_matchday,callback){
 					//save formation
-					conn.query("INSERT INTO ffgame_wc.game_team_formation\
+					conn.query("INSERT INTO ffgame.game_team_formation\
 								(game_team_id,formation,last_update)\
 								VALUES(?,?,NOW())\
 								ON DUPLICATE KEY UPDATE\
@@ -294,8 +294,8 @@ function getPlayers(game_team_id,callback){
 				async.waterfall([
 					function(callback){
 						conn.query("SELECT b.* \
-						FROM ffgame_wc.game_team_players a\
-						INNER JOIN ffgame_wc.master_player b \
+						FROM ffgame.game_team_players a\
+						INNER JOIN ffgame.master_player b \
 						ON a.player_id = b.uid\
 						WHERE game_team_id = ? ORDER BY b.position ASC,b.last_name ASC \
 						LIMIT 200;",
@@ -311,7 +311,7 @@ function getPlayers(game_team_id,callback){
 							async.waterfall([
 								function(cb){
 									conn.query("SELECT SUM(points) AS total_points\
-												FROM ffgame_stats_wc.game_team_player_weekly\
+												FROM ffgame_stats.game_team_player_weekly\
 												WHERE game_team_id = ? AND player_id = ?;",
 												[
 												 game_team_id,
@@ -331,10 +331,10 @@ function getPlayers(game_team_id,callback){
 										total_points = 0;
 									}
 									conn.query("SELECT performance \
-												FROM ffgame_stats_wc.game_match_player_points a\
+												FROM ffgame_stats.game_match_player_points a\
 												WHERE game_team_id=? AND player_id=?\
 												AND points <> 0\
-												AND EXISTS (SELECT 1 FROM ffgame_wc.game_fixtures b\
+												AND EXISTS (SELECT 1 FROM ffgame.game_fixtures b\
 												WHERE b.game_id = a.game_id AND (b.home_id = ? OR b.away_id=?)\
 												LIMIT 1) ORDER BY id DESC LIMIT 1;",
 												[
@@ -396,9 +396,9 @@ function getPlayers(game_team_id,callback){
 //get user's budget
 function getBudget(game_team_id,callback){
 	var sql = "SELECT SUM(initial_budget+total) AS budget \
-			FROM (SELECT budget AS initial_budget,0 AS total FROM ffgame_wc.game_team_purse WHERE game_team_id = ?\
+			FROM (SELECT budget AS initial_budget,0 AS total FROM ffgame.game_team_purse WHERE game_team_id = ?\
 			UNION ALL\
-			SELECT 0,SUM(amount) AS total FROM ffgame_wc.game_team_expenditures WHERE game_team_id = ?) a;";
+			SELECT 0,SUM(amount) AS total FROM ffgame.game_team_expenditures WHERE game_team_id = ?) a;";
 	prepareDb(function(conn){
 		conn.query(sql,
 				[game_team_id,game_team_id],
@@ -424,8 +424,8 @@ function getPlayerDetail(player_id,callback){
 		a.weight,a.height,a.jersey_num,a.real_position,a.real_position_side,\
 		a.country,team_id AS original_team_id,\
 		b.name AS original_team_name,a.salary,a.transfer_value\
-		FROM ffgame_wc.master_player a\
-		INNER JOIN ffgame_wc.master_team b\
+		FROM ffgame.master_player a\
+		INNER JOIN ffgame.master_team b\
 		ON a.team_id = b.uid\
 		WHERE a.uid = ? LIMIT 1;",
 				[player_id],
@@ -452,11 +452,11 @@ function getTeamPlayerDetail(game_team_id,player_id,callback){
 			a.weight,a.height,a.jersey_num,a.real_position,a.real_position_side,\
 			a.country,team_id AS original_team_id,\
 			b.name AS original_team_name,a.salary,a.transfer_value\
-			FROM ffgame_wc.master_player a\
-			INNER JOIN ffgame_wc.master_team b\
+			FROM ffgame.master_player a\
+			INNER JOIN ffgame.master_team b\
 			ON a.team_id = b.uid\
 			WHERE a.uid IN (\
-				SELECT player_id FROM ffgame_wc.game_team_players \
+				SELECT player_id FROM ffgame.game_team_players \
 				WHERE game_team_id=? AND player_id=?\
 			)\
 			LIMIT 1;";
@@ -486,8 +486,8 @@ function getTeamPlayerDetail(game_team_id,player_id,callback){
 function getPlayerStats(player_id,callback){
 	console.log('getPlayerStats');
 	var sql = "SELECT a.game_id,a.points,a.performance,b.matchday\
-			FROM ffgame_stats_wc.master_player_performance a\
-			INNER JOIN ffgame_wc.game_fixtures b\
+			FROM ffgame_stats.master_player_performance a\
+			INNER JOIN ffgame.game_fixtures b\
 			ON a.game_id = b.game_id \
 			WHERE player_id = ? ORDER BY a.id ASC;";
 	prepareDb(function(conn){
@@ -509,13 +509,13 @@ function getPlayerOverallStats(game_team_id,player_id,callback){
 	var sql = "";
 	if(game_team_id!=0){
 		sql = "SELECT stats_name,stats_category,SUM(stats_value) AS total,SUM(a.points) as points\
-				FROM ffgame_stats_wc.game_team_player_weekly a\
+				FROM ffgame_stats.game_team_player_weekly a\
 				WHERE a.player_id=? AND a.game_team_id=?\
 				GROUP BY a.stats_name LIMIT 20000;";
 	}else{
 		sql = "SELECT stats_name,'' as stats_category,SUM(stats_value) AS total,0 as points\
-				FROM ffgame_stats_wc.master_player_stats a\
-				INNER JOIN ffgame_wc.game_fixtures b\
+				FROM ffgame_stats.master_player_stats a\
+				INNER JOIN ffgame.game_fixtures b\
 				ON a.game_id = b.game_id\
 				WHERE a.player_id=?\
 				GROUP BY stats_name;";
@@ -539,9 +539,9 @@ function getPlayerTeamStats(game_team_id,player_id,callback){
 		if(JSON.parse(rs)==null){
 			console.log('getPlayerTeamStats','query from db');
 			var sql = "SELECT a.game_id,SUM(b.points) AS points,a.performance,b.matchday\
-						FROM ffgame_stats_wc.game_match_player_points a\
+						FROM ffgame_stats.game_match_player_points a\
 						INNER JOIN\
-						ffgame_stats_wc.game_team_player_weekly b\
+						ffgame_stats.game_team_player_weekly b\
 						ON a.game_id = b.game_id  \
 						AND a.player_id = b.player_id\
 						AND a.game_team_id = b.game_team_id\
@@ -607,15 +607,15 @@ function getPlayerDailyTeamStats(game_team_id,player_id,player_pos,done){
 			if(game_team_id!=0){
 				sql = "SELECT a.game_id,stats_name,stats_category,SUM(stats_value) AS total,\
 						SUM(points) as points\
-						FROM ffgame_stats_wc.game_team_player_weekly a\
+						FROM ffgame_stats.game_team_player_weekly a\
 						WHERE a.player_id=? AND a.game_team_id=?\
 						GROUP BY a.game_id,a.stats_name\
 						ORDER BY a.game_id ASC LIMIT 20000;";
 			}else{
 				sql = "SELECT a.game_id,stats_name,'' as stats_category,SUM(stats_value) AS total,\
 						0 as points\
-						FROM ffgame_stats_wc.master_player_stats a \
-						INNER JOIN ffgame_wc.game_fixtures b\
+						FROM ffgame_stats.master_player_stats a \
+						INNER JOIN ffgame.game_fixtures b\
 						ON a.game_id = b.game_id\
 						WHERE a.player_id=?\
 						GROUP BY a.game_id,stats_name \
@@ -633,7 +633,7 @@ function getPlayerDailyTeamStats(game_team_id,player_id,player_pos,done){
 							});
 					},
 					function(result,callback){
-						conn.query("SELECT * FROM ffgame_wc.game_matchstats_modifier;",
+						conn.query("SELECT * FROM ffgame.game_matchstats_modifier;",
 						[],
 						function(err,rs){
 							callback(err,rs,result);	
@@ -724,7 +724,7 @@ function getFinancialStatement(game_team_id,done){
 			[
 				function(callback){
 					//starting budget
-					conn.query("SELECT budget FROM ffgame_wc.game_team_purse WHERE game_team_id = ?;",
+					conn.query("SELECT budget FROM ffgame.game_team_purse WHERE game_team_id = ?;",
 							[game_team_id],function(err,rs){
 								if(!err){
 									try{
@@ -741,7 +741,7 @@ function getFinancialStatement(game_team_id,done){
 				function(starting_budget,callback){
 					//get the total matches by these team
 					conn.query("SELECT COUNT(*) AS total_matches FROM (SELECT game_id\
-								FROM ffgame_wc.game_team_expenditures WHERE game_team_id = ?\
+								FROM ffgame.game_team_expenditures WHERE game_team_id = ?\
 								GROUP BY game_id) a;",
 						[game_team_id],
 						function(err,result){
@@ -756,7 +756,7 @@ function getFinancialStatement(game_team_id,done){
 					//weekly balance
 					conn.query("SELECT game_id,SUM(amount) AS total_income,match_day,\
 								SUM(item_total) AS item_total\
-								FROM ffgame_wc.game_team_expenditures \
+								FROM ffgame.game_team_expenditures \
 								WHERE game_team_id=?\
 								GROUP BY game_id \
 								ORDER BY match_day LIMIT 100;",
@@ -788,7 +788,7 @@ function getFinancialStatement(game_team_id,done){
 					//get weekly ticket sold
 					conn.query("SELECT game_id,SUM(amount) AS total_income,match_day,\
 								SUM(item_total) AS item_total\
-								FROM ffgame_wc.game_team_expenditures \
+								FROM ffgame.game_team_expenditures \
 								WHERE game_team_id=? AND item_name='tickets_sold'\
 								GROUP BY game_id \
 								ORDER BY match_day LIMIT 100;",
@@ -805,7 +805,7 @@ function getFinancialStatement(game_team_id,done){
 					if(matches!=null){
 						conn.query("SELECT item_name,item_type,SUM(amount) AS total,\
 									SUM(item_total) AS item_total\
-									FROM ffgame_wc.game_team_expenditures\
+									FROM ffgame.game_team_expenditures\
 									WHERE game_team_id=?\
 									GROUP BY item_name;",
 							[game_team_id],
@@ -837,7 +837,7 @@ function getWeeklyFinance(game_team_id,week,done){
 		async.waterfall([
 				function(callback){
 						conn.query("SELECT game_team_id,item_name,item_type,item_total,amount,game_id,match_day \
-							FROM ffgame_wc.game_team_expenditures \
+							FROM ffgame.game_team_expenditures \
 							WHERE game_team_id=? AND match_day = ?;",
 							[game_team_id,week],
 							function(err,rs){
@@ -862,10 +862,10 @@ function next_match(team_id,done){
 							a.game_id,a.home_id,b.name AS home_name,a.away_id,\
 							c.name AS away_name,a.home_score,a.away_score,\
 							a.matchday,a.period,a.session_id,a.attendance,match_date\
-							FROM ffgame_wc.game_fixtures a\
-							INNER JOIN ffgame_wc.master_team b\
+							FROM ffgame.game_fixtures a\
+							INNER JOIN ffgame.master_team b\
 							ON a.home_id = b.uid\
-							INNER JOIN ffgame_wc.master_team c\
+							INNER JOIN ffgame.master_team c\
 							ON a.away_id = c.uid\
 							WHERE (home_id = ? OR away_id=?) AND period <> 'FullTime'\
 							ORDER BY a.matchday\
@@ -880,7 +880,7 @@ function next_match(team_id,done){
 						if(rs.length > 0){
 							conn.query("SELECT match_date \
 									FROM \
-									ffgame_wc.game_fixtures \
+									ffgame.game_fixtures \
 									WHERE matchday = ? \
 									ORDER BY match_date DESC \
 									LIMIT 1;",
@@ -898,13 +898,13 @@ function next_match(team_id,done){
 						}else{
 							rs = [];
 							console.log('next_match','no match for these team, se we guessing the matchday');
-							conn.query("SELECT matchday FROM ffgame_wc.game_fixtures \
+							conn.query("SELECT matchday FROM ffgame.game_fixtures \
 										WHERE period IN ('FullTime') ORDER BY matchday DESC LIMIT 1;",
 										[],function(err,m){
 											rs.push({next_match:null,matchday:m[0].matchday+1});
 											conn.query("SELECT match_date \
 											FROM \
-											ffgame_wc.game_fixtures \
+											ffgame.game_fixtures \
 											WHERE matchday = ? \
 											ORDER BY match_date DESC \
 											LIMIT 1;",
@@ -929,7 +929,7 @@ function next_match(team_id,done){
 					try{
 						conn.query("SELECT * \
 									FROM \
-									ffgame_wc.master_matchdays \
+									ffgame.master_matchdays \
 									WHERE matchday = ? \
 									LIMIT 1;",
 									[(rs[0].matchday)],
@@ -946,7 +946,7 @@ function next_match(team_id,done){
 					try{
 						conn.query("SELECT * \
 									FROM \
-									ffgame_wc.master_matchdays \
+									ffgame.master_matchdays \
 									WHERE matchday = ? \
 									LIMIT 1;",
 									[(rs[0].matchday - 1)],
@@ -963,7 +963,7 @@ function next_match(team_id,done){
 					try{
 						conn.query("SELECT * \
 									FROM \
-									ffgame_wc.master_matchdays \
+									ffgame.master_matchdays \
 									WHERE matchday = ? \
 									LIMIT 1;",
 									[(rs[0].matchday) + 1],
@@ -991,7 +991,7 @@ function getVenue(team_id,done){
 			[
 				function(callback){
 					conn.query("SELECT stadium_name AS name,stadium_capacity AS capacity \
-									FROM ffgame_wc.master_team WHERE uid=? LIMIT 1;",
+									FROM ffgame.master_team WHERE uid=? LIMIT 1;",
 									[team_id],function(err,rs){
 								callback(err,rs[0]);
 							});
@@ -1013,8 +1013,8 @@ function best_match(game_team_id,done){
 			[
 				function(callback){
 					conn.query("SELECT d.id AS user_team_id,a.id AS game_team_id,a.team_id\
-								FROM ffgame_wc.game_teams a\
-								INNER JOIN ffgame_wc.game_users b\
+								FROM ffgame.game_teams a\
+								INNER JOIN ffgame.game_users b\
 								ON a.user_id = b.id\
 								INNER JOIN "+frontend_schema+".users c\
 								ON c.fb_id = b.fb_id\
@@ -1055,10 +1055,10 @@ function best_match(game_team_id,done){
 				},
 				function(team_data,best_match,callback){
 					conn.query("SELECT a.game_id,a.home_score,a.away_score,a.home_id,a.away_id,b.name AS home_name,c.name AS away_name\
-								FROM ffgame_wc.game_fixtures a\
-								INNER JOIN ffgame_wc.master_team b\
+								FROM ffgame.game_fixtures a\
+								INNER JOIN ffgame.master_team b\
 								ON a.home_id = b.uid\
-								INNER JOIN ffgame_wc.master_team c\
+								INNER JOIN ffgame.master_team c\
 								ON a.away_id = c.uid\
 								WHERE (a.home_id = ? OR a.away_id = ?) AND a.matchday=?\
 								AND period='FullTime'\
@@ -1093,7 +1093,7 @@ function last_earning(game_team_id,done){
 			[
 				function(callback){
 					//get team_id
-					conn.query("SELECT team_id FROM ffgame_wc.game_teams WHERE id = ? LIMIT 1",
+					conn.query("SELECT team_id FROM ffgame.game_teams WHERE id = ? LIMIT 1",
 						[game_team_id],function(err,rs){
 							try{
 								callback(err,rs[0].team_id);
@@ -1106,10 +1106,10 @@ function last_earning(game_team_id,done){
 					//get next match's game_id
 					conn.query("SELECT \
 								a.game_id\
-								FROM ffgame_wc.game_fixtures a\
-								INNER JOIN ffgame_wc.master_team b\
+								FROM ffgame.game_fixtures a\
+								INNER JOIN ffgame.master_team b\
 								ON a.home_id = b.uid\
-								INNER JOIN ffgame_wc.master_team c\
+								INNER JOIN ffgame.master_team c\
 								ON a.away_id = c.uid\
 								WHERE (home_id = ? OR away_id=?) AND period <> 'FullTime'\
 								ORDER BY a.matchday\
@@ -1125,7 +1125,7 @@ function last_earning(game_team_id,done){
 							});
 				},
 				function(next_game_id,callback){
-					conn.query("SELECT game_id FROM ffgame_wc.game_team_expenditures \
+					conn.query("SELECT game_id FROM ffgame.game_team_expenditures \
 								WHERE game_team_id=? AND game_id <> ? ORDER BY id DESC \
 								LIMIT 1;\
 							",[game_team_id,next_game_id],function(err,rs){
@@ -1143,7 +1143,7 @@ function last_earning(game_team_id,done){
 				},
 				function(game_id,callback){
 					conn.query("SELECT SUM(amount) AS total_earnings \
-								FROM ffgame_wc.game_team_expenditures \
+								FROM ffgame.game_team_expenditures \
 								WHERE game_team_id = ? \
 								AND \
 								game_id = ? AND item_name='tickets_sold'",
@@ -1181,7 +1181,7 @@ function last_expenses(game_team_id,done){
 			[
 				function(callback){
 					//get team_id
-					conn.query("SELECT team_id FROM ffgame_wc.game_teams WHERE id = ? LIMIT 1",
+					conn.query("SELECT team_id FROM ffgame.game_teams WHERE id = ? LIMIT 1",
 						[game_team_id],function(err,rs){
 							try{
 								callback(err,rs[0].team_id);
@@ -1194,10 +1194,10 @@ function last_expenses(game_team_id,done){
 					//get next match's game_id
 					conn.query("SELECT \
 								a.game_id\
-								FROM ffgame_wc.game_fixtures a\
-								INNER JOIN ffgame_wc.master_team b\
+								FROM ffgame.game_fixtures a\
+								INNER JOIN ffgame.master_team b\
 								ON a.home_id = b.uid\
-								INNER JOIN ffgame_wc.master_team c\
+								INNER JOIN ffgame.master_team c\
 								ON a.away_id = c.uid\
 								WHERE (home_id = ? OR away_id=?) AND period <> 'FullTime'\
 								ORDER BY a.matchday\
@@ -1213,7 +1213,7 @@ function last_expenses(game_team_id,done){
 							});
 				},
 				function(next_game_id,callback){
-					conn.query("SELECT game_id FROM ffgame_wc.game_team_expenditures \
+					conn.query("SELECT game_id FROM ffgame.game_team_expenditures \
 								WHERE game_team_id=? AND game_id <> ? ORDER BY id DESC \
 								LIMIT 1;\
 							",[game_team_id,next_game_id],function(err,rs){
@@ -1231,7 +1231,7 @@ function last_expenses(game_team_id,done){
 				},
 				function(game_id,callback){
 					conn.query("SELECT SUM(amount) AS total_expenses \
-								FROM ffgame_wc.game_team_expenditures \
+								FROM ffgame.game_team_expenditures \
 								WHERE game_team_id = ? \
 								AND \
 								game_id = ? AND item_name <> 'buy_player' AND amount <= 0;",
@@ -1270,8 +1270,8 @@ function best_player(game_team_id,done){
 				function(callback){
 					conn.query("SELECT b.uid as player_id,SUM(a.points) AS total_points,b.first_name,\
 								b.known_name,b.last_name,b.name,b.position \
-								FROM ffgame_stats_wc.game_match_player_points a\
-								INNER JOIN ffgame_wc.master_player b\
+								FROM ffgame_stats.game_match_player_points a\
+								INNER JOIN ffgame.master_player b\
 								ON a.player_id = b.uid\
 								WHERE game_team_id=? GROUP BY player_id \
 								ORDER BY total_points DESC LIMIT 1;	\
@@ -1306,7 +1306,7 @@ function getTransferWindow(done){
 		async.waterfall([
 				function(callback){
 					conn.query("SELECT * \
-								FROM ffgame_wc.master_transfer_window \
+								FROM ffgame.master_transfer_window \
 								WHERE MONTH(tw_open) = MONTH(NOW())\
 								AND NOW() BETWEEN tw_open AND tw_close;",
 								[],function(err,rs){
@@ -1345,7 +1345,7 @@ function sale(redisClient,window_id,game_team_id,player_id,done){
 					conn.query(
 						"SELECT COUNT(id) AS total\
 						FROM \
-						ffgame_wc.game_team_players \
+						ffgame.game_team_players \
 						WHERE game_team_id=? AND player_id = ? LIMIT 1;",
 						[game_team_id,player_id],
 						function(err,rs){
@@ -1361,7 +1361,7 @@ function sale(redisClient,window_id,game_team_id,player_id,done){
 					if(is_valid){
 						//check for transfer value
 						conn.query(
-						"SELECT name,transfer_value FROM ffgame_wc.master_player WHERE uid = ? LIMIT 1;",
+						"SELECT name,transfer_value FROM ffgame.master_player WHERE uid = ? LIMIT 1;",
 						[player_id],
 						function(err,rs){
 							if(!err){
@@ -1379,7 +1379,7 @@ function sale(redisClient,window_id,game_team_id,player_id,done){
 					//check if these player can be transfered in current transfer window.
 					async.waterfall([
 							function(cb){
-								conn.query("SELECT COUNT(*) AS total FROM ffgame_wc.game_transfer_history \
+								conn.query("SELECT COUNT(*) AS total FROM ffgame.game_transfer_history \
 											WHERE tw_id=? AND game_team_id = ? AND player_id = ?;",
 											[window_id,game_team_id,player_id],
 											function(err,rs){
@@ -1406,7 +1406,7 @@ function sale(redisClient,window_id,game_team_id,player_id,done){
 						//check for player's latest performances
 						var performance_diff = 0;
 						conn.query(
-						"SELECT points,performance FROM ffgame_stats_wc.game_match_player_points \
+						"SELECT points,performance FROM ffgame_stats.game_match_player_points \
 						 WHERE game_team_id=? AND player_id=? ORDER BY id DESC;",
 						[game_team_id,player_id],
 						function(err,rs){
@@ -1437,7 +1437,7 @@ function sale(redisClient,window_id,game_team_id,player_id,done){
 							function(callback){
 								//remove player from lineup
 								conn.query(
-										"DELETE FROM ffgame_wc.game_team_lineups\
+										"DELETE FROM ffgame.game_team_lineups\
 										 WHERE game_team_id=? AND player_id=?",
 										 [game_team_id,player_id],function(err,rs){
 										 	callback(err,rs);
@@ -1448,7 +1448,7 @@ function sale(redisClient,window_id,game_team_id,player_id,done){
 								//remove player from team's rooster
 								if(rs!=null){
 									conn.query(
-										"DELETE FROM ffgame_wc.game_team_players \
+										"DELETE FROM ffgame.game_team_players \
 										 WHERE game_team_id=? AND player_id=?;",
 										 [game_team_id,player_id],
 										 function(err,rs){
@@ -1460,7 +1460,7 @@ function sale(redisClient,window_id,game_team_id,player_id,done){
 							function(rs,callback){
 								if(rs!=null){
 									//we need to know the next week game_id
-									conn.query("SELECT team_id FROM ffgame_wc.game_teams WHERE id=? LIMIT 1",
+									conn.query("SELECT team_id FROM ffgame.game_teams WHERE id=? LIMIT 1",
 										 [game_team_id],
 										 function(err,rs){
 										 	
@@ -1475,10 +1475,10 @@ function sale(redisClient,window_id,game_team_id,player_id,done){
 								a.game_id,a.home_id,b.name AS home_name,a.away_id,\
 								c.name AS away_name,a.home_score,a.away_score,\
 								a.matchday,a.period,a.session_id,a.attendance,match_date\
-								FROM ffgame_wc.game_fixtures a\
-								INNER JOIN ffgame_wc.master_team b\
+								FROM ffgame.game_fixtures a\
+								INNER JOIN ffgame.master_team b\
 								ON a.home_id = b.uid\
-								INNER JOIN ffgame_wc.master_team c\
+								INNER JOIN ffgame.master_team c\
 								ON a.away_id = c.uid\
 								WHERE (home_id = ? OR away_id=?) AND period <> 'FullTime'\
 								ORDER BY a.matchday\
@@ -1486,7 +1486,7 @@ function sale(redisClient,window_id,game_team_id,player_id,done){
 								",[team_id,team_id],function(err,rs){
 									if(rs.length==0){
 										rs = [];
-										conn.query("SELECT matchday FROM ffgame_wc.game_fixtures \
+										conn.query("SELECT matchday FROM ffgame.game_fixtures \
 										WHERE period NOT IN ('FullTime') ORDER BY matchday ASC LIMIT 1;",
 													[],function(err,m){
 														rs.push({matchday:m[0].matchday,game_id:''});
@@ -1501,7 +1501,7 @@ function sale(redisClient,window_id,game_team_id,player_id,done){
 							function(name,transfer_value,game_id,matchday,callback){
 								//ok now we have all the ingridients..  
 								//lets insert into financial expenditure
-								conn.query("INSERT INTO ffgame_wc.game_team_expenditures\
+								conn.query("INSERT INTO ffgame.game_team_expenditures\
 											(game_team_id,item_name,item_type,amount,game_id,match_day)\
 											VALUES\
 											(?,?,?,?,?,?)\
@@ -1520,7 +1520,7 @@ function sale(redisClient,window_id,game_team_id,player_id,done){
 								});
 							},
 							function(transfer_result,callback){
-								conn.query("INSERT IGNORE INTO ffgame_wc.game_transfer_history\
+								conn.query("INSERT IGNORE INTO ffgame.game_transfer_history\
 											(tw_id,game_team_id,player_id,transfer_value,\
 											transfer_date,transfer_type)\
 											VALUES\
@@ -1623,7 +1623,7 @@ function buy(redisClient,window_id,game_team_id,player_id,done){
 					conn.query(
 						"SELECT COUNT(id) AS total\
 						FROM \
-						ffgame_wc.game_team_players \
+						ffgame.game_team_players \
 						WHERE game_team_id=? AND player_id = ? LIMIT 1;",
 						[game_team_id,player_id],
 						function(err,rs){
@@ -1641,7 +1641,7 @@ function buy(redisClient,window_id,game_team_id,player_id,done){
 						//check for transfer value
 						conn.query(
 						"SELECT name,transfer_value \
-						 FROM ffgame_wc.master_player WHERE uid = ? LIMIT 1;",
+						 FROM ffgame.master_player WHERE uid = ? LIMIT 1;",
 						[player_id],
 						function(err,rs){
 							//console.log(this.sql);
@@ -1660,7 +1660,7 @@ function buy(redisClient,window_id,game_team_id,player_id,done){
 					//check if these player can be transfered in current transfer window.
 					async.waterfall([
 							function(cb){
-								conn.query("SELECT COUNT(*) AS total FROM ffgame_wc.game_transfer_history \
+								conn.query("SELECT COUNT(*) AS total FROM ffgame.game_transfer_history \
 											WHERE tw_id=? AND game_team_id = ? AND player_id = ?;",
 											[window_id,game_team_id,player_id],
 											function(err,rs){
@@ -1687,7 +1687,7 @@ function buy(redisClient,window_id,game_team_id,player_id,done){
 						//check for player's latest performances
 						var performance_diff = 0;
 						conn.query(
-						"SELECT points,performance FROM ffgame_stats_wc.master_player_performance \
+						"SELECT points,performance FROM ffgame_stats.master_player_performance \
 						 WHERE player_id=? ORDER BY id DESC;",
 						[player_id],
 						function(err,rs){
@@ -1721,11 +1721,11 @@ function buy(redisClient,window_id,game_team_id,player_id,done){
 								//check for the budget
 								conn.query("SELECT SUM(budget+balance) AS money FROM (\
 												SELECT budget, 0 AS balance \
-												FROM ffgame_wc.game_team_purse \
+												FROM ffgame.game_team_purse \
 												WHERE game_team_id=?\
 													UNION\
 												SELECT 0 AS budget,SUM(amount) AS balance \
-												FROM ffgame_wc.game_team_expenditures \
+												FROM ffgame.game_team_expenditures \
 												WHERE game_team_id = ?) a;",
 								[game_team_id,game_team_id],function(err,rs){
 									if(rs!=null){
@@ -1743,7 +1743,7 @@ function buy(redisClient,window_id,game_team_id,player_id,done){
 								//remove player from team's rooster
 								if(has_money){
 									conn.query(
-										"INSERT INTO ffgame_wc.game_team_players \
+										"INSERT INTO ffgame.game_team_players \
 										 (game_team_id,player_id)\
 										 VALUES(?,?);",
 										 [game_team_id,player_id],
@@ -1756,7 +1756,7 @@ function buy(redisClient,window_id,game_team_id,player_id,done){
 							function(rs,callback){
 								if(rs!=null){
 									//we need to know the next week game_id
-									conn.query("SELECT team_id FROM ffgame_wc.game_teams WHERE id=? LIMIT 1",
+									conn.query("SELECT team_id FROM ffgame.game_teams WHERE id=? LIMIT 1",
 										 [game_team_id],
 										 function(err,rs){
 										 	//console.log(this.sql);
@@ -1771,10 +1771,10 @@ function buy(redisClient,window_id,game_team_id,player_id,done){
 								a.game_id,a.home_id,b.name AS home_name,a.away_id,\
 								c.name AS away_name,a.home_score,a.away_score,\
 								a.matchday,a.period,a.session_id,a.attendance,match_date\
-								FROM ffgame_wc.game_fixtures a\
-								INNER JOIN ffgame_wc.master_team b\
+								FROM ffgame.game_fixtures a\
+								INNER JOIN ffgame.master_team b\
 								ON a.home_id = b.uid\
-								INNER JOIN ffgame_wc.master_team c\
+								INNER JOIN ffgame.master_team c\
 								ON a.away_id = c.uid\
 								WHERE (home_id = ? OR away_id=?) AND period <> 'FullTime'\
 								ORDER BY a.matchday\
@@ -1783,7 +1783,7 @@ function buy(redisClient,window_id,game_team_id,player_id,done){
 									//console.log(this.sql);
 									if(rs.length==0){
 										rs = [];
-										conn.query("SELECT matchday FROM ffgame_wc.game_fixtures \
+										conn.query("SELECT matchday FROM ffgame.game_fixtures \
 										WHERE period NOT IN ('FullTime') ORDER BY matchday ASC LIMIT 1;",
 										[],function(err,m){
 														rs.push({matchday:m[0].matchday,game_id:''});
@@ -1798,7 +1798,7 @@ function buy(redisClient,window_id,game_team_id,player_id,done){
 							function(name,transfer_value,game_id,matchday,callback){
 								//ok now we have all the ingridients..  
 								//lets insert into financial expenditure
-								conn.query("INSERT INTO ffgame_wc.game_team_expenditures\
+								conn.query("INSERT INTO ffgame.game_team_expenditures\
 											(game_team_id,item_name,item_type,amount,game_id,match_day)\
 											VALUES\
 											(?,?,?,?,?,?)\
@@ -1817,7 +1817,7 @@ function buy(redisClient,window_id,game_team_id,player_id,done){
 								});
 							},
 							function(transfer_result,callback){
-								conn.query("INSERT IGNORE INTO ffgame_wc.game_transfer_history\
+								conn.query("INSERT IGNORE INTO ffgame.game_transfer_history\
 											(tw_id,game_team_id,player_id,transfer_value,\
 											transfer_date,transfer_type)\
 											VALUES\
@@ -1891,7 +1891,7 @@ function leaderboard(done){
 			[
 				function(callback){
 					//get team list
-					conn.query("SELECT uid AS team_id,name FROM ffgame_wc.master_team;",
+					conn.query("SELECT uid AS team_id,name FROM ffgame.master_team;",
 						[],function(err,rs){
 						callback(err,rs);
 					});
@@ -1929,7 +1929,7 @@ function matchstatus(matchday,done){
 			[
 				function(callback){
 					//get team list
-					conn.query("SELECT game_id FROM ffgame_wc.game_fixtures WHERE matchday=? LIMIT 10;",
+					conn.query("SELECT game_id FROM ffgame.game_fixtures WHERE matchday=? LIMIT 10;",
 						[matchday],function(err,rs){
 						var matches = [];
 						if(rs!=null && rs.length > 0){
@@ -1943,7 +1943,7 @@ function matchstatus(matchday,done){
 				function(matches,callback){
 					//check the finished match
 					conn.query("SELECT COUNT(*) AS total FROM\
-						(SELECT game_id FROM ffgame_stats_wc.job_queue \
+						(SELECT game_id FROM ffgame_stats.job_queue \
 						WHERE game_id IN (?)\
 						AND  \
 						n_status = 2 GROUP BY game_id) a;",[matches],function(err,rs){
@@ -1954,7 +1954,7 @@ function matchstatus(matchday,done){
 				function(matches,total_done,callback){
 					//check the in-queue match
 					conn.query("SELECT COUNT(*) AS total FROM\
-						(SELECT game_id FROM ffgame_stats_wc.job_queue \
+						(SELECT game_id FROM ffgame_stats.job_queue \
 						WHERE game_id IN (?)\
 						AND  \
 						n_status IN (0,1) GROUP BY game_id) a;",[matches],function(err,rs){
@@ -2003,7 +2003,7 @@ function getTeamResultStats(conn,team_id,callback){
 				//how many goals, how many goals conceded.
 				conn.query("SELECT home_id,away_id,home_score,away_score,period\
 							FROM \
-							ffgame_wc.game_fixtures \
+							ffgame.game_fixtures \
 							WHERE (home_id = ? OR away_id= ?) \
 							AND is_processed=1 AND period='FullTime';",
 							[team_id,team_id],
@@ -2050,9 +2050,9 @@ function getTeamResultStats(conn,team_id,callback){
 			function(stats,callback){
 				//find for top goals
 				conn.query("SELECT a.player_id,SUM(stats_value) AS goals,b.* \
-							FROM ffgame_stats_wc.master_match_result_stats a\
+							FROM ffgame_stats.master_match_result_stats a\
 							INNER JOIN\
-							ffgame_wc.master_player b ON a.player_id = b.uid\
+							ffgame.master_player b ON a.player_id = b.uid\
 							WHERE a.team_id=? AND stats_name='goals'\
 							GROUP BY a.player_id\
 							ORDER BY goals DESC LIMIT 1",
@@ -2067,9 +2067,9 @@ function getTeamResultStats(conn,team_id,callback){
 			function(stats,callback){
 				//find for top assist
 				conn.query("SELECT a.player_id,SUM(stats_value) AS assist,b.* \
-							FROM ffgame_stats_wc.master_match_result_stats a\
+							FROM ffgame_stats.master_match_result_stats a\
 							INNER JOIN\
-							ffgame_wc.master_player b ON a.player_id = b.uid\
+							ffgame.master_player b ON a.player_id = b.uid\
 							WHERE a.team_id=? AND stats_name='goal_assist'\
 							GROUP BY a.player_id\
 							ORDER BY assist DESC;",
@@ -2091,32 +2091,32 @@ function getCash(game_team_id,done){
 	prepareDb(function(conn){
 		async.waterfall([
 			function(callback){
-				conn.query("SELECT cash FROM ffgame_wc.game_team_cash \
+				conn.query("SELECT cash FROM ffgame.game_team_cash \
 							WHERE game_team_id=? LIMIT 1;",
 				[game_team_id],
 				function(err,rs){
 					try{
 						if(rs.length==0){
 							//insert transactions
-							conn.query("INSERT IGNORE INTO ffgame_wc.game_transactions\
+							conn.query("INSERT IGNORE INTO ffgame.game_transactions\
 										(game_team_id,transaction_dt,transaction_name,amount,details)\
 										SELECT ?,NOW(),'OLD_COINS',cash,'OLD COINS'\
-										FROM ffgame_wc.old_cash a \
-										WHERE EXISTS (SELECT 1 FROM ffgame_wc.game_teams b\
-										INNER JOIN ffgame_wc.game_users c ON b.user_id = c.id \
+										FROM ffgame.old_cash a \
+										WHERE EXISTS (SELECT 1 FROM ffgame.game_teams b\
+										INNER JOIN ffgame.game_users c ON b.user_id = c.id \
 										WHERE b.id = ? AND c.fb_id = a.fb_id LIMIT 1);",[game_team_id,game_team_id],function(err,rs){
 											
 											//update total cash
-											conn.query("INSERT INTO ffgame_wc.game_team_cash\
+											conn.query("INSERT INTO ffgame.game_team_cash\
 														(game_team_id,cash)\
 														SELECT game_team_id,SUM(amount) AS cash \
-														FROM ffgame_wc.game_transactions\
+														FROM ffgame.game_transactions\
 														WHERE game_team_id = ?\
 														GROUP BY game_team_id\
 														ON DUPLICATE KEY UPDATE\
 														cash = VALUES(cash);",[game_team_id],function(err,rs){
 															
-															conn.query("SELECT cash FROM ffgame_wc.game_team_cash \
+															conn.query("SELECT cash FROM ffgame.game_team_cash \
 																WHERE game_team_id=? LIMIT 1;",
 																[game_team_id],function(err,last_rs){
 																	if(last_rs.length > 0){
@@ -2150,8 +2150,8 @@ function redeemCode(game_team_id,coupon_code,done){
 		async.waterfall([
 			function(callback){
 				conn.query("SELECT coin_amount,ss_dollar \
-							FROM ffgame_wc.coupons a\
-							INNER JOIN ffgame_wc.coupon_codes b\
+							FROM ffgame.coupons a\
+							INNER JOIN ffgame.coupon_codes b\
 							ON a.id = b.coupon_id\
 							WHERE \
 							b.coupon_code = ?\
@@ -2171,7 +2171,7 @@ function redeemCode(game_team_id,coupon_code,done){
 			function(redeemed,callback){
 				if(redeemed!=null){
 					//we need to know the next week game_id
-					conn.query("SELECT team_id FROM ffgame_wc.game_teams WHERE id=? LIMIT 1",
+					conn.query("SELECT team_id FROM ffgame.game_teams WHERE id=? LIMIT 1",
 						 [game_team_id],
 						 function(err,rs){
 						 	console.log(S(this.sql).collapseWhitespace().s);
@@ -2188,10 +2188,10 @@ function redeemCode(game_team_id,coupon_code,done){
 					a.game_id,a.home_id,b.name AS home_name,a.away_id,\
 					c.name AS away_name,a.home_score,a.away_score,\
 					a.matchday,a.period,a.session_id,a.attendance,match_date\
-					FROM ffgame_wc.game_fixtures a\
-					INNER JOIN ffgame_wc.master_team b\
+					FROM ffgame.game_fixtures a\
+					INNER JOIN ffgame.master_team b\
 					ON a.home_id = b.uid\
-					INNER JOIN ffgame_wc.master_team c\
+					INNER JOIN ffgame.master_team c\
 					ON a.away_id = c.uid\
 					WHERE (home_id = ? OR away_id=?) AND period <> 'FullTime'\
 					ORDER BY a.matchday\
@@ -2206,7 +2206,7 @@ function redeemCode(game_team_id,coupon_code,done){
 			},
 			function(redeemed,team_id,game_id,matchday,callback){
 				if(redeemed!=null){
-					conn.query("INSERT INTO ffgame_wc.game_team_expenditures\
+					conn.query("INSERT INTO ffgame.game_team_expenditures\
 							(game_team_id,item_name,item_type,amount,game_id,match_day)\
 							VALUES\
 							(?,?,?,?,?,?)\
@@ -2246,7 +2246,7 @@ function apply_perk(game_team_id,perk_id,done){
 		async.waterfall([
 			function(cb){
 				//first we get the perk detail
-				conn.query("SELECT * FROM ffgame_wc.master_perks WHERE id = ? LIMIT 1;",
+				conn.query("SELECT * FROM ffgame.master_perks WHERE id = ? LIMIT 1;",
 							[perk_id],
 							function(err,rs){
 								console.log('GET_PERK',S(this.sql).collapseWhitespace().s);
@@ -2258,7 +2258,7 @@ function apply_perk(game_team_id,perk_id,done){
 			function(perk,cb){
 				/*
 				//check if the team has apply the perk. if it has, make sure all of it are disabled.
-				conn.query("SELECT * FROM ffgame_wc.digital_perks \
+				conn.query("SELECT * FROM ffgame.digital_perks \
 							WHERE game_team_id=?\
 							AND master_perk_id=?\
 							AND available > 0\
@@ -2276,7 +2276,7 @@ function apply_perk(game_team_id,perk_id,done){
 				cb(null,perk,true);
 			},
 			function(perk,canAddPerk,cb){
-				conn.query("SELECT * FROM ffgame_wc.digital_perks_group WHERE master_perk_id = ? LIMIT 1",
+				conn.query("SELECT * FROM ffgame.digital_perks_group WHERE master_perk_id = ? LIMIT 1",
 					[perk_id],function(err,perk_group){
 						console.log('GET_PERK',S(this.sql).collapseWhitespace().s);
 						var group_name = '';
@@ -2293,8 +2293,8 @@ function apply_perk(game_team_id,perk_id,done){
 			function(perk,canAddPerk,group_name,cb){
 				//cari apakah perk dari category ini uda pernah dibeli apa belum.
 				if(group_name!=''){
-					conn.query("SELECT * FROM ffgame_wc.digital_perks a\
-								INNER JOIN ffgame_wc.digital_perks_group b \
+					conn.query("SELECT * FROM ffgame.digital_perks a\
+								INNER JOIN ffgame.digital_perks_group b \
 								ON a.master_perk_id = b.master_perk_id\
 								WHERE category = ? \
 								AND game_team_id=? AND a.available > 0\
@@ -2318,7 +2318,7 @@ function apply_perk(game_team_id,perk_id,done){
 					if(perk.data.duration==null){
 						perk.data.duration = 0;
 					}
-					conn.query("INSERT INTO ffgame_wc.digital_perks\
+					conn.query("INSERT INTO ffgame.digital_perks\
 								(game_team_id,master_perk_id,redeem_dt,available,n_status)\
 								VALUES\
 								(?,?,NOW(),?,1);",
@@ -2355,7 +2355,7 @@ function check_perk(game_team_id,perk_id,done){
 		async.waterfall([
 			function(cb){
 				//first we get the perk detail
-				conn.query("SELECT * FROM ffgame_wc.master_perks WHERE id = ? LIMIT 1;",
+				conn.query("SELECT * FROM ffgame.master_perks WHERE id = ? LIMIT 1;",
 							[perk_id],
 							function(err,rs){
 								console.log('GET_PERK',S(this.sql).collapseWhitespace().s);
@@ -2366,7 +2366,7 @@ function check_perk(game_team_id,perk_id,done){
 			},
 			function(perk,cb){
 				//check if the team has apply the perk. if it has, make sure all of it are disabled.
-				conn.query("SELECT * FROM ffgame_wc.digital_perks \
+				conn.query("SELECT * FROM ffgame.digital_perks \
 							WHERE game_team_id=?\
 							AND master_perk_id=?\
 							AND available > 0\
@@ -2382,7 +2382,7 @@ function check_perk(game_team_id,perk_id,done){
 							});
 			},
 			function(perk,canAddPerk,cb){
-				conn.query("SELECT * FROM ffgame_wc.digital_perks_group WHERE master_perk_id = ? LIMIT 1",
+				conn.query("SELECT * FROM ffgame.digital_perks_group WHERE master_perk_id = ? LIMIT 1",
 					[perk_id],function(err,perk_group){
 						console.log('GET_PERK',S(this.sql).collapseWhitespace().s);
 						var group_name = '';
@@ -2400,8 +2400,8 @@ function check_perk(game_team_id,perk_id,done){
 			function(perk,canAddPerk,group_name,cb){
 				//cari apakah perk dari category ini uda pernah dibeli apa belum.
 				if(group_name!=''){
-					conn.query("SELECT * FROM ffgame_wc.digital_perks a\
-								INNER JOIN ffgame_wc.digital_perks_group b \
+					conn.query("SELECT * FROM ffgame.digital_perks a\
+								INNER JOIN ffgame.digital_perks_group b \
 								ON a.master_perk_id = b.master_perk_id\
 								WHERE category = ? \
 								AND game_team_id=? AND a.available > 0\
@@ -2442,7 +2442,7 @@ exports.setPostponedStatus = function(redisClient,game_id,toggle,callback){
 				function(cb){
 					console.log('updating fixtures');
 					//update game fixtures, set to FullTime and is_perocessed = 1
-					conn.query("UPDATE ffgame_wc.game_fixtures \
+					conn.query("UPDATE ffgame.game_fixtures \
 								SET is_processed = 1, period='FullTime'\
 								WHERE game_id=?",
 								[game_id],
@@ -2457,7 +2457,7 @@ exports.setPostponedStatus = function(redisClient,game_id,toggle,callback){
 				function(result,cb){
 					console.log('insert dummy entry to job_queue');
 					//then insert a dummy entry to make job_queue stops the job.
-					conn.query("INSERT IGNORE INTO ffgame_stats_wc.job_queue\
+					conn.query("INSERT IGNORE INTO ffgame_stats.job_queue\
 						        (game_id,since_id,until_id)\
 						        VALUES(?,0,0)",[game_id],function(err,rs){
 						console.log(S(this.sql).collapseWhitespace().s);
@@ -2480,7 +2480,7 @@ exports.setPostponedStatus = function(redisClient,game_id,toggle,callback){
 			async.waterfall([
 				function(cb){
 					//update game fixtures, set to FullTime and is_perocessed = 1
-					conn.query("UPDATE ffgame_wc.game_fixtures \
+					conn.query("UPDATE ffgame.game_fixtures \
 								SET is_processed = 0, period='PreMatch'\
 								WHERE game_id=?",[game_id],function(err,rs){
 						if(err){
@@ -2551,7 +2551,7 @@ function add_expenditure(game_team_id,transaction_name,amount,done){
 				function(callback){
 					
 					//we need to know the next week game_id
-					conn.query("SELECT team_id FROM ffgame_wc.game_teams WHERE id=? LIMIT 1",
+					conn.query("SELECT team_id FROM ffgame.game_teams WHERE id=? LIMIT 1",
 						 [game_team_id],
 						 function(err,rs){
 						 	console.log(S(this.sql).collapseWhitespace().s);
@@ -2566,10 +2566,10 @@ function add_expenditure(game_team_id,transaction_name,amount,done){
 					a.game_id,a.home_id,b.name AS home_name,a.away_id,\
 					c.name AS away_name,a.home_score,a.away_score,\
 					a.matchday,a.period,a.session_id,a.attendance,match_date\
-					FROM ffgame_wc.game_fixtures a\
-					INNER JOIN ffgame_wc.master_team b\
+					FROM ffgame.game_fixtures a\
+					INNER JOIN ffgame.master_team b\
 					ON a.home_id = b.uid\
-					INNER JOIN ffgame_wc.master_team c\
+					INNER JOIN ffgame.master_team c\
 					ON a.away_id = c.uid\
 					WHERE (home_id = ? OR away_id=?) AND period <> 'FullTime'\
 					ORDER BY a.matchday\
@@ -2586,7 +2586,7 @@ function add_expenditure(game_team_id,transaction_name,amount,done){
 					if(amount < 0 ){
 						item_type = 2;
 					}
-					conn.query("INSERT INTO ffgame_wc.game_team_expenditures\
+					conn.query("INSERT INTO ffgame.game_team_expenditures\
 								(game_team_id,item_name,item_type,amount,game_id,match_day)\
 								VALUES\
 								(?,?,?,?,?,?)\

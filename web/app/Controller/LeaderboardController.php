@@ -115,8 +115,8 @@ class LeaderboardController extends AppController {
 		    	$rs[$n]['Team'] = $poin['Team'];
 		    	//get manager's name
 		    	$manager = $this->User->findById($poin['Team']['user_id']);
-		    	$game_team = $this->Game->query("SELECT b.id as id FROM ffgame_wc.game_users a
-							INNER JOIN ffgame_wc.game_teams b
+		    	$game_team = $this->Game->query("SELECT b.id as id FROM ffgame.game_users a
+							INNER JOIN ffgame.game_teams b
 							ON a.id = b.user_id WHERE fb_id = '{$manager['User']['fb_id']}' LIMIT 1;");
 
 		    	$rs[$n]['Manager'] = @$manager['User'];

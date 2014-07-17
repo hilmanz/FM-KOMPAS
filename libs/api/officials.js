@@ -51,7 +51,7 @@ function hire_official(game_team_id,official_id,callback){
 		async.waterfall(
 			[
 				function(callback){
-					conn.query("INSERT IGNORE INTO ffgame_wc.game_team_officials\
+					conn.query("INSERT IGNORE INTO ffgame.game_team_officials\
 					(game_team_id,official_id,recruit_date)\
 					VALUES\
 					(?,?,NOW());",[game_team_id,official_id],function (err,rs){
@@ -59,8 +59,8 @@ function hire_official(game_team_id,official_id,callback){
 					});		
 				},
 				function(staff_id,callback){
-					conn.query("SELECT b.id,b.name FROM ffgame_wc.game_team_officials a\
-								INNER JOIN ffgame_wc.game_officials b\
+					conn.query("SELECT b.id,b.name FROM ffgame.game_team_officials a\
+								INNER JOIN ffgame.game_officials b\
 								ON a.official_id = b.id\
 								WHERE a.id=?;",[staff_id],function(err,rs){
 									console.log(rs);
@@ -79,7 +79,7 @@ function hire_official(game_team_id,official_id,callback){
 }
 function remove_official(game_team_id,official_id,callback){
 	prepareDb(function(conn){
-		conn.query("DELETE FROM ffgame_wc.game_team_officials WHERE game_team_id = ? AND official_id = ?",
+		conn.query("DELETE FROM ffgame.game_team_officials WHERE game_team_id = ? AND official_id = ?",
 					[game_team_id,official_id],function (err,rs){
 						conn.release();
 						callback(err,rs);
@@ -90,14 +90,14 @@ function remove_official(game_team_id,official_id,callback){
 
 function get_master_officials(conn,callback){
 	
-	conn.query("SELECT * FROM ffgame_wc.game_officials ORDER BY id LIMIT 20;",[],callback);
+	conn.query("SELECT * FROM ffgame.game_officials ORDER BY id LIMIT 20;",[],callback);
 
 }
 function get_user_officials(conn,game_team_id,officials,done){
 	async.waterfall(
 		[
 			function(callback){
-				conn.query("SELECT * FROM ffgame_wc.game_team_officials WHERE game_team_id = ? LIMIT 20;",
+				conn.query("SELECT * FROM ffgame.game_team_officials WHERE game_team_id = ? LIMIT 20;",
 							[game_team_id],
 							function(err,rs){
 								callback(err,rs);

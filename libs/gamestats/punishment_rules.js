@@ -40,7 +40,7 @@ exports.execute_punishment = function(conn,game_id,game_team_id,team_id,callback
 		function(cb){
 			//check if the team has home punishment in effect.
 			conn.query("SELECT id,game_type,punishment \
-			FROM ffgame_wc.game_punishments \
+			FROM ffgame.game_punishments \
 			WHERE game_team_id=? AND \
 			game_type = 'home' AND \
 			n_status=0 GROUP BY punishment;",
@@ -79,7 +79,7 @@ exports.execute_punishment = function(conn,game_id,game_team_id,team_id,callback
 		function(cb){
 			//check if the team has home punishment in effect.
 			conn.query("SELECT id,game_type,punishment \
-			FROM ffgame_wc.game_punishments \
+			FROM ffgame.game_punishments \
 			WHERE game_team_id=? AND \
 			game_type = 'away' AND \
 			n_status=0 GROUP BY punishment;",
@@ -128,8 +128,8 @@ exports.check_violation = function(conn,game_id,game_team_id,original_team_id,ca
 		function(cb){
 			//check the current lineup setup in history
 			conn.query("SELECT b.team_id,COUNT(b.team_id) AS total \
-						FROM ffgame_wc.game_team_players a\
-						INNER JOIN ffgame_wc.master_player b\
+						FROM ffgame.game_team_players a\
+						INNER JOIN ffgame.master_player b\
 						ON a.player_id = b.uid \
 						WHERE game_team_id=? GROUP BY team_id;",
 						[game_team_id],
@@ -157,7 +157,7 @@ exports.check_violation = function(conn,game_id,game_team_id,original_team_id,ca
 			}*/
 			//check jenis game.. home apa away ?
 			conn.query(
-				"SELECT home_id,away_id FROM ffgame_wc.game_fixtures WHERE game_id = ? LIMIT 1;",
+				"SELECT home_id,away_id FROM ffgame.game_fixtures WHERE game_id = ? LIMIT 1;",
 				[game_id],
 				function(err,rs){
 					var type = '';
@@ -212,7 +212,7 @@ function add_rules(conn,game_id,game_team_id,game_type,done){
 			function(cb){
 				var can_punish = true;
 				//we can only give new punishment if all punishment is done.
-				conn.query("SELECT COUNT(*) AS total FROM ffgame_wc.game_punishments \
+				conn.query("SELECT COUNT(*) AS total FROM ffgame.game_punishments \
 							WHERE game_team_id = ? AND punishment='home_income_cuts';",
 							[game_team_id],function(err,rs){
 								try{
@@ -232,7 +232,7 @@ function add_rules(conn,game_id,game_team_id,game_type,done){
 					console.log('can punish');
 					var setting = home_income_cuts();
 					async.times(setting.terms.amount,function(n,next){
-						conn.query("INSERT INTO ffgame_wc.game_punishments\
+						conn.query("INSERT INTO ffgame.game_punishments\
 								(game_id,game_team_id,game_type,punishment,n_status,submit_dt)\
 								VALUES\
 								(?,?,?,?,0,NOW());",
@@ -254,7 +254,7 @@ function add_rules(conn,game_id,game_team_id,game_type,done){
 			function(cb){
 				var can_punish = true;
 				//we can only give new punishment if all punishment is done.
-				conn.query("SELECT COUNT(*) AS total FROM ffgame_wc.game_punishments \
+				conn.query("SELECT COUNT(*) AS total FROM ffgame.game_punishments \
 							WHERE game_team_id = ? AND punishment='home_balance_cuts';",
 							[game_team_id],function(err,rs){
 								try{
@@ -273,7 +273,7 @@ function add_rules(conn,game_id,game_team_id,game_type,done){
 					console.log('can punish');
 					var setting = home_balance_cuts();
 					async.times(setting.terms.amount,function(n,next){
-						conn.query("INSERT INTO ffgame_wc.game_punishments\
+						conn.query("INSERT INTO ffgame.game_punishments\
 								(game_id,game_team_id,game_type,punishment,n_status,submit_dt)\
 								VALUES\
 								(?,?,?,?,0,NOW());",
@@ -306,7 +306,7 @@ function add_rules(conn,game_id,game_team_id,game_type,done){
 				var can_punish = true;
 				//--we can only give new punishment if all punishment is done.-- Obseleted
 
-				conn.query("SELECT COUNT(*) AS total FROM ffgame_wc.game_punishments \
+				conn.query("SELECT COUNT(*) AS total FROM ffgame.game_punishments \
 							WHERE game_team_id = ? AND punishment='away_balance_cuts';",
 							[game_team_id],function(err,rs){
 								try{
@@ -329,7 +329,7 @@ function add_rules(conn,game_id,game_team_id,game_type,done){
 						function(c){
 							var setting = away_balance_cuts();
 							async.times(setting.terms.amount,function(n,next){
-								conn.query("INSERT INTO ffgame_wc.game_punishments\
+								conn.query("INSERT INTO ffgame.game_punishments\
 										(game_id,game_team_id,game_type,punishment,n_status,submit_dt)\
 										VALUES\
 										(?,?,?,?,0,NOW());",
@@ -400,7 +400,7 @@ function doPunish(conn,game_id,game_team_id,team_id,item,cb){
 		async.waterfall([
 			function(callback){
 				conn.query("SELECT home_id,away_id,matchday \
-							FROM ffgame_wc.game_fixtures \
+							FROM ffgame.game_fixtures \
 							WHERE game_id=? \
 							LIMIT 1",[game_id],
 							function(err,r){
@@ -417,7 +417,7 @@ function doPunish(conn,game_id,game_team_id,team_id,item,cb){
 			},
 			/*function(callback){
 				//get tickets sold
-				conn.query("SELECT amount FROM ffgame_wc.game_team_expenditures \
+				conn.query("SELECT amount FROM ffgame.game_team_expenditures \
 							WHERE game_id = ? AND game_team_id = ? \
 							AND item_name = 'tickets_sold';",
 							[game_id,game_team_id],
@@ -482,7 +482,7 @@ function doPunish(conn,game_id,game_team_id,team_id,item,cb){
 			},
 			function(callback){
 				if(cut_ok){
-					conn.query("UPDATE ffgame_wc.game_punishments SET n_status=1 WHERE id = ?",
+					conn.query("UPDATE ffgame.game_punishments SET n_status=1 WHERE id = ?",
 								[item.id],function(err,rs){
 									callback(err);
 								});
@@ -520,7 +520,7 @@ function doPunish(conn,game_id,game_team_id,team_id,item,cb){
 }
 function addCost(conn,game_id,game_team_id,item_name,amount,matchday,callback){
 
-	conn.query("INSERT IGNORE INTO ffgame_wc.game_team_expenditures\
+	conn.query("INSERT IGNORE INTO ffgame.game_team_expenditures\
 				(game_team_id,item_name,item_type,amount,game_id,match_day,item_total,base_price)\
 				VALUES\
 				(?,?,?,?,?,?,?,?);",

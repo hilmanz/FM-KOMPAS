@@ -30,7 +30,7 @@ function authenticate(req,res){
 function register(data,callback){
 	
 	prepareDb(function(conn){
-		conn.query("INSERT INTO ffgame_wc.game_users\
+		conn.query("INSERT INTO ffgame.game_users\
 					(name,email,phone,fb_id,n_status,access_key,register_date)\
 					VALUES(?,?,?,?,?,?,NOW());",
 					[data.name,data.email,data.phone,data.fb_id,1,''],function(err,rs){
@@ -43,7 +43,7 @@ function register(data,callback){
 }
 function removeByFbId(fb_id,callback){
 	prepareDb(function(conn){
-		conn.query("DELETE FROM ffgame_wc.game_users\
+		conn.query("DELETE FROM ffgame.game_users\
 					WHERE fb_id = ?",
 					[fb_id],function(err,rs){
 						conn.release();

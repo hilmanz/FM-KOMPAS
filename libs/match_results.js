@@ -168,7 +168,7 @@ function calculatePlayerPerformance(game_id,done){
 			function(callback){
 				//1. get the overall points for each team
 				conn.query("SELECT team_id,overall_points \
-							FROM ffgame_stats_wc.master_match_points\
+							FROM ffgame_stats.master_match_points\
 							WHERE game_id=? LIMIT 2",[game_id],function(err,team_points){
 								callback(err,team_points);
 							});
@@ -177,11 +177,11 @@ function calculatePlayerPerformance(game_id,done){
 				console.log(team_points);
 				console.log('calculate player performance summary for team #',team_points[0].team_id);
 				var avg_points = team_points[0]['overall_points'] / 11;
-				conn.query("INSERT INTO ffgame_stats_wc.master_player_performance\
+				conn.query("INSERT INTO ffgame_stats.master_player_performance\
 							(game_id,player_id,points,performance)\
 							SELECT game_id,player_id,points,\
 							((points-(?))/(?))*100 AS performance\
-							FROM ffgame_stats_wc.master_match_player_points \
+							FROM ffgame_stats.master_match_player_points \
 							WHERE game_id=? AND team_id=?\
 							ON DUPLICATE KEY UPDATE\
 							points = VALUES(points),\
@@ -195,11 +195,11 @@ function calculatePlayerPerformance(game_id,done){
 			function(team_points,callback){
 				console.log('calculate player performance summary for team #',team_points[1].team_id);
 				var avg_points = team_points[1]['overall_points'] / 11;
-				conn.query("INSERT INTO ffgame_stats_wc.master_player_performance\
+				conn.query("INSERT INTO ffgame_stats.master_player_performance\
 							(game_id,player_id,points,performance)\
 							SELECT game_id,player_id,points,\
 							((points-(?))/(?))*100 AS performance\
-							FROM ffgame_stats_wc.master_match_player_points \
+							FROM ffgame_stats.master_match_player_points \
 							WHERE game_id=? AND team_id=?\
 							ON DUPLICATE KEY UPDATE\
 							points = VALUES(points),\
@@ -257,7 +257,7 @@ function updateGameFixtures(game_id,data,done){
 		async.waterfall(
 			[
 				function(callback){
-					conn.query("INSERT INTO ffgame_wc.game_fixtures\
+					conn.query("INSERT INTO ffgame.game_fixtures\
 								(game_id,home_id,away_id,period,matchday,\
 								competition_id,session_id,home_score,away_score,attendance,is_processed)\
 								VALUES(?,?,?,?,?,?,?,?,?,?,?)\
@@ -294,10 +294,10 @@ function calculateTeamOverallPoints(game_id,callback){
 	console.log('calculate team overall points for game #',game_id);
 	pool.getConnection(
 		function(err,conn){
-			conn.query("INSERT INTO ffgame_stats_wc.master_match_points\
+			conn.query("INSERT INTO ffgame_stats.master_match_points\
 							 (game_id,team_id,overall_points,last_update)\
 							 SELECT game_id,team_id,SUM(points) AS overall_points,NOW()\
-							 FROM ffgame_stats_wc.master_match_player_points\
+							 FROM ffgame_stats.master_match_player_points\
 							 WHERE game_id=?\
 							 GROUP BY team_id\
 							 ON DUPLICATE KEY UPDATE\
@@ -339,7 +339,7 @@ function generatePlayerPoints(game_id,callback){
 		async.waterfall(
 			[
 				function(callback){
-					conn.query("SELECT * FROM ffgame_wc.game_matchstats_modifier;",[],function(err,rs){
+					conn.query("SELECT * FROM ffgame.game_matchstats_modifier;",[],function(err,rs){
 						if(err){ console.log(err.message); }
 						for(var i in rs){
 							points[rs[i].name.toLowerCase()] = {
@@ -357,8 +357,8 @@ function generatePlayerPoints(game_id,callback){
 					
 					//get player lineups
 					conn.query("SELECT a.team_id,player_id,b.name,b.position FROM \
-								 ffgame_stats_wc.master_match_result_stats a\
-								 INNER JOIN ffgame_wc.master_player b\
+								 ffgame_stats.master_match_result_stats a\
+								 INNER JOIN ffgame.master_player b\
 								 ON a.player_id = b.uid\
 								 WHERE a.game_id=?\
 								 GROUP BY a.player_id;",
@@ -402,7 +402,7 @@ function calculatePlayerPoints(conn,points,game_id,player,done){
 	async.waterfall([
 		function(callback){
 			conn.query("SELECT stats_name,stats_value\
-				 FROM ffgame_stats_wc.master_match_result_stats\
+				 FROM ffgame_stats.master_match_result_stats\
 				 WHERE game_id = ?\
 				 AND player_id=?\
 				 LIMIT 1000;",
@@ -437,7 +437,7 @@ function calculatePlayerPoints(conn,points,game_id,player,done){
 				}
 			}
 			
-			conn.query("INSERT INTO ffgame_stats_wc.master_match_player_points\
+			conn.query("INSERT INTO ffgame_stats.master_match_player_points\
 						 (game_id,team_id,player_id,points,last_update)\
 						 VALUES(?,?,?,?,NOW())\
 						 ON DUPLICATE KEY UPDATE\
@@ -451,7 +451,7 @@ function calculatePlayerPoints(conn,points,game_id,player,done){
 		},
 		function(game_id,team_id,player_id,game_points,player_stats,callback){
 			console.log('saving player performance stats #',player_id,'for game #',game_id);
-			var sql = "INSERT INTO ffgame_stats_wc.master_player_stats\
+			var sql = "INSERT INTO ffgame_stats.master_player_stats\
 						(game_id,team_id,player_id,stats_name,stats_value,last_update)\
 						VALUES";
 			var data  = [];
@@ -528,7 +528,7 @@ function savePlayerStats(game_id,team_id,data,callback){
 			}
 			async.eachSeries(data.Stat,
 				function(item,onDone){
-					var q = conn.query("INSERT INTO ffgame_stats_wc.master_match_result_stats\
+					var q = conn.query("INSERT INTO ffgame_stats.master_match_result_stats\
 								(game_id,team_id,player_id,stats_name,stats_value)\
 								VALUES(?,?,?,?,?)\
 								ON DUPLICATE KEY UPDATE\

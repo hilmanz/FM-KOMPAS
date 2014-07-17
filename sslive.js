@@ -328,7 +328,7 @@ function resetData(done){
 function getFixtures(done){
 	pool.getConnection(function(err,conn){
 		conn.query("SELECT game_id,home_id,away_id,home_score,away_score,period,matchday,match_date \
-					FROM ffgame_wc.game_fixtures\
+					FROM ffgame.game_fixtures\
 					LIMIT 1000;",[],function(err,rs){
 						conn.release();
 						done(err,rs);

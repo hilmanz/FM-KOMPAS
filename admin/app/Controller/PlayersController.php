@@ -55,32 +55,32 @@ class PlayersController extends AppController {
 		$this->loadModel('Game');
 		$user = $this->User->findById($user_id);
 		$point = $this->Point->findByTeam_id($user['Team']['id']);
-		$team_data = $this->User->query("SELECT * FROM ffgame_wc.game_users a
-											INNER JOIN ffgame_wc.game_teams b
+		$team_data = $this->User->query("SELECT * FROM ffgame.game_users a
+											INNER JOIN ffgame.game_teams b
 											ON a.id = b.user_id
-											INNER JOIN ffgame_wc.master_team c
+											INNER JOIN ffgame.master_team c
 											ON b.team_id = c.uid
 											WHERE fb_id='{$user['User']['fb_id']}' LIMIT 1;");
 
 		$budget = $this->User->query("SELECT (SUM(budget + expense)) AS current_budget
 										FROM (
 										SELECT budget,0 AS expense
-										FROM ffgame_wc.game_team_purse 
+										FROM ffgame.game_team_purse 
 										WHERE game_team_id={$team_data[0]['b']['id']}
 										UNION ALL
 										SELECT 0,SUM(amount) AS total_balance 
-										FROM ffgame_wc.game_team_expenditures 
+										FROM ffgame.game_team_expenditures 
 										WHERE game_team_id={$team_data[0]['b']['id']})
 										a LIMIT 100;");
 
 		$matches = $this->User->query("SELECT COUNT(game_id) AS total_matches FROM 
 										(SELECT game_id 
-											FROM ffgame_stats_wc.game_match_player_points 
+											FROM ffgame_stats.game_match_player_points 
 											WHERE game_team_id={$team_data[0]['b']['id']} 
 											GROUP BY game_id) a LIMIT 100;");
 		
-		/*$squad = $this->User->query("SELECT b.* FROM ffgame_wc.game_team_players a
-										INNER JOIN ffgame_wc.master_player b
+		/*$squad = $this->User->query("SELECT b.* FROM ffgame.game_team_players a
+										INNER JOIN ffgame.master_player b
 										ON a.player_id = b.uid
 										WHERE a.game_team_id = {$team_data[0]['b']['id']} 
 										ORDER BY position,last_name
@@ -92,8 +92,8 @@ class PlayersController extends AppController {
 
 		/*foreach($squad as $n=>$v){
 		
-			$r = $this->Game->query("SELECT COUNT(*) AS total FROM (SELECT a.game_id FROM ffgame_stats_wc.game_match_player_points a
-								INNER JOIN ffgame_wc.game_fixtures b
+			$r = $this->Game->query("SELECT COUNT(*) AS total FROM (SELECT a.game_id FROM ffgame_stats.game_match_player_points a
+								INNER JOIN ffgame.game_fixtures b
 								ON a.game_id = b.game_id
 								WHERE game_team_id={$team_data[0]['b']['id']}  
 								AND player_id='{$v['uid']}'
@@ -119,27 +119,27 @@ class PlayersController extends AppController {
 		$this->loadModel('Game');
 		$user = $this->User->findById($user_id);
 		$point = $this->Point->findByTeam_id($user['Team']['id']);
-		$team_data = $this->User->query("SELECT * FROM ffgame_wc.game_users a
-											INNER JOIN ffgame_wc.game_teams b
+		$team_data = $this->User->query("SELECT * FROM ffgame.game_users a
+											INNER JOIN ffgame.game_teams b
 											ON a.id = b.user_id
-											INNER JOIN ffgame_wc.master_team c
+											INNER JOIN ffgame.master_team c
 											ON b.team_id = c.uid
 											WHERE fb_id='{$user['User']['fb_id']}' LIMIT 1;");
 
 		$budget = $this->User->query("SELECT (SUM(budget + expense)) AS current_budget
 										FROM (
 										SELECT budget,0 AS expense
-										FROM ffgame_wc.game_team_purse 
+										FROM ffgame.game_team_purse 
 										WHERE game_team_id={$team_data[0]['b']['id']}
 										UNION ALL
 										SELECT 0,SUM(amount) AS total_balance 
-										FROM ffgame_wc.game_team_expenditures 
+										FROM ffgame.game_team_expenditures 
 										WHERE game_team_id={$team_data[0]['b']['id']})
 										a LIMIT 100;");
 
 		$matches = $this->User->query("SELECT COUNT(game_id) AS total_matches FROM 
 										(SELECT game_id 
-											FROM ffgame_stats_wc.game_match_player_points 
+											FROM ffgame_stats.game_match_player_points 
 											WHERE game_team_id={$team_data[0]['b']['id']} 
 											GROUP BY game_id) a LIMIT 100;");
 		
@@ -163,37 +163,37 @@ class PlayersController extends AppController {
 
 		$user = $this->User->findById($user_id);
 		$point = $this->Point->findByTeam_id($user['Team']['id']);
-		$team_data = $this->User->query("SELECT * FROM ffgame_wc.game_users a
-											INNER JOIN ffgame_wc.game_teams b
+		$team_data = $this->User->query("SELECT * FROM ffgame.game_users a
+											INNER JOIN ffgame.game_teams b
 											ON a.id = b.user_id
-											INNER JOIN ffgame_wc.master_team c
+											INNER JOIN ffgame.master_team c
 											ON b.team_id = c.uid
 											WHERE fb_id='{$user['User']['fb_id']}' LIMIT 1;");
 
 		$budget = $this->User->query("SELECT (SUM(budget + expense)) AS current_budget
 										FROM (
 										SELECT budget,0 AS expense
-										FROM ffgame_wc.game_team_purse 
+										FROM ffgame.game_team_purse 
 										WHERE game_team_id={$team_data[0]['b']['id']}
 										UNION ALL
 										SELECT 0,SUM(amount) AS total_balance 
-										FROM ffgame_wc.game_team_expenditures 
+										FROM ffgame.game_team_expenditures 
 										WHERE game_team_id={$team_data[0]['b']['id']})
 										a LIMIT 1;");
 
 		$matches = $this->User->query("SELECT COUNT(game_id) AS total_matches FROM 
 										(SELECT game_id 
-											FROM ffgame_stats_wc.game_match_player_points 
+											FROM ffgame_stats.game_match_player_points 
 											WHERE game_team_id={$team_data[0]['b']['id']} 
 											GROUP BY game_id) a LIMIT 100;");
 
 		$players = $this->Game->getMatchDetailsByGameTeamId($game_team_id, $game_id);
-		$rs_extra_point = $this->Game->query("SELECT * FROM ffgame_stats_wc.game_team_extra_points 
+		$rs_extra_point = $this->Game->query("SELECT * FROM ffgame_stats.game_team_extra_points 
 											WHERE game_team_id='{$game_team_id}' AND game_id='{$game_id}'
 											LIMIT 20");
 
 		$transaction_name = $game_team_id.'_matchday_'.$matchday;
-		$cash = $this->Game->query("SELECT amount FROM ffgame_wc.game_transactions
+		$cash = $this->Game->query("SELECT amount FROM ffgame.game_transactions
 											WHERE game_team_id='{$game_team_id}' 
 											AND transaction_name = '{$transaction_name}'
 											LIMIT 1");
@@ -211,7 +211,7 @@ class PlayersController extends AppController {
 
 	public function transaction($user_id, $game_team_id)
 	{
-		$rs_transaction = $this->Game->query("SELECT * FROM ffgame_wc.game_transactions 
+		$rs_transaction = $this->Game->query("SELECT * FROM ffgame.game_transactions 
 											WHERE game_team_id='{$game_team_id}' ORDER BY id DESC
 											LIMIT 1000");
 		$this->set('user_id', $user_id);
@@ -243,11 +243,11 @@ class PlayersController extends AppController {
 		}
 
 		$users = $this->Game->query("SELECT * FROM users a
-								INNER JOIN ffgame_wc.game_users b
+								INNER JOIN ffgame.game_users b
 								ON a.fb_id = b.fb_id
-								INNER JOIN ffgame_wc.game_teams c
+								INNER JOIN ffgame.game_teams c
 								ON b.id = c.user_id
-								INNER JOIN ffgame_wc.master_team d
+								INNER JOIN ffgame.master_team d
 								ON c.team_id = d.uid
 								WHERE a.id='{$user_id}' LIMIT 1");
 		if(count($users) == 0){
@@ -258,10 +258,10 @@ class PlayersController extends AppController {
 
 	/*private function getMatchDetail($game_team_id,$original_team_id,$game_id){
 		$q = $this->Game->query("SELECT a.*,b.name as home_name,c.name as away_name,a.matchday
-									FROM ffgame_wc.game_fixtures a
-									INNER JOIN ffgame_wc.master_team b
+									FROM ffgame.game_fixtures a
+									INNER JOIN ffgame.master_team b
 									ON a.home_id = b.uid
-									INNER JOIN ffgame_wc.master_team c
+									INNER JOIN ffgame.master_team c
 									ON a.away_id = c.uid
 									WHERE game_id = '{$game_id}'
 									LIMIT 1;
@@ -275,13 +275,13 @@ class PlayersController extends AppController {
 		$away_score = $q[0]['a']['away_score'];
 		//get the points
 		$score = $this->Game->query("SELECT SUM(points) AS total 
-										FROM ffgame_stats_wc.game_team_player_weekly 
+										FROM ffgame_stats.game_team_player_weekly 
 										WHERE game_team_id = {$game_team_id} 
 										AND matchday = {$q[0]['a']['matchday']};",false);
 		
 		//get ticket sold attribute
 		$money = $this->Game->query("SELECT item_name,amount 
-									FROM ffgame_wc.game_team_expenditures a
+									FROM ffgame.game_team_expenditures a
 									WHERE game_team_id={$game_team_id} 
 									AND item_name IN ('tickets_sold','ticket_sold_penalty') 
 									AND game_id='{$game_id}';",false);
@@ -302,8 +302,8 @@ class PlayersController extends AppController {
 		//get squads
 		$squads = $this->Game->query("SELECT a.player_id,a.matchday,b.name,b.position,a.position_no,
 										a.stats_category,a.stats_name,a.stats_value,a.points 
-										FROM ffgame_stats_wc.game_team_player_weekly a
-										INNER JOIN ffgame_wc.master_player b 
+										FROM ffgame_stats.game_team_player_weekly a
+										INNER JOIN ffgame.master_player b 
 										ON a.player_id = b.uid
 										WHERE game_team_id={$game_team_id} AND matchday={$q[0]['a']['matchday']} 
 										LIMIT 10000;");
@@ -357,16 +357,16 @@ class PlayersController extends AppController {
 	}
 	private function getPreviousMatches($game_team_id,$original_team_id){
 		$rs = $this->Game->query("SELECT DISTINCT matchday 
-								  FROM ffgame_stats_wc.game_team_player_weekly a
+								  FROM ffgame_stats.game_team_player_weekly a
 								  WHERE game_team_id={$game_team_id} ORDER BY matchday LIMIT 400;",false);
 		$matches = array();
 		foreach($rs as $r){
 			
 			$q = $this->Game->query("SELECT a.*,b.name as home_name,c.name as away_name
-									FROM ffgame_wc.game_fixtures a
-									INNER JOIN ffgame_wc.master_team b
+									FROM ffgame.game_fixtures a
+									INNER JOIN ffgame.master_team b
 									ON a.home_id = b.uid
-									INNER JOIN ffgame_wc.master_team c
+									INNER JOIN ffgame.master_team c
 									ON a.away_id = c.uid
 									WHERE matchday = {$r['a']['matchday']}
 									AND (home_id = '{$original_team_id}' OR away_id = '{$original_team_id}')
@@ -381,13 +381,13 @@ class PlayersController extends AppController {
 			$away_score = $q[0]['a']['away_score'];
 			//get the points
 			$score = $this->Game->query("SELECT SUM(points) AS total 
-											FROM ffgame_stats_wc.game_team_player_weekly 
+											FROM ffgame_stats.game_team_player_weekly 
 											WHERE game_team_id = {$game_team_id} 
 											AND matchday = {$r['a']['matchday']};",false);
 			
 			//get ticket sold attribute
 			$money = $this->Game->query("SELECT item_name,amount 
-										FROM ffgame_wc.game_team_expenditures a
+										FROM ffgame.game_team_expenditures a
 										WHERE game_team_id={$game_team_id} 
 										AND item_name IN ('tickets_sold','ticket_sold_penalty') 
 										AND game_id='{$q[0]['a']['game_id']}';",false);
@@ -420,13 +420,13 @@ class PlayersController extends AppController {
 	private function getTeamPlayerDetail($game_team_id,$player_id){
 		$stats = $this->User->query("SELECT COUNT(DISTINCT game_id) AS total_plays,SUM(points) AS total_points,
 							SUM(performance) AS total_performance 
-							FROM ffgame_stats_wc.game_match_player_points 
+							FROM ffgame_stats.game_match_player_points 
 							WHERE game_team_id = {$game_team_id} AND player_id='{$player_id}';");
 
 		$last_performance = $this->User->query("
 								SELECT game_id,SUM(points) AS total_points,
 								SUM(performance) AS total_performance 
-								FROM ffgame_stats_wc.game_match_player_points 
+								FROM ffgame_stats.game_match_player_points 
 								WHERE game_team_id = {$game_team_id} 
 								AND player_id='{$player_id}' 
 								GROUP BY game_id ORDER BY game_id DESC LIMIT 1;
@@ -444,7 +444,7 @@ class PlayersController extends AppController {
 				ON a.team_id = b.id 
 				INNER JOIN fantasy.users c
 				ON b.user_id = c.id
-				INNER JOIN ffgame_wc.master_team d
+				INNER JOIN ffgame.master_team d
 				ON b.team_id = d.uid
 				WHERE matchday={$week} GROUP BY a.team_id
 				ORDER BY total_points DESC LIMIT 20;";
@@ -483,11 +483,11 @@ class PlayersController extends AppController {
 										ON a.user_id = b.id
 										INNER JOIN teams c
 										ON a.user_id = c.user_id
-										INNER JOIN ffgame_wc.game_users d
+										INNER JOIN ffgame.game_users d
 										ON b.fb_id = d.fb_id
-										INNER JOIN ffgame_wc.game_teams e
+										INNER JOIN ffgame.game_teams e
 										ON d.id = e.user_id
-										INNER JOIN ffgame_wc.master_team f
+										INNER JOIN ffgame.master_team f
 										ON e.team_id = f.uid
 										GROUP BY a.user_id LIMIT ".$start.",".$limit);
 
@@ -526,7 +526,7 @@ class PlayersController extends AppController {
 	*/
 	public function playerweekly(){
 		$rs = $this->Game->query("SELECT MAX(matchday) AS last_week 
-									FROM ffgame_wc.game_fixtures Fixture 
+									FROM ffgame.game_fixtures Fixture 
 									WHERE period='FullTime'");
 		
 		$week = intval($this->request->query['week']);
@@ -551,10 +551,10 @@ class PlayersController extends AppController {
 
 		//get game_ids
 		if($week>0){
-			$games = $this->Game->query("SELECT game_id FROM ffgame_wc.game_fixtures 
+			$games = $this->Game->query("SELECT game_id FROM ffgame.game_fixtures 
 										WHERE matchday={$week} LIMIT 10",false);	
 		}else{
-			$games = $this->Game->query("SELECT game_id FROM ffgame_wc.game_fixtures LIMIT 400",false);	
+			$games = $this->Game->query("SELECT game_id FROM ffgame.game_fixtures LIMIT 400",false);	
 		}
 		
 		$game_id = array();
@@ -565,7 +565,7 @@ class PlayersController extends AppController {
 		$str_ids = implode(',',$game_id);
 		$stats = $this->Game->query("SELECT stats_name,SUM(stats_value) as stats_value 
 									FROM 
-									 ffgame_stats_wc.master_player_stats a
+									 ffgame_stats.master_player_stats a
 									 WHERE player_id='{$player['player_id']}' 
 									 AND game_id IN ({$str_ids}) GROUP BY stats_name;
 									");
@@ -579,7 +579,7 @@ class PlayersController extends AppController {
 		}
 
 		//modifiers
-		$modifier = $this->Game->query("SELECT * FROM ffgame_wc.game_matchstats_modifier s");
+		$modifier = $this->Game->query("SELECT * FROM ffgame.game_matchstats_modifier s");
 		$mods = array();
 		while(sizeof($modifier)>0){
 			$m = array_shift($modifier);
@@ -626,7 +626,7 @@ class PlayersController extends AppController {
 		$this->layout = 'ajax';
 		$data = array();
 		$start = intval($this->request->query['start']);
-		$modifier = $this->Game->query("SELECT * FROM ffgame_wc.game_matchstats_modifier s");
+		$modifier = $this->Game->query("SELECT * FROM ffgame.game_matchstats_modifier s");
 		$mods = array();
 		while(sizeof($modifier)>0){
 			$m = array_shift($modifier);
@@ -638,8 +638,8 @@ class PlayersController extends AppController {
 
 
 		$rs = $this->Game->query("SELECT a.*,b.name as team_name 
-									FROM ffgame_wc.master_player a
-								  INNER JOIN ffgame_wc.master_team b
+									FROM ffgame.master_player a
+								  INNER JOIN ffgame.master_team b
 								  ON a.team_id = b.uid
 								  ORDER BY id ASC LIMIT {$start},20",false);
 		while(sizeof($rs)>0){
@@ -657,7 +657,7 @@ class PlayersController extends AppController {
 		$data = array();
 		$start = intval($this->request->query['start']);
 		$week = intval(@$this->request->query['week']);
-		$modifier = $this->Game->query("SELECT * FROM ffgame_wc.game_matchstats_modifier s");
+		$modifier = $this->Game->query("SELECT * FROM ffgame.game_matchstats_modifier s");
 		$mods = array();
 		while(sizeof($modifier)>0){
 			$m = array_shift($modifier);
@@ -669,8 +669,8 @@ class PlayersController extends AppController {
 
 
 		$rs = $this->Game->query("SELECT a.*,b.name as team_name 
-									FROM ffgame_wc.master_player a
-								  INNER JOIN ffgame_wc.master_team b
+									FROM ffgame.master_player a
+								  INNER JOIN ffgame.master_team b
 								  ON a.team_id = b.uid
 								  ORDER BY id ASC LIMIT {$start},20",false);
 		while(sizeof($rs)>0){
@@ -686,7 +686,7 @@ class PlayersController extends AppController {
 	private function get_player_statistics_weekly($week,$player,$modifier){
 		$map = $this->getStatsCategories();
 		//get the game_id of specified week
-		$sql = "SELECT * FROM ffgame_wc.game_fixtures Fixture WHERE matchday={$week} LIMIT 10";
+		$sql = "SELECT * FROM ffgame.game_fixtures Fixture WHERE matchday={$week} LIMIT 10";
 		$games = $this->Game->query($sql,false);
 		$game_ids = array();
 		foreach($games as $g){
@@ -696,7 +696,7 @@ class PlayersController extends AppController {
 		unset($games);
 
 		$sql = "SELECT player_id,stats_name,SUM(stats_value) AS total 
-				FROM ffgame_stats_wc.master_player_stats s
+				FROM ffgame_stats.master_player_stats s
 				WHERE player_id='{$player['uid']}' 
 				AND game_id IN (".implode(',',$game_ids).")
 				GROUP BY stats_name;";
@@ -742,7 +742,7 @@ class PlayersController extends AppController {
 		$map = $this->getStatsCategories();
 
 		$sql = "SELECT player_id,stats_name,SUM(stats_value) AS total 
-				FROM ffgame_stats_wc.master_player_stats s
+				FROM ffgame_stats.master_player_stats s
 				WHERE player_id='{$player['uid']}'
 				GROUP BY stats_name;";
 		$rs = $this->Game->query($sql);

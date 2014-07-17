@@ -71,7 +71,7 @@ class DATABASE_CONFIG {
 		'host' => 'localhost',
 		'login' => 'root',
 		'password' => 'root',
-		'database' => 'ffgame_wc',
+		'database' => 'ffgame',
 		'prefix' => '',
 		'encoding' => 'utf8',
 	);

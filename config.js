@@ -5,7 +5,7 @@ exports.config = {
 		host:'localhost',
 		username:'root',
 		password:'root',
-		database:'ffgame_wc',
+		database:'ffgame',
 		frontend_schema:'fantasy',
 		optadb: 'optadb'
 	},

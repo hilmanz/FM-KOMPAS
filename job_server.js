@@ -128,7 +128,7 @@ http.createServer(app).listen(3099, function(){
 
 function assignQueue(bot_id,queue,done){
 	pool.getConnection(function(err,conn){
-		conn.query("UPDATE ffgame_stats_wc.job_queue SET n_done=0,worker_id=?,n_status=1 WHERE id=?",
+		conn.query("UPDATE ffgame_stats.job_queue SET n_done=0,worker_id=?,n_status=1 WHERE id=?",
 					[bot_id,queue.id],function(err,rs){
 						conn.release();
 						done(err);
@@ -138,7 +138,7 @@ function assignQueue(bot_id,queue,done){
 
 function getQueues(done){
 	pool.getConnection(function(err,conn){
-		conn.query("SELECT * FROM ffgame_stats_wc.job_queue WHERE n_status=0 ORDER BY id ASC LIMIT 100;",
+		conn.query("SELECT * FROM ffgame_stats.job_queue WHERE n_status=0 ORDER BY id ASC LIMIT 100;",
 					[],function(err,rs){
 						conn.release();
 						done(err,rs);
@@ -152,7 +152,7 @@ function getQueues(done){
 //we only need at least 1 job in active.
 function getActiveJobs(done){
 	pool.getConnection(function(err,conn){
-		conn.query("SELECT * FROM ffgame_stats_wc.job_queue WHERE n_status=1 ORDER BY id ASC LIMIT 1;",
+		conn.query("SELECT * FROM ffgame_stats.job_queue WHERE n_status=1 ORDER BY id ASC LIMIT 1;",
 					[],function(err,rs){
 						conn.release();
 						done(err,rs);

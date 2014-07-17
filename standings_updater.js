@@ -1,5 +1,5 @@
 /*
-INSERT INTO ffgame_wc.master_standings
+INSERT INTO ffgame.master_standings
 (
 team_id,
 AGAINST,
@@ -128,7 +128,7 @@ function update_data(team,group_name,done){
 	var team_id = team.TeamRef;
 	
 	
-	conn.query("INSERT INTO ffgame_wc.master_standings\
+	conn.query("INSERT INTO ffgame.master_standings\
 				(\
 				team_id,\
 				t_against,\

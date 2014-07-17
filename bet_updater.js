@@ -126,7 +126,7 @@ function processGameStats(conn,matchday,game_id,done){
 			};
 	async.waterfall([
 		function(cb){
-			conn.query("SELECT * FROM ffgame_wc.game_fixtures WHERE game_id=? LIMIT 1;",
+			conn.query("SELECT * FROM ffgame.game_fixtures WHERE game_id=? LIMIT 1;",
 						[game_id],function(err,rs){
 							console.log(S(this.sql).collapseWhitespace().s);
 							
@@ -249,7 +249,7 @@ function processGameStats(conn,matchday,game_id,done){
 		function(stats,goals,cb){
 			console.log('BLAH',stats);
 			console.log(game_id,stats);
-			conn.query("UPDATE ffgame_wc.game_bet_winners SET score=0 WHERE game_id=?",
+			conn.query("UPDATE ffgame.game_bet_winners SET score=0 WHERE game_id=?",
 						[game_id],function(err,rs){
 							console.log('calculate',S(this.sql).collapseWhitespace().s);
 							cb(err,stats,goals);
@@ -308,7 +308,7 @@ function sendEarningNotification(conn,game_id,done){
 				(content,url,dt,game_team_id,msg_id)\
 				SELECT CONCAT('Selamat ! loe sudah memenangkan ',score,' coins dari tebak skor !') AS content,\
 				'#',NOW(),game_team_id,? \
-				FROM ffgame_wc.game_bet_winners WHERE game_id=?;",
+				FROM ffgame.game_bet_winners WHERE game_id=?;",
 				[msgid,game_id],
 				function(err,rs){
 					console.log('calculate',S(this.sql).collapseWhitespace().s);
@@ -316,7 +316,7 @@ function sendEarningNotification(conn,game_id,done){
 				});
 }
 function calculateWinner(conn,game_id,done){
-	conn.query("SELECT game_team_id,score FROM ffgame_wc.game_bet_winners\
+	conn.query("SELECT game_team_id,score FROM ffgame.game_bet_winners\
 				 WHERE game_id=? ORDER BY score DESC LIMIT 10;",
 				 [game_id],function(err,rs){
 				 	done(err,rs);
@@ -332,7 +332,7 @@ function calculateUserBetScore(conn,game_id,stats,cb){
 		return has_data;
 	},
 	function(next){
-		conn.query("SELECT * FROM ffgame_wc.game_bets WHERE id > ? AND game_id=? ORDER BY id LIMIT 1",
+		conn.query("SELECT * FROM ffgame.game_bets WHERE id > ? AND game_id=? ORDER BY id LIMIT 1",
 					[since_id,game_id],
 					function(err,rs){
 			console.log('calculate',S(this.sql).collapseWhitespace().s);
@@ -429,7 +429,7 @@ function assignScore(conn,game_id,stats,bet,done){
 	}
 	async.waterfall([
 		function(cb){
-			conn.query("INSERT INTO ffgame_wc.game_bet_winners\
+			conn.query("INSERT INTO ffgame.game_bet_winners\
 				(game_id,game_team_id,score)\
 				VALUES\
 				(?,?,?)\
@@ -477,7 +477,7 @@ function assignScore(conn,game_id,stats,bet,done){
 
 function getCurrentMatchday(conn,done){
 	conn.query("SELECT matchday FROM \
-				ffgame_wc.game_fixtures \
+				ffgame.game_fixtures \
 				WHERE is_processed = 0 \
 				ORDER BY id ASC LIMIT 1;",
 				[],function(err,rs){
@@ -491,7 +491,7 @@ function getCurrentMatchday(conn,done){
 
 function getGameIdsByMatchday(conn,matchday,done){
 	conn.query("SELECT game_id,period FROM \
-				ffgame_wc.game_fixtures \
+				ffgame.game_fixtures \
 				WHERE matchday = ? \
 				ORDER BY id ASC LIMIT 10;",
 				[matchday],function(err,rs){

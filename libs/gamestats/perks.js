@@ -36,11 +36,11 @@ exports.apply_player_perk = function(conn,game_team_id,player_id,new_stats,match
 			},
 			function(perks,extra_points,additional_points,cb){
 				//get the game_id played by the game_team_id
-				conn.query("SELECT game_id FROM ffgame_wc.game_fixtures WHERE matchday = ? AND \
+				conn.query("SELECT game_id FROM ffgame.game_fixtures WHERE matchday = ? AND \
 							(\
-							home_id IN (SELECT team_id FROM ffgame_wc.game_teams WHERE id = ?)\
+							home_id IN (SELECT team_id FROM ffgame.game_teams WHERE id = ?)\
 							OR\
-							away_id IN (SELECT team_id FROM ffgame_wc.game_teams WHERE id = ?)\
+							away_id IN (SELECT team_id FROM ffgame.game_teams WHERE id = ?)\
 							)\
 							LIMIT 1;",
 				[
@@ -50,7 +50,7 @@ exports.apply_player_perk = function(conn,game_team_id,player_id,new_stats,match
 					try{
 						cb(err,perks,extra_points,additional_points,rs[0].game_id);	
 					}catch(e){
-						conn.query("SELECT game_id FROM ffgame_wc.game_fixtures\
+						conn.query("SELECT game_id FROM ffgame.game_fixtures\
 								 WHERE matchday=? ORDER BY game_id ASC LIMIT 1",
 								 [matchday],function(err,match){
 								 	the_game_id = match[0]['game_id'];
@@ -148,8 +148,8 @@ exports.apply_player_perk = function(conn,game_team_id,player_id,new_stats,match
 
 
 function getAllPerks(conn,game_team_id,callback){
-	conn.query("SELECT * FROM ffgame_wc.digital_perks a\
-				INNER JOIN ffgame_wc.master_perks b\
+	conn.query("SELECT * FROM ffgame.digital_perks a\
+				INNER JOIN ffgame.master_perks b\
 				ON a.master_perk_id = b.id\
 				WHERE \
 				a.game_team_id=? \
@@ -367,7 +367,7 @@ function getExtraPoints(perk_data,points){
 }
 
 function saveExtraPoint(conn,game_id,matchday,game_team_id,modifier_name,extra_points,callback){
-	conn.query("INSERT INTO ffgame_stats_wc.game_team_extra_points\
+	conn.query("INSERT INTO ffgame_stats.game_team_extra_points\
 				(game_id,matchday,game_team_id,modifier_name,extra_points)\
 				VALUES\
 				(?,?,?,?,?)\

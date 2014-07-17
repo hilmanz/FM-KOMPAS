@@ -44,7 +44,7 @@ exports.update = function(conn,since_id,until_id,update_rank,game_id,done){
 		async.waterfall([
 			function(cb){
 				//first, we check the matchday
-				conn.query("SELECT matchday FROM ffgame_wc.game_fixtures WHERE game_id=? LIMIT 1",
+				conn.query("SELECT matchday FROM ffgame.game_fixtures WHERE game_id=? LIMIT 1",
 							[game_id],function(err,rs){
 								cb(err,rs[0].matchday);
 				});
@@ -55,9 +55,9 @@ exports.update = function(conn,since_id,until_id,update_rank,game_id,done){
 					FROM "+frontend_schema+".teams a \
 					INNER JOIN "+frontend_schema+".users b\
 					ON a.user_id = b.id \
-					INNER JOIN ffgame_wc.game_users c\
+					INNER JOIN ffgame.game_users c\
 					ON b.fb_id = c.fb_id\
-					INNER JOIN ffgame_wc.game_teams d\
+					INNER JOIN ffgame.game_teams d\
 					ON d.user_id = c.id\
 					WHERE d.id BETWEEN ? AND ?\
 					LIMIT ?;",
@@ -115,7 +115,7 @@ exports.update = function(conn,since_id,until_id,update_rank,game_id,done){
 	//});
 }
 function update_rank_history(conn,done){
-	conn.query("INSERT INTO ffgame_stats_wc.rank_update_history(last_update)\
+	conn.query("INSERT INTO ffgame_stats.rank_update_history(last_update)\
 				VALUES(NOW());",[],function(err,rs){
 					done(err);
 				});
@@ -256,7 +256,7 @@ function updatePoints(conn,team,stats,done){
 			}
 		},
 		function(game_points,cb){
-			conn.query("SELECT * FROM ffgame_wc.game_matchstats_modifier Modifier LIMIT 100",
+			conn.query("SELECT * FROM ffgame.game_matchstats_modifier Modifier LIMIT 100",
 						[],
 						function(err,rs){
 							var modifier = [];
@@ -334,10 +334,10 @@ function getUserTeamPoints(conn,fb_id,matchday,done){
 			function(callback){
 				//get overall points
 				conn.query("SELECT a.fb_id,b.user_id,b.id,b.team_id,c.points,0 as extra_points \
-							FROM ffgame_wc.game_users a\
-							INNER JOIN ffgame_wc.game_teams b\
+							FROM ffgame.game_users a\
+							INNER JOIN ffgame.game_teams b\
 							ON a.id = b.user_id\
-							LEFT JOIN ffgame_stats_wc.game_team_points c\
+							LEFT JOIN ffgame_stats.game_team_points c\
 							ON b.id = c.game_team_id\
 							WHERE a.fb_id = ?;",
 							[fb_id],
@@ -355,7 +355,7 @@ function getUserTeamPoints(conn,fb_id,matchday,done){
 					var original_team_id = rs.team_id;
 					//extra points
 					conn.query("SELECT SUM(extra_points) AS extra_point \
-								FROM ffgame_stats_wc.game_team_extra_points \
+								FROM ffgame_stats.game_team_extra_points \
 								WHERE game_team_id=?;",[rs.id],function(err,r){
 									if(!err){
 										if(r!=null){
@@ -378,8 +378,8 @@ function getUserTeamPoints(conn,fb_id,matchday,done){
 									0 AS extra_points,\
 									a.matchday,b.match_date\
 									FROM \
-									ffgame_stats_wc.game_team_player_weekly a\
-									INNER JOIN ffgame_wc.game_fixtures b\
+									ffgame_stats.game_team_player_weekly a\
+									INNER JOIN ffgame.game_fixtures b\
 									ON a.game_id = b.game_id\
 									WHERE a.game_team_id = ?\
 									AND a.matchday = ?\
@@ -418,7 +418,7 @@ function getUserTeamPoints(conn,fb_id,matchday,done){
 					//we do these logic to make sure that unplayed match will have a default data 
 					//(all stats will be temporarily 0 for those match until the match is played) 
 					conn.query("SELECT game_id,matchday,match_date \
-								FROM ffgame_wc.game_fixtures WHERE matchday IN (?) AND (home_id = ? OR away_id=?)"
+								FROM ffgame.game_fixtures WHERE matchday IN (?) AND (home_id = ? OR away_id=?)"
 								,[week,original_team_id,original_team_id],
 								function(err,matches){
 									console.log(S(this.sql).collapseWhitespace().s);
@@ -477,7 +477,7 @@ function getUserTeamPoints(conn,fb_id,matchday,done){
 				if(rs!=null&&rs.id!=null){
 					//extra points
 					conn.query("SELECT game_id,SUM(extra_points) AS extra \
-									FROM ffgame_stats_wc.game_team_extra_points \
+									FROM ffgame_stats.game_team_extra_points \
 									WHERE game_team_id=? GROUP BY game_id LIMIT 400",
 									[rs.id],function(err,r){
 									if(!err){
@@ -641,8 +641,8 @@ function implode (glue, pieces) {
 function generate_summary(conn,user,modifier,done){
 	async.waterfall([
 		function(callback){
-			conn.query("SELECT GameTeam.id AS game_team_id FROM ffgame_wc.game_users GameUser\
-                              INNER JOIN ffgame_wc.game_teams GameTeam\
+			conn.query("SELECT GameTeam.id AS game_team_id FROM ffgame.game_users GameUser\
+                              INNER JOIN ffgame.game_teams GameTeam\
                               ON GameTeam.user_id = GameUser.id\
                               WHERE GameUser.fb_id = ? LIMIT 1",
                           [user.fb_id],function(err,rs){
@@ -660,10 +660,10 @@ function generate_summary(conn,user,modifier,done){
 			if(game_team_id!=null){
 				conn.query("SELECT SUM(start_budget+transactions) AS balance FROM \
                                 (SELECT budget AS start_budget,0 AS transactions\
-                                FROM ffgame_wc.game_team_purse WHERE game_team_id=? LIMIT 1\
+                                FROM ffgame.game_team_purse WHERE game_team_id=? LIMIT 1\
                                 UNION ALL\
                                 SELECT 0,SUM(amount) AS transactions\
-                                FROM ffgame_wc.game_team_expenditures\
+                                FROM ffgame.game_team_expenditures\
                                 WHERE game_team_id=?\
                                 ) Finance;",
 						[game_team_id,game_team_id],
@@ -679,7 +679,7 @@ function generate_summary(conn,user,modifier,done){
 		},
 		function(game_team_id,money,callback){
 			conn.query("SELECT game_team_id,COUNT(id) AS total \
-                                  FROM ffgame_wc.game_transfer_history \
+                                  FROM ffgame.game_transfer_history \
                                   WHERE game_team_id = ?\
                                   AND transfer_type=1 LIMIT 10;",
                                   [game_team_id],
@@ -735,8 +735,8 @@ function give_weekly_cash(since_id,until_id,matchday,conn,done){
 	console.log('GIVING WEEKLY CASH');
 
 	conn.query("SELECT a.id AS game_team_id,b.fb_id \
-				FROM ffgame_wc.game_teams a\
-				INNER JOIN ffgame_wc.game_users b\
+				FROM ffgame.game_teams a\
+				INNER JOIN ffgame.game_users b\
 				ON a.user_id = b.id\
 				WHERE a.id BETWEEN ? AND ?\
 				ORDER BY a.id ASC\
@@ -766,7 +766,7 @@ function distribute_weekly_cash(conn,teams,matchday,done){
 		function(cb){
 			//get the latest matchday
 			conn.query("SELECT matchday \
-						FROM ffgame_stats_wc.game_team_player_weekly \
+						FROM ffgame_stats.game_team_player_weekly \
 						ORDER BY id DESC LIMIT 1",
 						[],
 			function(err,rs){
@@ -853,7 +853,7 @@ function getStatsGroupValues(conn,game_team_id,modifier,done){
     	}
 
     conn.query("SELECT stats_category,SUM(points) as total\
-    			FROM ffgame_stats_wc.game_team_player_weekly \
+    			FROM ffgame_stats.game_team_player_weekly \
     			WHERE game_team_id = ? GROUP BY stats_category;",
     			[game_team_id],
     			function(err,rs){
@@ -868,7 +868,7 @@ function getStatsGroupValues(conn,game_team_id,modifier,done){
     /*
     async.waterfall([
     	function(callback){//step 1 dapetin game_id
-    		conn.query("SELECT game_id FROM ffgame_stats_wc.game_match_player_points a\
+    		conn.query("SELECT game_id FROM ffgame_stats.game_match_player_points a\
                                         WHERE game_team_id=? GROUP BY game_id;",
                         [game_team_id],function(err,rs){
                         		var game_id = [];
@@ -880,7 +880,7 @@ function getStatsGroupValues(conn,game_team_id,modifier,done){
     	},
     	
     	function(game_id,callback){//step 2 dapetin daftar players
-    		conn.query("SELECT player_id FROM ffgame_stats_wc.game_match_player_points bb\
+    		conn.query("SELECT player_id FROM ffgame_stats.game_match_player_points bb\
                                           WHERE bb.game_team_id=? GROUP BY player_id;",
                         [game_team_id],function(err,rs){
                         	var players = [];
@@ -899,8 +899,8 @@ function getStatsGroupValues(conn,game_team_id,modifier,done){
 					conn.query("SELECT a.stats_name,SUM(a.stats_value) AS frequency,\
 								SUM(a.points) AS total_points,\
 								b.position \
-                              FROM ffgame_stats_wc.game_team_player_weekly a\
-                              INNER JOIN ffgame_wc.master_player b\
+                              FROM ffgame_stats.game_team_player_weekly a\
+                              INNER JOIN ffgame.master_player b\
                               ON a.player_id = b.uid\
                               WHERE a.game_id IN (?) AND a.player_id IN (?)\
                               AND a.game_team_id = ?\

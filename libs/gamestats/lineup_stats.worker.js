@@ -98,7 +98,7 @@ exports.done = function(){
 
 function get_master_team_stats(game_id,done){
 	pool.getConnection(function(err,conn){
-		conn.query("SELECT * FROM ffgame_stats_wc.master_match_player_points\
+		conn.query("SELECT * FROM ffgame_stats.master_match_player_points\
 					WHERE game_id = ? LIMIT 50",
 					[game_id],
 		function(err,rs){
@@ -112,7 +112,7 @@ function get_master_team_stats(game_id,done){
 }
 function get_master_match_summary(game_id,done){
 	pool.getConnection(function(err,conn){
-		conn.query("SELECT * FROM ffgame_stats_wc.master_match_points\
+		conn.query("SELECT * FROM ffgame_stats.master_match_points\
 					WHERE game_id = ? LIMIT 30",
 					[game_id],
 		function(err,rs){
@@ -130,7 +130,7 @@ function get_master_match_summary(game_id,done){
 function get_user_teams(start,limit,done){
 	pool.getConnection(function(err,conn){
 		if(err) console.log(err.message);
-		conn.query("SELECT * FROM ffgame_wc.game_teams ORDER BY id ASC LIMIT ?,?",
+		conn.query("SELECT * FROM ffgame.game_teams ORDER BY id ASC LIMIT ?,?",
 				[start,limit],
 		function(err,rs){
 			if(err){console.log(err.message);}
@@ -143,7 +143,7 @@ function get_user_teams(start,limit,done){
 function get_user_teams_by_idRange(since_id,until_id,limit,done){
 	pool.getConnection(function(err,conn){
 		if(err) console.log(err.message);
-		conn.query("SELECT * FROM ffgame_wc.game_teams WHERE id BETWEEN ? AND ? ORDER BY id ASC LIMIT ?",
+		conn.query("SELECT * FROM ffgame.game_teams WHERE id BETWEEN ? AND ? ORDER BY id ASC LIMIT ?",
 				[since_id,until_id,limit],
 		function(err,rs){
 			if(err){console.log(err.message);}
@@ -173,7 +173,7 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 									function(next){
 										//check the game fixture date
 										conn.query("SELECT UNIX_TIMESTAMP(match_date) AS ts \
-													FROM ffgame_wc.game_fixtures WHERE game_id=? LIMIT 1;",
+													FROM ffgame.game_fixtures WHERE game_id=? LIMIT 1;",
 													[game_id],function(err,rs){
 														next(err,rs[0].ts);
 													});
@@ -181,7 +181,7 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 									function(game_ts,next){
 										//make sure that the team is created before the match
 										conn.query("SELECT UNIX_TIMESTAMP(created_date) AS ts \
-													FROM ffgame_wc.game_teams WHERE id = ? LIMIT 1;",
+													FROM ffgame.game_teams WHERE id = ? LIMIT 1;",
 													[item.id],function(err,rs){
 														//if the team is created at least 1 hour before the match. it's ok
 														if(rs[0].ts < (game_ts - (60*60))){
@@ -215,7 +215,7 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 										console.log('ISSUE1','Lets process the extra points if the week has ended....')
 										//check the game's matchday
 										conn.query("SELECT matchday \
-													FROM ffgame_wc.game_fixtures \
+													FROM ffgame.game_fixtures \
 													WHERE game_id=? \
 													LIMIT 1",[game_id],
 													function(err,r){
@@ -233,7 +233,7 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 										async.waterfall([
 												function(cb){
 													console.log('ISSUE1','checking for #',team);
-													conn.query("SELECT game_id FROM ffgame_wc.game_fixtures \
+													conn.query("SELECT game_id FROM ffgame.game_fixtures \
 															WHERE (home_id = ? OR away_id = ?) \
 															AND matchday=? LIMIT 1",
 															[item.team_id,item.team_id,matchday],
@@ -245,7 +245,7 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 																	the_game_id = match[0]['game_id'];
 																	cb(err,the_game_id);
 																}catch(e){
-																	conn.query("SELECT game_id FROM ffgame_wc.game_fixtures\
+																	conn.query("SELECT game_id FROM ffgame.game_fixtures\
 																	 WHERE matchday=? ORDER BY game_id ASC LIMIT 1",
 																	 [matchday],function(err,match){
 																	 	the_game_id = match[0]['game_id'];
@@ -260,8 +260,8 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 												},
 												function(t_game_id,cb){
 													conn.query("SELECT a.player_id,a.position_no,b.position \
-																FROM ffgame_wc.game_team_lineups_history a\
-																INNER JOIN ffgame_wc.master_player b\
+																FROM ffgame.game_team_lineups_history a\
+																INNER JOIN ffgame.master_player b\
 																ON a.player_id = b.uid\
 																WHERE a.game_id = ?\
 																AND a.game_team_id=? LIMIT 16;",
@@ -314,7 +314,7 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 										async.waterfall([
 											function(cb){
 												conn.query("SELECT COUNT(*) AS total \
-													FROM ffgame_wc.game_fixtures \
+													FROM ffgame.game_fixtures \
 													WHERE matchday = ?",[matchday],
 													function(err,r){
 														cb(err,r[0].total);
@@ -322,7 +322,7 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 											},
 											function(total_fixtures,cb){
 												conn.query("SELECT COUNT(*) AS total \
-													FROM ffgame_wc.game_fixtures \
+													FROM ffgame.game_fixtures \
 													WHERE period = 'FullTime' \
 													AND matchday = ? \
 													AND is_processed=1",[matchday],
@@ -353,7 +353,7 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 											async.waterfall([
 													function(cb){
 														conn.query("SELECT game_id \
-																	FROM ffgame_wc.game_fixtures \
+																	FROM ffgame.game_fixtures \
 																	WHERE (home_id =? OR away_id=?) \
 																	AND matchday = ?;",
 																	[item.team_id,item.team_id,matchday],
@@ -366,7 +366,7 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 																				the_game_id = r[0].game_id;
 																				cb(err,the_game_id);
 																			}catch(e){
-																				conn.query("SELECT game_id FROM ffgame_wc.game_fixtures\
+																				conn.query("SELECT game_id FROM ffgame.game_fixtures\
 																				 WHERE matchday=? ORDER BY game_id ASC LIMIT 1",
 																				 [matchday],function(err,match){
 																				 	the_game_id = match[0]['game_id'];
@@ -382,11 +382,11 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 												function(err,the_game_id){
 													//check if all lineup is played in real game.
 													conn.query("SELECT * FROM \
-														ffgame_wc.game_team_lineups_history a\
+														ffgame.game_team_lineups_history a\
 														INNER JOIN\
-														ffgame_stats_wc.master_player_stats b\
+														ffgame_stats.master_player_stats b\
 														ON a.player_id = b.player_id\
-														INNER JOIN ffgame_wc.game_fixtures c\
+														INNER JOIN ffgame.game_fixtures c\
 														ON b.game_id = c.game_id\
 														WHERE a.game_team_id=? AND a.game_id = ?\
 														AND b.stats_name = 'game_started'\
@@ -421,11 +421,11 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 											conn.query("SELECT SUM(budget+expenses) AS balance\
 														FROM (\
 															SELECT budget,0 AS expenses \
-															FROM ffgame_wc.game_team_purse \
+															FROM ffgame.game_team_purse \
 															WHERE game_team_id=?\
 														UNION ALL\
 															SELECT 0,SUM(amount) AS total \
-															FROM ffgame_wc.game_team_expenditures \
+															FROM ffgame.game_team_expenditures \
 															WHERE match_day <= ? AND game_team_id=?\
 														) a;",
 												[item.id,matchday,item.id],
@@ -466,7 +466,7 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 												function(cb){
 													if(is_all_player_started){
 														conn.query("INSERT INTO \
-																	ffgame_stats_wc.game_team_extra_points\
+																	ffgame_stats.game_team_extra_points\
 																	(game_id,matchday,game_team_id,\
 																		modifier_name,extra_points)\
 																	VALUES\
@@ -495,7 +495,7 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 															penalty = -100;
 														}
 														conn.query("INSERT INTO \
-																	ffgame_stats_wc.game_team_extra_points\
+																	ffgame_stats.game_team_extra_points\
 																	(game_id,matchday,game_team_id,\
 																		modifier_name,extra_points)\
 																	VALUES\
@@ -561,7 +561,7 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 													console.log('ISSUE 4','check if tim is overcapacity ?');
 													var my_team_id = item.id;
 													var rooster_overlimit = false;
-													conn.query("SELECT COUNT(id) as total FROM ffgame_wc.game_team_players\
+													conn.query("SELECT COUNT(id) as total FROM ffgame.game_team_players\
 																 WHERE game_team_id = ?",
 																 [my_team_id],
 																 function(err,check){
@@ -581,7 +581,7 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 																	overlimit_penalty);
 
 														conn.query("INSERT INTO \
-																	ffgame_stats_wc.game_team_extra_points\
+																	ffgame_stats.game_team_extra_points\
 																	(game_id,matchday,game_team_id,\
 																		modifier_name,extra_points)\
 																	VALUES\
@@ -645,7 +645,7 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 
 								function(err,wf_result){
 									console.log('linup_stats','done');
-									conn.query("UPDATE ffgame_stats_wc.job_queue SET current_id=?,n_done=n_done+1\
+									conn.query("UPDATE ffgame_stats.job_queue SET current_id=?,n_done=n_done+1\
 												WHERE id = ?",
 												[item.id,queue_id],function(err,rs){
 													console.log(S(this.sql).collapseWhitespace().s);
@@ -686,8 +686,8 @@ function getPlayerDailyTeamStats(conn,game_team_id,player_id,player_pos,matchday
 	}
 	
 	var sql = "SELECT a.game_id,stats_name,stats_value\
-			FROM ffgame_stats_wc.master_player_stats a \
-			INNER JOIN ffgame_wc.game_fixtures b\
+			FROM ffgame_stats.master_player_stats a \
+			INNER JOIN ffgame.game_fixtures b\
 			ON a.game_id = b.game_id\
 			WHERE a.player_id=? AND b.matchday=?\
 			LIMIT 500;";
@@ -703,7 +703,7 @@ function getPlayerDailyTeamStats(conn,game_team_id,player_id,player_pos,matchday
 				});
 		},
 		function(result,callback){
-			conn.query("SELECT * FROM ffgame_wc.game_matchstats_modifier;",
+			conn.query("SELECT * FROM ffgame.game_matchstats_modifier;",
 			[],
 			function(err,rs){
 				callback(err,rs,result);	
@@ -715,8 +715,8 @@ function getPlayerDailyTeamStats(conn,game_team_id,player_id,player_pos,matchday
 			var percentage = 1;
 			async.waterfall([
 				function(cb){
-					conn.query("SELECT a.id,amount FROM ffgame_wc.job_event_master_player a\
-						INNER JOIN ffgame_wc.master_events b\
+					conn.query("SELECT a.id,amount FROM ffgame.job_event_master_player a\
+						INNER JOIN ffgame.master_events b\
 						ON a.master_event_id = b.id\
 						WHERE game_team_id = ? AND player_id=? AND affected_item = 2\
 						AND matchday=? AND a.n_status = 0 LIMIT 1;",[game_team_id,player_id,matchday],
@@ -733,7 +733,7 @@ function getPlayerDailyTeamStats(conn,game_team_id,player_id,player_pos,matchday
 						});
 				},function(job_id,cb){
 					//flag to done
-					conn.query("UPDATE ffgame_wc.job_event_master_player SET n_status=1 WHERE id = ?",
+					conn.query("UPDATE ffgame.job_event_master_player SET n_status=1 WHERE id = ?",
 								[job_id],function(err,rs){
 									console.log('EVENT APPLIED POINTS','event flagged as applied');
 								cb(err);
@@ -787,7 +787,7 @@ function getPlayerDailyTeamStats(conn,game_team_id,player_id,player_pos,matchday
 		},
 		function(weekly,callback){
 			async.eachSeries(weekly,function(w,next){
-				conn.query("INSERT INTO ffgame_stats_wc.game_team_player_weekly\
+				conn.query("INSERT INTO ffgame_stats.game_team_player_weekly\
 						(game_id,game_team_id,matchday,player_id,stats_category,stats_name,stats_value,points,position_no)\
 						VALUES\
 						(?,?,?,?,?,?,?,?,?)\
@@ -946,7 +946,7 @@ function addToHistory(game_id,team,done){
 	pool.getConnection(function(err,conn){
 		async.waterfall([
 			function(callback){
-				conn.query("SELECT matchday FROM ffgame_wc.game_fixtures WHERE game_id=? LIMIT 1",
+				conn.query("SELECT matchday FROM ffgame.game_fixtures WHERE game_id=? LIMIT 1",
 							[game_id],function(err,match){
 								console.log('ISSUE1',this.sql);
 								try{
@@ -958,7 +958,7 @@ function addToHistory(game_id,team,done){
 							});
 			},
 			function(callback){
-				conn.query("SELECT game_id FROM ffgame_wc.game_fixtures \
+				conn.query("SELECT game_id FROM ffgame.game_fixtures \
 							WHERE (home_id = ? OR away_id = ?) \
 							AND matchday=? LIMIT 1",
 							[team.team_id,team.team_id,matchday],function(err,match){
@@ -969,7 +969,7 @@ function addToHistory(game_id,team,done){
 									console.log('the game id : ',the_game_id);
 									callback(err,the_game_id);
 								}catch(e){
-									conn.query("SELECT game_id FROM ffgame_wc.game_fixtures\
+									conn.query("SELECT game_id FROM ffgame.game_fixtures\
 												 WHERE matchday=? ORDER BY game_id ASC LIMIT 1",
 												 [matchday],function(err,match){
 												 	the_game_id = match[0]['game_id'];
@@ -983,7 +983,7 @@ function addToHistory(game_id,team,done){
 			function(the_game_id,callback){
 				var can_insert = true;
 				//we only do insert once
-				conn.query("SELECT * FROM ffgame_wc.game_team_lineups_history\
+				conn.query("SELECT * FROM ffgame.game_team_lineups_history\
 							WHERE game_id = ? AND game_team_id= ?",
 							[the_game_id,team.id],function(err,rs){
 								console.log('ISSUE1','check if theres already history',S(this.sql).collapseWhitespace().s);
@@ -1000,10 +1000,10 @@ function addToHistory(game_id,team,done){
 			function(the_game_id,can_insert,callback){
 				if(can_insert){
 					conn.query("INSERT IGNORE INTO \
-					ffgame_wc.game_team_lineups_history\
+					ffgame.game_team_lineups_history\
 					(game_id,game_team_id,player_id,position_no,last_update)\
 					SELECT ? AS game_id,game_team_id,player_id,position_no,NOW() AS last_update\
-					FROM ffgame_wc.game_team_lineups WHERE game_team_id=? AND matchday = ?;",
+					FROM ffgame.game_team_lineups WHERE game_team_id=? AND matchday = ?;",
 					[the_game_id,team.id,matchday],
 					function(err,rs){
 						console.log('ISSUE1','update lineup history ',S(this.sql).collapseWhitespace().s);
@@ -1027,7 +1027,7 @@ function getTeamLineups(game_id,team,done){
 	pool.getConnection(function(err,conn){
 		async.waterfall([
 			function(callback){
-				conn.query("SELECT matchday FROM ffgame_wc.game_fixtures WHERE game_id=? LIMIT 1",
+				conn.query("SELECT matchday FROM ffgame.game_fixtures WHERE game_id=? LIMIT 1",
 							[game_id],function(err,match){
 								console.log('ISSUE1',this.sql);
 								try{
@@ -1039,7 +1039,7 @@ function getTeamLineups(game_id,team,done){
 							});
 			},
 			function(callback){
-				conn.query("SELECT game_id FROM ffgame_wc.game_fixtures \
+				conn.query("SELECT game_id FROM ffgame.game_fixtures \
 							WHERE (home_id = ? OR away_id = ?) \
 							AND matchday=? LIMIT 1",
 							[team.team_id,team.team_id,matchday],function(err,match){
@@ -1051,7 +1051,7 @@ function getTeamLineups(game_id,team,done){
 									callback(err,the_game_id);
 								}catch(e){
 									//err = new Error('no game_id found');
-									conn.query("SELECT game_id FROM ffgame_wc.game_fixtures\
+									conn.query("SELECT game_id FROM ffgame.game_fixtures\
 												 WHERE matchday=? ORDER BY game_id ASC LIMIT 1",
 												 [matchday],function(err,match){
 												 	the_game_id = match[0]['game_id'];
@@ -1063,7 +1063,7 @@ function getTeamLineups(game_id,team,done){
 							});
 			},
 			function(the_game_id,callback){
-				conn.query("SELECT * FROM ffgame_wc.game_team_lineups_history \
+				conn.query("SELECT * FROM ffgame.game_team_lineups_history \
 					WHERE game_id=? AND game_team_id = ?\
 					LIMIT 20",
 					[the_game_id,team.id],function(err,rs){
@@ -1100,7 +1100,7 @@ function updateLineupStats(game_id,lineups,summary,player_stats,in_game,done){
 							async.waterfall([
 									function(callback){
 										conn.query("SELECT game_id,player_id,stats_name \
-													FROM ffgame_stats_wc.master_player_stats \
+													FROM ffgame_stats.master_player_stats \
 													WHERE game_id = ?  AND player_id= ? \
 													AND stats_name = 'game_started' LIMIT 1;",
 													[game_id,item.player_id],function(err,sqlResult){
@@ -1137,7 +1137,7 @@ function updateLineupStats(game_id,lineups,summary,player_stats,in_game,done){
 											callback(err,null);
 										}else{
 											console.log('add #',item.player_id,' from team #',item.game_team_id,' stats');
-											conn.query("INSERT INTO ffgame_stats_wc.game_match_player_points\
+											conn.query("INSERT INTO ffgame_stats.game_match_player_points\
 												(game_id,game_team_id,player_id,points,performance,last_update)\
 												VALUES(?,?,?,?,?,NOW())\
 												ON DUPLICATE KEY UPDATE\
@@ -1177,10 +1177,10 @@ function updateLineupStats(game_id,lineups,summary,player_stats,in_game,done){
 function update_team_points(done){
 	console.log('updating team points');
 	pool.getConnection(function(err,conn){
-		conn.query("INSERT INTO ffgame_stats_wc.game_team_points\
+		conn.query("INSERT INTO ffgame_stats.game_team_points\
 					(game_team_id,points)\
 					SELECT game_team_id,SUM(points) AS total_points\
-					FROM ffgame_stats_wc.game_team_player_weekly\
+					FROM ffgame_stats.game_team_player_weekly\
 					GROUP BY game_team_id\
 					ON DUPLICATE KEY UPDATE\
 					points = VALUES(points);",

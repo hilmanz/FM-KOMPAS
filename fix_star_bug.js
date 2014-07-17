@@ -29,7 +29,7 @@ var pool  = mysql.createPool({
 pool.getConnection(function(err,conn){
 	async.waterfall([
 			function(cb){
-				conn.query("SELECT id as game_team_id FROM ffgame_wc.game_teams",[],function(err,teams){
+				conn.query("SELECT id as game_team_id FROM ffgame.game_teams",[],function(err,teams){
 					
 					cb(err,teams);
 				});
@@ -61,7 +61,7 @@ function checkTeamPurchase(conn,team,done){
 		//check for its total transactions
 		function(cb){
 			conn.query("SELECT SUM(amount) AS total \
-						FROM ffgame_wc.game_team_expenditures \
+						FROM ffgame.game_team_expenditures \
 						WHERE item_name IN ('player_sold','buy_player') \
 						AND game_team_id=?;",[team.game_team_id],
 						function(err,rs){
@@ -78,7 +78,7 @@ function checkTeamPurchase(conn,team,done){
 		function(total_transaction,cb){
 			//check total real buy
 			conn.query("SELECT SUM(transfer_value) AS total \
-						FROM ffgame_wc.game_transfer_history \
+						FROM ffgame.game_transfer_history \
 						WHERE game_team_id=? AND transfer_type=1;",
 						[team.game_team_id],
 						function(err,rs){
@@ -95,7 +95,7 @@ function checkTeamPurchase(conn,team,done){
 		function(total_transaction,total_buy,cb){
 			//check total real sale
 			conn.query("SELECT SUM(transfer_value) AS total \
-						FROM ffgame_wc.game_transfer_history \
+						FROM ffgame.game_transfer_history \
 						WHERE game_team_id=? AND transfer_type=2;",
 						[team.game_team_id],
 						function(err,rs){
@@ -142,7 +142,7 @@ function checkTeamPurchase(conn,team,done){
 					item_name = 'buy_player'
 					item_type = 1;
 				}	
-				conn.query("INSERT INTO ffgame_wc.game_team_expenditures\
+				conn.query("INSERT INTO ffgame.game_team_expenditures\
 							(game_team_id,item_name,item_type,amount,game_id,\
 							match_day,item_total,base_price)\
 							VALUES\

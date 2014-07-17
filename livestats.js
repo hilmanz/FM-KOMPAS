@@ -45,7 +45,7 @@ pool.getConnection(function(err,conn){
 			function(matchday,game_id,cb){
 				console.log(game_id);
 				//foreach game_ids, retrieve the playerstats
-				//and populate it into ffgame_stats_wc.master_player_progress
+				//and populate it into ffgame_stats.master_player_progress
 				//console.log(game_id);
 				if(game_id.length > 0){
 					populateIntoMasterPlayerProgress(conn,matchday,game_id,cb);
@@ -81,7 +81,7 @@ pool.getConnection(function(err,conn){
 
 function getCurrentMatchday(conn,done){
 	conn.query("SELECT matchday FROM \
-				ffgame_wc.game_fixtures \
+				ffgame.game_fixtures \
 				WHERE is_processed = 0 \
 				ORDER BY id ASC LIMIT 1;",
 				[],function(err,rs){
@@ -95,7 +95,7 @@ function getCurrentMatchday(conn,done){
 
 function getGameIdsByMatchday(conn,matchday,done){
 	conn.query("SELECT game_id,period FROM \
-				ffgame_wc.game_fixtures \
+				ffgame.game_fixtures \
 				WHERE matchday = ? \
 				ORDER BY id ASC LIMIT 40;",
 				[matchday],function(err,rs){
@@ -231,7 +231,7 @@ function populateData(conn,modifiers,game_id,done){
 
 			async.each(items,function(item,next){
 				conn.query("INSERT INTO \
-							ffgame_stats_wc.master_player_progress\
+							ffgame_stats.master_player_progress\
 							(game_id,player_id,points,atk,def,error,ts,dt)\
 							VALUES\
 							(?,?,?,?,?,?,UNIX_TIMESTAMP(NOW()),NOW())\
@@ -338,7 +338,7 @@ function getModifiers(conn,done){
 				d AS defender,\
 				m AS midfielder,\
 				f AS forward \
-				FROM ffgame_wc.game_matchstats_modifier \
+				FROM ffgame.game_matchstats_modifier \
 				LIMIT 1000;",
 				[],
 				function(err,rs){
@@ -446,9 +446,9 @@ function storeMatchInfoToRedis(conn,matchday,done){
 						a.t_position as group_position,\
 						a.group_name\
 					FROM\
-					    ffgame_wc.master_standings a\
+					    ffgame.master_standings a\
 					INNER JOIN\
-					    ffgame_wc.master_team b ON a.team_id = b.uid\
+					    ffgame.master_team b ON a.team_id = b.uid\
 					ORDER BY\
 						group_name,group_position LIMIT 100;",[],function(err,rs){
 				cb(err,matches,rs);
@@ -495,7 +495,7 @@ function storeGameIdPlayerPointsToRedis(conn,game_id,done){
 			conn.query("SELECT a.game_id,a.player_id,a.points,\
 						a.atk,a.def,a.error,\
 						a.ts,b.name,b.team_id \
-						FROM ffgame_stats_wc.master_player_progress a\
+						FROM ffgame_stats.master_player_progress a\
 						INNER JOIN optadb.master_player b\
 						ON a.player_id = b.uid \
 						WHERE game_id = ? LIMIT 10000;",

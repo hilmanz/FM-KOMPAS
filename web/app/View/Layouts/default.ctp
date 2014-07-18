@@ -99,7 +99,7 @@
                         	<a href="<?=$this->Html->url('/manage/club')?>">Tim Saya</a>
                             <ul>
                             	<li><a href="<?=$this->Html->url('/manage/club')?>#tabs-Info">Info</a></li>
-                            	<!--<li><a href="<?=$this->Html->url('/manage/club')?>#tabs-Money">Keuangan</a></li>-->
+                            	<li><a href="<?=$this->Html->url('/manage/club')?>#tabs-Money">Keuangan</a></li>
                             	<li><a href="<?=$this->Html->url('/manage/club')?>#tabs-Players">Pemain</a></li>
                             </ul>
                         </li>

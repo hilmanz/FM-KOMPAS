@@ -19,7 +19,7 @@
     					</td>
                         <td>
                             <span>Rank: <strong><?=number_format($USER_RANK)?></strong></span>
-                            <span>Stars: <strong><?=number_format($team_bugdet)?> Star</strong></span>
+                            <span>ss$: <strong><?=number_format($team_bugdet)?></strong></span>
                             <span>Point: <strong><?=number_format($USER_POINTS)?></strong></span>
                         </td>
                         <!--<td colspan="2" class="pendapatan">
@@ -65,7 +65,7 @@
                         <th data-class="expand" width="1"></th>
                         <th>Name</th>
                         <th data-hide="phone,tablet" class="aligncenter">Position</th>
-                        <!--<th data-hide="phone,tablet" class="alignright">Gaji</th>-->
+                        <th data-hide="phone,tablet" class="alignright">Gaji</th>
                        
                         <th data-hide="phone,tablet" class="alignright">Nilai Transfer</th>
                         <th data-hide="phone" width="1"></th>
@@ -91,9 +91,9 @@
                         <td width="1"><a class="thumbPlayersSmall" href="<?=$urlto?>"><img src="http://omo.akamai.opta.net/image.php?custID=c8bb60c8f6d0184c33a87e6f3041b9cc&sport=football&entity=player&description=<?=str_replace('t','',$club['uid'])?>&dimensions=103x155&id=<?=str_replace('p','',$player['uid'])?>"/></a></td>
                         <td><a href="<?=$urlto?>" class="yellow"><?=h($player['name'])?></a></td>
                         <td class="aligncenter"><?=h($player['position'])?></td>
-                        <!--<td class="alignright">SS$ <?=number_format($player['salary'])?></td>-->
+                        <td class="alignright">SS$ <?=number_format($player['salary'])?></td>
                        
-                        <td class="alignright"><?=number_format($player['transfer_value'])?> Star</td>
+                        <td class="alignright">ss$ <?=number_format($player['transfer_value'])?></td>
                         <td>
                             <a href="<?=$urlto?>" 
                                 class="button">LIHAT</a>

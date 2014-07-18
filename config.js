@@ -22,9 +22,9 @@ exports.config = {
 		host:'mandiri-ecash.com',
 		username:'supersoccer',
 		password: 'pass123456',
-		returnUrl: 'http://localhost/fantasy_wc/merchandises/payment',
+		returnUrl: 'http://localhost/fm_2014/merchandises/payment',
 		returnUrl2: 'http://localhost/duf/supersoccer_fork/onlinecatalog/complete',
-		returnUrl3: 'http://localhost/fantasy_wc/merchandises/pay/return',
+		returnUrl3: 'http://localhost/fm_2014/merchandises/pay/return',
 		returnUrl4: 'http://localhost/duf/supersoccer_fork/onlinecatalog/pay/success'
 	},
 	mailer:{

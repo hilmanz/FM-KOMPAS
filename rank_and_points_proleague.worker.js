@@ -34,10 +34,10 @@ pool.getConnection(function(err, conn){
 			for(var i=0;i<game_id.length;i++){
 				where_in.push(game_id[i].game_id);
 			}
-			cb(err, matchday, where_in, where_in.length);
+			
+			cb(null, matchday, where_in, where_in.length);
 		},
 		function(matchday, where_in, length_game_id, cb){
-			//console.log(length_game_id);
 			checkGameId(conn, matchday, where_in, length_game_id, cb);
 			//console.log(where_in);
 		},
@@ -48,34 +48,29 @@ pool.getConnection(function(err, conn){
 		},
 		function(result, matchday, game_id, cb){
 			if(result[0].total > 0 && result.length == 1){
-				//console.log("fine");
 				getPlayer(conn, matchday, game_id, cb);
 			}
 		},
 		function(result_player, matchday, game_id, done){
-			async.eachSeries(result_player, function(player,next){
+			async.each(result_player, function(player, next){
 				async.waterfall([
 					function(cb){
-						conn.query("SELECT * FROM fantasy.weekly_points \
-									WHERE game_id IN(?) AND team_id=? AND matchday = ? LIMIT 1000", 
-									[game_id, player.team_id, matchday],
-						function(err, rs){
-							cb(err, rs, matchday, game_id, player);
+						console.log('player',player);
+						getWeeklyPoint(conn, matchday, game_id, player, function(err){
+							cb(err, null);
 						});
-					},
-					function(result_point, matchday, game_id, player, cb){
-						//insertLeagueTable(conn, player, result_point, cb);
-						cb(err);
 					}
-					], function(err){
-						next();
-					});
-			},function(err){
+				],
+				function(err){
+					next();
+				});
+			},
+			function(err){
 				done(err);
 			});
 		}
-	], function(){
-
+	], function(err){
+		conn.release();
 	});
 });
 
@@ -145,7 +140,8 @@ function compareResultJob(conn, game_id, matchday, cb){
 function getPlayer(conn, matchday, game_id, cb){
 	conn.query("SELECT league_id, team_id FROM fantasy.league_member LIMIT 100000",[],
 				function(err, rs){
-			 		cb(rs, matchday, game_id);
+			 		cb(err, rs, matchday, game_id);
+
 				});
 }
 
@@ -154,22 +150,40 @@ function getWeeklyPoint(conn, matchday, game_id, player, cb){
 				WHERE game_id IN(?) AND team_id=? AND matchday = ? LIMIT 10000", 
 				[game_id, player.team_id, matchday],
 				function(err, rs){
-					//console.log(S(this.sql).collapseWhitespace().s);
-					cb(rs, matchday, game_id, player);
+					if(rs!=null && rs.length > 0){
+						async.each(rs, function(value, next){
+							conn.query("INSERT IGNORE INTO fantasy.league_table(league_id, team_id, game_id, matchday, matchdate, points) VALUES(?, ?, ?, ?, ?, ?)
+									",[player.league_id, player.team_id, rs.game_id,
+									 rs.matchday, rs.matchdate, 
+									 rs.points+rs.extra_points],
+									function(err, rs){
+										cb(err);
+									});
+						},
+						function(err){
+							cb(err);
+						});
+						/**/
+					}
 				});
 }
 
 function insertLeagueTable(conn, player, weekly_points, cb){
-	for(var i=0;i<weekly_points.length;i++){
+	//for(var i=0;i<weekly_points.length;i++){
 		//console.log(weekly_points[i].game_id);
-		conn.query("INSERT INTO fantasy.league_table(league_id, team_id, game_id, matchday, matchdate, points) VALUES(?, ?, ?, ?, ?, ?)
+		/*conn.query("INSERT INTO fantasy.league_table(league_id, team_id, game_id, matchday, matchdate, points) VALUES(?, ?, ?, ?, ?, ?)
 					",[player.league_id, player.team_id, weekly_points[i].game_id,
 					 weekly_points[i].matchday, weekly_points[i].matchdate, 
 					 weekly_points[i].points+weekly_points[i].extra_points],
 					function(err, rs){
 
 						cb(err);
-					});
-	}
+					});*/
+	//}
+
+	/*conn.query("SELECT 1+1",[], function(err, rs){
+		console.log(rs);
+	});*/
+	console.log("Foo");
 	
 }

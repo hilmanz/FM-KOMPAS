@@ -355,3 +355,36 @@ CREATE TABLE `fantasy`.`banned_users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `COMPOUND` (`user_id`,`banned_type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `league` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) DEFAULT NULL,
+  `logo` varchar(140) DEFAULT NULL,
+  `type` varchar(45) DEFAULT NULL,
+  `user_id` bigint(21) DEFAULT NULL,
+  `limit` varchar(2) DEFAULT NULL,
+  `date_created` timestamp NULL DEFAULT NULL,
+  `n_status` varchar(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `league_member` (
+  `id` bigint(21) NOT NULL AUTO_INCREMENT,
+  `league_id` bigint(21) DEFAULT NULL,
+  `team_id` bigint(21) DEFAULT NULL,
+  `join_date` timestamp NULL DEFAULT NULL,
+  `n_status` varchar(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `league_table` (
+  `id` bigint(21) NOT NULL AUTO_INCREMENT,
+  `league_id` int(11) DEFAULT NULL,
+  `team_id` varchar(45) DEFAULT NULL,
+  `game_id` varchar(32) DEFAULT NULL,
+  `matchday` int(11) DEFAULT NULL,
+  `matchdate` datetime DEFAULT NULL,
+  `points` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `COMPOUND` (`team_id`,`game_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

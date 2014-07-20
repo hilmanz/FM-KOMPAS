@@ -3,15 +3,9 @@ ranks and points updater
 Multi-Worker.
 **/
 /////THE MODULES/////////
-var fs = require('fs');
-var path = require('path');
 var config = require('./config').config;
-var xmlparser = require('xml2json');
-var master = require('./libs/master');
 var async = require('async');
 var mysql = require('mysql');
-var util = require('util');
-var argv = require('optimist').argv;
 var S = require('string');
 /////DECLARATIONS/////////
 
@@ -55,9 +49,9 @@ pool.getConnection(function(err, conn){
 			async.each(result_player, function(player, next){
 				async.waterfall([
 					function(cb){
-						console.log('player',player);
+						//console.log('player',player);
 						getWeeklyPoint(conn, matchday, game_id, player, function(err){
-							cb(err, null);
+							//cb(err, null);
 						});
 					}
 				],
@@ -152,38 +146,20 @@ function getWeeklyPoint(conn, matchday, game_id, player, cb){
 				function(err, rs){
 					if(rs!=null && rs.length > 0){
 						async.each(rs, function(value, next){
-							conn.query("INSERT IGNORE INTO fantasy.league_table(league_id, team_id, game_id, matchday, matchdate, points) VALUES(?, ?, ?, ?, ?, ?)
-									",[player.league_id, player.team_id, rs.game_id,
-									 rs.matchday, rs.matchdate, 
-									 rs.points+rs.extra_points],
+							conn.query("INSERT INTO fantasy.league_table\
+								(league_id, team_id, game_id, matchday, matchdate, points) \
+								VALUES(?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE points=?",
+									[player.league_id, player.team_id, value.game_id,
+									 value.matchday, value.matchdate, 
+									 value.points+value.extra_points,
+									 value.points+value.extra_points],
 									function(err, rs){
 										cb(err);
 									});
 						},
 						function(err){
-							cb(err);
+							next();
 						});
-						/**/
 					}
 				});
-}
-
-function insertLeagueTable(conn, player, weekly_points, cb){
-	//for(var i=0;i<weekly_points.length;i++){
-		//console.log(weekly_points[i].game_id);
-		/*conn.query("INSERT INTO fantasy.league_table(league_id, team_id, game_id, matchday, matchdate, points) VALUES(?, ?, ?, ?, ?, ?)
-					",[player.league_id, player.team_id, weekly_points[i].game_id,
-					 weekly_points[i].matchday, weekly_points[i].matchdate, 
-					 weekly_points[i].points+weekly_points[i].extra_points],
-					function(err, rs){
-
-						cb(err);
-					});*/
-	//}
-
-	/*conn.query("SELECT 1+1",[], function(err, rs){
-		console.log(rs);
-	});*/
-	console.log("Foo");
-	
 }

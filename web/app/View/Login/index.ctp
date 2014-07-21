@@ -1,5 +1,5 @@
 <div id="loginContainer">
-    <div  id="login">
+    <div  id="login" class="widgets tr">
         <h4>Login dengan email</h4>
         <?php echo $this->Session->flash();?>
         <form method="post" action="<?=$this->Html->url('/login');?>" enctype="application/x-www-form-urlencoded">
@@ -18,7 +18,7 @@
             <p>Belum punya akun ? Klik <a href="<?=$this->Html->url('/login/register')?>">disini</a> untuk mendaftar</p>
         </form>
     </div>
-    <div  id="loginFB" style="min-height:290px;">
+    <div  id="loginFB"  class="widgets tr" style="min-height:290px;">
         <h4 style="margin:85px auto 10px;">Atau lo bisa login dengan menggunakan facebook</h4>
         <a style="margin:0px 10px;" href="javascript:fb_login();" class="boxButton loginFacebook">&nbsp;</a>
     </div>

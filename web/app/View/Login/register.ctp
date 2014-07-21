@@ -98,8 +98,13 @@
         </form>
     </div>
 </div>
-<div id="sidebar" class="tr">
-    <a href="javascript:fb_login();" class="boxButton loginFacebook">&nbsp;</a>
+<div id="sidebar">
+   <?php if(!isset($disable_login)):?>
+    <div id="loginbox" class="widgets tr" >
+        <a href="<?=$this->Html->url('/login');?>" class="boxButton loginBtn">&nbsp;</a>
+        <a href="<?=$this->Html->url('/login/register');?>" class="boxButton createAccount">&nbsp;</a>
+    </div>
+    <?php endif;?>
 </div>
 <!-- -->
 <script>

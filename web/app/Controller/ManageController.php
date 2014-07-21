@@ -32,7 +32,7 @@ class ManageController extends AppController {
 		parent::beforeFilter();
 		$this->loadModel('Team');
 		$this->loadModel('User');
-
+		
 		
 		if(!$this->hasTeam()){
 			$this->redirect('/login/expired');

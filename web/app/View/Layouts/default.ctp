@@ -77,52 +77,45 @@
                 <?php else:?>
           			 <div id="header">
             		 <a id="logo" href="<?=$this->Html->url('/')?>" title="SUPER SOCCER - FANTASY FOOTBALL LEAGUE">&nbsp;</a>
-                     <a id="brazil-edition" href="<?=$this->Html->url('/manage/team')?>" title="BRAZIL EDITION">&nbsp;</a>
-                     <?php if(!isset($disable_login)):?>
-                    <div id="loginbox">
-                        <a href="<?=$this->Html->url('/login');?>" class="boxButton loginBtn">&nbsp;</a>
-                        <a href="<?=$this->Html->url('/login/register');?>" class="boxButton createAccount">&nbsp;</a>
-                    </div>
-                    <?php endif;?>
+                    
          		     </div><!-- end #header -->
           		<?php endif;?>
-            <div id="container">
-            <?php
+                 <?php
                 if($USER_IS_LOGIN):
             ?>
                 <div id="navigation">
-                	<ul id="mainNav" class="sf-menu">
-                    	<li>
-                        	<a href="<?=$this->Html->url('/manage/team')?>">Mengelola Tim</a>
+                    <ul id="mainNav" class="sf-menu">
+                        <li>
+                            <a href="<?=$this->Html->url('/manage/team')?>">Mengelola Tim</a>
                         </li>
-                    	<li>
-                        	<a href="<?=$this->Html->url('/manage/club')?>">Tim Saya</a>
+                        <li>
+                            <a href="<?=$this->Html->url('/manage/club')?>">Tim Saya</a>
                             <ul>
-                            	<li><a href="<?=$this->Html->url('/manage/club')?>#tabs-Info">Info</a></li>
-                            	<li><a href="<?=$this->Html->url('/manage/club')?>#tabs-Money">Keuangan</a></li>
-                            	<li><a href="<?=$this->Html->url('/manage/club')?>#tabs-Players">Pemain</a></li>
+                                <li><a href="<?=$this->Html->url('/manage/club')?>#tabs-Info">Info</a></li>
+                                <li><a href="<?=$this->Html->url('/manage/club')?>#tabs-Money">Keuangan</a></li>
+                                <li><a href="<?=$this->Html->url('/manage/club')?>#tabs-Players">Pemain</a></li>
                             </ul>
                         </li>
-                    	<li>
-                        	<a href="<?=$this->Html->url('/profile')?>">Profil Saya</a>
+                        <li>
+                            <a href="<?=$this->Html->url('/profile')?>">Profil Saya</a>
                             <ul>
                                 <li><a href="<?=$this->Html->url('/profile')?>">Profil Saya</a></li>
                                 <li><a href="<?=$this->Html->url('/profile/booster')?>">Point Booster</a></li>
                             </ul>
                         </li>
-                    	<li>
-                        	<a href="<?=$this->Html->url('/leaderboard/overall')?>">Papan Peringkat</a>
+                        <li>
+                            <a href="<?=$this->Html->url('/leaderboard/overall')?>">Papan Peringkat</a>
                         </li>
-                    	<li>
-                        	<a href="<?=$this->Html->url('/market')?>">Bursa Transfer</a>
+                        <li>
+                            <a href="<?=$this->Html->url('/market')?>">Bursa Transfer</a>
                         </li>
                         <li>
                             <a href="<?=$this->Html->url('/merchandises')?>">Online Catalog</a>
                         </li>
-                    	<!--<li><a href="<?=$this->Html->url('/pages/faq')?>">Bantuan & FAQ</a></li>-->
+                        <!--<li><a href="<?=$this->Html->url('/pages/faq')?>">Bantuan & FAQ</a></li>-->
                     </ul>
                 </div>
-			<?php else:?>
+            <?php else:?>
                 <div id="topnavs" class="topnav">
                     <ul id="topnav">
                         <li><a href="http://www.supersoccer.co.id/" target="_blank" class="nav1">Home</a></li>
@@ -188,14 +181,13 @@
                             <li><a href="http://www.supersoccer.co.id/category/sepakbola-indonesia/laporan-pertandingan-sepakbola-indonesia/">Laporan Pertandingan</a></li>
                             </ul>
                         </li>-->
-                        <li><a href="#" class="nav7">Supersoccer Collections</a>
-                            <ul>
-                            <li><a href="#">Supersoccer Collection</a></li>
-                             </ul>
+                        <li><a href="http://www.supersoccer.co.id/onlinecatalog/" class="nav7">Store</a>
+                            
                         </li>
                     </ul>
                 </div>
             <?php endif;?>
+            <div id="container">
 				<?php echo $this->fetch('content'); ?>
             </div><!-- end #container -->
             <div id="footer">

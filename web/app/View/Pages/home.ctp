@@ -89,6 +89,12 @@
 </div><!-- end #content -->
 
 <div id="sidebar">
+    <?php if(!isset($disable_login)):?>
+    <div id="loginbox" class="widgets tr" >
+        <a href="<?=$this->Html->url('/login');?>" class="boxButton loginBtn">&nbsp;</a>
+        <a href="<?=$this->Html->url('/login/register');?>" class="boxButton createAccount">&nbsp;</a>
+    </div>
+    <?php endif;?>
     <div class="widgets tr" id="gameNews">
         <h3>Game News & Update</h3>
         <div class="gameNews">

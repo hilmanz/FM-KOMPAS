@@ -388,3 +388,14 @@ CREATE TABLE `league_table` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `COMPOUND` (`team_id`,`game_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+ALTER TABLE `fantasy`.`league` 
+ADD INDEX `index_1` (`user_id` ASC);
+
+ALTER TABLE `fantasy`.`league_member` 
+ADD INDEX `INDEX_1` (`league_id` ASC, `team_id` ASC);
+
+ALTER TABLE `fantasy`.`league_table` 
+DROP INDEX `COMPOUND` ,
+ADD UNIQUE INDEX `COMPOUND` (`team_id` ASC, `game_id` ASC, `league_id` ASC);

@@ -356,7 +356,7 @@ CREATE TABLE `fantasy`.`banned_users` (
   UNIQUE KEY `COMPOUND` (`user_id`,`banned_type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-CREATE TABLE `league` (
+CREATE TABLE `fantasy`.`league`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) DEFAULT NULL,
   `logo` varchar(140) DEFAULT NULL,
@@ -368,7 +368,7 @@ CREATE TABLE `league` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-CREATE TABLE `league_member` (
+CREATE TABLE `fantasy`.`league`  (
   `id` bigint(21) NOT NULL AUTO_INCREMENT,
   `league_id` bigint(21) DEFAULT NULL,
   `team_id` bigint(21) DEFAULT NULL,
@@ -377,7 +377,7 @@ CREATE TABLE `league_member` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-CREATE TABLE `league_table` (
+CREATE TABLE `fantasy`.`league`  (
   `id` bigint(21) NOT NULL AUTO_INCREMENT,
   `league_id` int(11) DEFAULT NULL,
   `team_id` varchar(45) DEFAULT NULL,

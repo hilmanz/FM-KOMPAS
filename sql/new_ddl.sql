@@ -368,7 +368,7 @@ CREATE TABLE `fantasy`.`league`  (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-CREATE TABLE `fantasy`.`league`  (
+CREATE TABLE `fantasy`.`league_member`  (
   `id` bigint(21) NOT NULL AUTO_INCREMENT,
   `league_id` bigint(21) DEFAULT NULL,
   `team_id` bigint(21) DEFAULT NULL,
@@ -377,7 +377,7 @@ CREATE TABLE `fantasy`.`league`  (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-CREATE TABLE `fantasy`.`league`  (
+CREATE TABLE `fantasy`.`league_table`  (
   `id` bigint(21) NOT NULL AUTO_INCREMENT,
   `league_id` int(11) DEFAULT NULL,
   `team_id` varchar(45) DEFAULT NULL,
@@ -388,7 +388,6 @@ CREATE TABLE `fantasy`.`league`  (
   PRIMARY KEY (`id`),
   UNIQUE KEY `COMPOUND` (`team_id`,`game_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
 
 ALTER TABLE `fantasy`.`league` 
 ADD INDEX `index_1` (`user_id` ASC);

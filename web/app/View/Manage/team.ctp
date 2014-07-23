@@ -176,6 +176,9 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
                 </select>
                 <?php if($can_update_formation):?>
                 <a id="btn_save" class="showPopup button" href="#popup-messages">SIMPAN LINE-UP</a>
+                <a id="btn_tactices" class="showPopup button" href="<?=$this->Html->url('/manage/tactics')?>">
+                    TACTICS
+                </a>
                 <?php endif;?>
 				<a id="btn_inbox" href="#popup-notifications">&nbsp;</a>
                 </div>
@@ -189,6 +192,7 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
                     </div><!-- end .substitutions -->
                 </div><!-- end .field-formation -->
             </div><!-- end .field-container -->
+
         </div><!-- end .box3 -->
         <div class="box4 fr" id="boxSquad">
             <div class="widget tr squad-team-name">

@@ -29,8 +29,8 @@
 								<th>Posisi</th>
                                 <th>Tgl.Lahir</th>
                                 <th>Usia</th>
-                                <th>Stars</th>
-                                <!--<th>Gaji</th>-->
+                               
+                                <th>Gaji</th>
 							  </tr>
 							 </thead>
 							 <tbody  id="available">
@@ -64,10 +64,10 @@
 	    </div><!-- end .widget -->
 	    <div class="widget">
 	        <div class="cash-left">
-	            <h3 class="red">SISA STARS</h3>
-	            <h1><?=number_format($INITIAL_BUDGET)?> STARS</h1>
-	            <!--<h3 class="red">Est. PENGELUARAN MINGGUAN</h3>
-	            <h1>SS$ <span class="expense">0</span></h1>-->
+	            <h3 class="red">SISA UANG</h3>
+	            <h1>SS$ <?=number_format($INITIAL_BUDGET)?></h1>
+	            <h3 class="red">Est. PENGELUARAN MINGGUAN</h3>
+	            <h1>SS$ <span class="expense">0</span></h1>
 	        </div>
 	    </div><!-- end .widget -->
 	</div><!-- end #sidebar -->
@@ -186,8 +186,8 @@ function populatePlayers(team_id,response){
     <td><%=pos_code%></td>
     <td><%=birthday%></td>
     <td><%=age%></td>
-    <td><%=transfer_value%> Star</td>
-    <!--<td><%=number_format(salary)%></td>-->
+    
+    <td><%=number_format(salary)%></td>
   </tr>
 </script>
 <script type="text/template" id="player_selected">

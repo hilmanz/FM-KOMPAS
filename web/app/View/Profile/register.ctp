@@ -32,7 +32,7 @@
                         <select name="bod_dt">
                             <option value="0">Tanggal</option>
                             <?php for($i=1;$i<=31;$i++): ?>
-                                <?php if($i == intval($birthdate[0])): ?>
+                                <?php if($i == intval($birthdate[1])): ?>
                                     <option selected="selected" value="<?=$i?>"><?=$i?></option>
                                 <?php else: ?>
                                     <option value="<?=$i?>"><?=$i?></option>
@@ -43,7 +43,7 @@
                          <select name="bod_mt">
                             <option value="0">Bulan</option>
                             <?php for($i=1;$i<=12;$i++): ?>
-                                <?php if($i == intval($birthdate[1])): ?>
+                                <?php if($i == intval($birthdate[0])): ?>
                                     <option selected="selected" value="<?=$i?>"><?=$i?></option>
                                 <?php else: ?>
                                     <option value="<?=$i?>"><?=$i?></option>
@@ -148,10 +148,10 @@
 	    </div><!-- end .widget -->
 	    <div class="widget">
 	        <div class="cash-left">
-	            <h3 class="red">SISA STARS</h3>
-	            <h1><?=number_format($INITIAL_BUDGET)?> STARS</h1>
-	            <!--<h3 class="red">Est. PENGELUARAN MINGGUAN</h3>
-	            <h1>SS$ <span class="expense">0</span></h1> -->
+	            <h3 class="red">SISA UANG</h3>
+	            <h1>SS$ <?=number_format($INITIAL_BUDGET)?></h1>
+	            <h3 class="red">Est. PENGELUARAN MINGGUAN</h3>
+	            <h1>SS$ <span class="expense">0</span></h1>
 	        </div>
 	    </div><!-- end .widget -->
 	</div><!-- end #sidebar -->

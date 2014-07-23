@@ -178,6 +178,7 @@ function create(data,callback){
 					}
 				},
 				function(result,callback){
+					console.log(result);
 					if(result!=null){
 
 						var sql = "INSERT IGNORE INTO ffgame.game_team_players\
@@ -201,14 +202,18 @@ function create(data,callback){
 					}
 				},
 				function(game_team_id,callback){
+
 					if(game_team_id!=null){
 						conn.query(
 							"INSERT IGNORE INTO ffgame.game_team_purse(game_team_id,budget)\
 							 VALUES(?,?)"
-						,[game_team_id,initial_money-team_stars[data.team_id]],
+						,[game_team_id,initial_money],
 						function(err,rs){
+							console.log(S(this.sql).collapseWhitespace().s);
 							callback(err,game_team_id);
 						});
+					}else{
+						callback(err,0);
 					}
 				}
 			],

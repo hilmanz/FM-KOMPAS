@@ -871,11 +871,15 @@ function next_match(team_id,done){
 							ORDER BY a.matchday\
 							LIMIT 1;\
 							",[team_id,team_id],function(err,rs){
+								
+								if(err){
+									console.log(err.message);
+								}
 								callback(err,rs);
 							});
 				},
 				function(rs,callback){
-					rs = [];
+					
 					try{
 						if(rs.length > 0){
 							conn.query("SELECT match_date \
@@ -886,7 +890,7 @@ function next_match(team_id,done){
 									LIMIT 1;",
 									[(rs[0].matchday - 1)],
 									function(err,last_match){
-										
+										console.log(S(this.sql).collapseWhitespace().s);
 										if(last_match!=null && last_match.length > 0){
 											rs[0].last_match = last_match[0].match_date;
 										}else{
@@ -901,6 +905,7 @@ function next_match(team_id,done){
 							conn.query("SELECT matchday FROM ffgame.game_fixtures \
 										WHERE period IN ('FullTime') ORDER BY matchday DESC LIMIT 1;",
 										[],function(err,m){
+											console.log(S(this.sql).collapseWhitespace().s);
 											rs.push({next_match:null,matchday:m[0].matchday+1});
 											conn.query("SELECT match_date \
 											FROM \
@@ -910,6 +915,7 @@ function next_match(team_id,done){
 											LIMIT 1;",
 											[m[0].matchday],
 											function(err,last_match){
+												console.log(S(this.sql).collapseWhitespace().s);
 												if(last_match!=null && last_match.length > 0){
 													rs[0].last_match = last_match[0].match_date;
 												}else{

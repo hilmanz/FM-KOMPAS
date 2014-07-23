@@ -581,6 +581,7 @@ class ProfileController extends AppController {
 								$this->Info->write('new player',$msg);
 
 								if(@$rs['User']['n_status'] == 0 || $user_data['n_status'] == 0){
+									
 									if($this->send_mail($user_data))
 									{
 										$this->redirect("/profile/activation");
@@ -840,6 +841,7 @@ class ProfileController extends AppController {
 	}
 
 	public function send_mail($data = array()){
+		$smtp_config = Configure::read('MAILGUN');
 		$view = new View($this, false);
 
 		if(isset($this->request->data_request))
@@ -852,12 +854,12 @@ class ProfileController extends AppController {
 									));
 
 		# Instantiate the client.
-		$mgClient = new Mailgun('key-9oyd1c7638c35gmayktmgeyjhtyth5w0');
-		$domain = "mg.supersoccer.co.id";
+		$mgClient = new Mailgun($smtp_config['api_key']);
+		$domain = $smtp_config['domain'];
 
 		# Make the call to the client.
 		$result = $mgClient->sendMessage($domain, array(
-		    'from'    => 'supersoccer <postmaster@mg.supersoccer.co.id>',
+		    'from'    => $smtp_config['from'],
 		    'to'      => '<'.$data['email'].'>',
 		    'subject' => 'Kode Aktivasi',
 		    'html'    => $body

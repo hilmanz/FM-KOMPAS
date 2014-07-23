@@ -358,7 +358,7 @@ Configure::write('DOMAIN','localhost/fantasy');
 Configure::write('API_URL',array('http://localhost:3002'));
 Configure::write('API_KEY','1234567890');
 Configure::write('API_SALT',md5("hello world"));
-Configure::write('INITIAL_BUDGET','0');
+Configure::write('INITIAL_BUDGET','10000000');
 Configure::write('REDIS.Host','127.0.0.1');
 Configure::write('REDIS.Port',6379);
 Configure::write('REDIS.Database','15');
@@ -388,3 +388,10 @@ Configure::write('MERCHANDISE_ENABLE',true);
 
 //Ticket Category
 Configure::write('ticket_category_id',8);
+
+
+//Mailgun Settings
+Configure::write('MAILGUN',
+				 array('api_key'=>'key-9oyd1c7638c35gmayktmgeyjhtyth5w0',
+				 		'domain'=>'sandbox6048e62f52c444e28b8529f4e62f0c1e.mailgun.org',
+				 		'from'=>'supersoccer <postmaster@mg.supersoccer.co.id>'));

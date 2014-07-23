@@ -886,11 +886,11 @@ select.styled{
 	 top:5px;
 }
 .selectFormation .select{
-	width:90px;
+	width:65px;
 	border-radius:5px;
 }
 .selectFormation select.styled{
-	width:120px;
+	width:90px;
 }
 .rows{
 	clear:both;
@@ -2233,8 +2233,8 @@ table.dataTable{
 	text-decoration:none;
 }
 #btn_save{
-	line-height:28px;
-	width:170px;
+	line-height:32px;
+	width:108px;
 	text-align:center;
 }
 #tablePoint td{

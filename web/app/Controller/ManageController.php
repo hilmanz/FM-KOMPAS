@@ -754,4 +754,52 @@ class ManageController extends AppController {
 			$this->redirect('/manage/team');
 		}
 	}
+
+	/*Tactics Page
+	in tactics page, the player lists and tactic options can only be displayed if
+	user already set a formation for the upcoming matchday.
+	Note that the new tactics only applied for the upcoming matchday.*/
+	public function tactics(){
+		$userData = $this->userData;
+
+		//list of players
+		$players = $this->Game->get_team_players($userData['fb_id']);
+		$this->set('players',$players);
+
+
+		//lineup
+		$lineup = $this->Game->getLineup($userData['team']['id']);
+
+		//user data
+		$user = $this->userDetail;
+		$this->set('user',$user['User']);
+		
+
+		//budget
+		$budget = $this->Game->getBudget($userData['team']['id']);
+		$this->set('team_bugdet',$budget);
+
+		//club
+		$club = $this->Team->findByUser_id($user['User']['id']);
+		$this->set('club',$club['Team']);
+
+		$this->set('game_team_id',$userData['team']['id']);
+	
+		$next_match = $this->nextMatch;
+		$next_match['match']['home_original_name'] = @$next_match['match']['home_name'];
+		$next_match['match']['away_original_name'] = @$next_match['match']['away_name'];
+		if(@$next_match['match']['home_id']==@$userData['team']['team_id']){
+			$next_match['match']['home_name'] = $club['Team']['team_name'];
+		}else{
+			$next_match['match']['away_name'] = $club['Team']['team_name'];
+		}
+		
+		$this->set('next_match',$next_match['match']);
+
+		
+		$this->set('lineup',$lineup['lineup']);
+		//banners
+		$sidebar_banner = $this->getBanners('INSIDE_SIDEBAR',2,true);
+		$this->set('sidebar_banner',$sidebar_banner);
+	}
 }

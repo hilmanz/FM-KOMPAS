@@ -399,3 +399,15 @@ ADD INDEX `INDEX_1` (`league_id` ASC, `team_id` ASC);
 ALTER TABLE `fantasy`.`league_table` 
 DROP INDEX `COMPOUND` ,
 ADD UNIQUE INDEX `COMPOUND` (`team_id` ASC, `game_id` ASC, `league_id` ASC);
+
+
+CREATE TABLE ffgame.game_team_instructions(
+  `id` bigint(21) NOT NULL AUTO_INCREMENT,
+  `game_team_id` bigint(21) DEFAULT NULL,
+  `matchday` int(3) DEFAULT '1',
+  `player_id` int(3) DEFAULT '0',
+  `instruction_id` int(3) DEFAULT NULL,
+  `amount` int(3) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UNIQUE_INSTRUCTIONS` (`game_team_id`,`matchday`,`player_id`,`instruction_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

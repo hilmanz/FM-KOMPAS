@@ -161,6 +161,11 @@ class ProfileController extends AppController {
 						if($this->send_mail($rs_user['User'])){
 							$this->redirect('/profile/activation');
 						}
+						else
+						{
+							$this->Session->setFlash("Email yang loe masukan gak valid !");
+							$this->redirect("/profile/send_activation");
+						}
 					}
 					else if($rs_user['User']['register_completed'] == 0)
 					{
@@ -586,6 +591,11 @@ class ProfileController extends AppController {
 									{
 										$this->redirect("/profile/activation");
 									}
+									else
+									{
+										$this->Session->setFlash("Email yang loe masukan gak valid !");
+										$this->redirect("/profile/send_activation");
+									}
 								}else{
 									$this->redirect("/profile/register_team");
 								}
@@ -703,7 +713,10 @@ class ProfileController extends AppController {
 				$rs_user = $this->User->findByFb_id($user_fb['fb_id']);
 
 				if($trxsess != 1){
-					$this->send_mail($rs_user['User']);
+					if(!$this->send_mail($rs_user['User'])){
+						$this->Session->setFlash("Email yang loe masukan gak valid !");
+						$this->redirect("/profile/send_activation");
+					}
 				}
 
 				$this->Session->write('trxsess_'.$this->request->data['trxsess'],1);
@@ -856,16 +869,20 @@ class ProfileController extends AppController {
 		# Instantiate the client.
 		$mgClient = new Mailgun($smtp_config['api_key']);
 		$domain = $smtp_config['domain'];
+		$result = $mgClient->get("address/validate", array('address' => $data['email']));
 
-		# Make the call to the client.
-		$result = $mgClient->sendMessage($domain, array(
-		    'from'    => $smtp_config['from'],
-		    'to'      => '<'.$data['email'].'>',
-		    'subject' => 'Kode Aktivasi',
-		    'html'    => $body
-		));
-		if($result->http_response_code == 200){
-			return true;
+		if($result->http_response_body->is_valid == 1)
+		{
+			# Make the call to the client.
+			$result = $mgClient->sendMessage($domain, array(
+			    'from'    => $smtp_config['from'],
+			    'to'      => '<'.$data['email'].'>',
+			    'subject' => 'Kode Aktivasi',
+			    'html'    => $body
+			));
+			if($result->http_response_code == 200){
+				return true;
+			}
 		}
 
 		return false;

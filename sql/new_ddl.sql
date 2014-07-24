@@ -1,4 +1,3 @@
-
 CREATE TABLE ffgame.newsletter (
   `id` bigint(21) NOT NULL AUTO_INCREMENT,
   `subject` varchar(140) DEFAULT NULL,
@@ -388,6 +387,7 @@ CREATE TABLE `fantasy`.`league_table`  (
   PRIMARY KEY (`id`),
   UNIQUE KEY `COMPOUND` (`team_id`,`game_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
 
 ALTER TABLE `fantasy`.`league` 
 ADD INDEX `index_1` (`user_id` ASC);

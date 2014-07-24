@@ -623,7 +623,7 @@ class MerchandisesController extends AppController {
 			if($this->request->data['payment_method']=='coins'){
 				//cek user if CANT_USE_COIN 
 				$users = $this->User->findByFb_id($this->userData['fb_id']);
-				$rs_banned = $this->Game->query("SELECT * FROM fantasy_wc.banned_users
+				$rs_banned = $this->Game->query("SELECT * FROM fantasy.banned_users
 												WHERE user_id = '{$users['User']['id']}'
 												AND banned_type = 'CANT_USE_COIN' LIMIT 1");
 				if(count($rs_banned) != 0)

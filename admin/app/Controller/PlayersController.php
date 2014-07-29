@@ -39,10 +39,9 @@ class PlayersController extends AppController {
 		$this->PlayerReport = new PlayerReport;
 		
 		$q = $this->request->query['q'];
-		//$this->paginate = array('limit'=>25);
+		$this->paginate = array('limit'=>25);
 		$this->paginate = array('conditions'=>array('OR'=>array("team_name LIKE '%".Sanitize::clean($q)."%'",
-												"User.email LIKE '%".Sanitize::clean($q)."%'")),
-								'limit'=>1);
+												"User.email LIKE '%".Sanitize::clean($q)."%'")));
 		$rs = $this->paginate('PlayerReport');
 
 		
@@ -61,6 +60,7 @@ class PlayersController extends AppController {
 											INNER JOIN ffgame.master_team c
 											ON b.team_id = c.uid
 											WHERE fb_id='{$user['User']['fb_id']}' LIMIT 1;");
+
 
 		$budget = $this->User->query("SELECT (SUM(budget + expense)) AS current_budget
 										FROM (

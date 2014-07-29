@@ -410,3 +410,13 @@ CREATE TABLE ffgame.game_team_instructions(
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQUE_INSTRUCTIONS` (`game_team_id`,`matchday`,`player_id`,`instruction_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE `fantasy`.`league` 
+CHANGE COLUMN `limit` `max_player` VARCHAR(2) NULL DEFAULT NULL ;
+
+CREATE TABLE `fantasy`.`league_invitations` (
+  `id` BIGINT(21) NOT NULL AUTO_INCREMENT,
+  `league_id` BIGINT(21) NULL,
+  `email` VARCHAR(64) NULL,
+  `n_status` VARCHAR(1) NULL,
+  PRIMARY KEY (`id`));

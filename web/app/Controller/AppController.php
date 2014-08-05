@@ -395,7 +395,7 @@ class AppController extends Controller {
 	private function ApiInit(){
 		require_once APP . 'Vendor' . DS. 'lib/Predis/Autoloader.php';
 		//tell the browser that we're outputing JSON data.
-		header('Content-type: application/json');
+		if(Configure::read('debug') ==0 ){header('Content-type: application/json');}
 
 		$this->loadModel('Apikey');
 		$this->loadModel('User');
@@ -407,8 +407,10 @@ class AppController extends Controller {
 											    'database' => Configure::read('REDIS.Database')
 											));
 		$this->layout = 'ajax';
-		if($this->request->params['action']!='auth'){
+
+		if($this->request->params['action']!='auth' && $this->request->params['action'] != 'login'){
 			$access_token = @$_REQUEST['access_token'];
+
 			
 			if(!$this->validateAPIAccessToken($access_token) || strlen($access_token) < 2){
 				print json_encode(array('status'=>401,'error'=>'invalid access token !'));

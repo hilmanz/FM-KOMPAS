@@ -33,7 +33,7 @@
  * In production mode, flash messages redirect after a time interval.
  * In development mode, you need to click the flash message to continue.
  */
-	Configure::write('debug', 2);
+	Configure::write('debug', 1);
 
 /**
  * Configure the Error handler used to handle errors for your application. By default
@@ -52,7 +52,7 @@
  */
 	Configure::write('Error', array(
 		'handler' => 'ErrorHandler::handleError',
-		'level' => E_ALL & ~E_DEPRECATED,
+		'level' => E_ALL & ~E_DEPRECATED & ~E_WARNING,
 		'trace' => true
 	));
 
@@ -395,3 +395,6 @@ Configure::write('MAILGUN',
 				 array('api_key'=>'key-9oyd1c7638c35gmayktmgeyjhtyth5w0',
 				 		'domain'=>'sandbox6048e62f52c444e28b8529f4e62f0c1e.mailgun.org',
 				 		'from'=>'supersoccer <postmaster@mg.supersoccer.co.id>'));
+
+
+Configure::write('MINIMUM_INSTRUCTION_POINTS',5);

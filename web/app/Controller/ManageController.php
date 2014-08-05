@@ -760,7 +760,11 @@ class ManageController extends AppController {
 	user already set a formation for the upcoming matchday.
 	Note that the new tactics only applied for the upcoming matchday.*/
 	public function tactics(){
+		
+		
 		$userData = $this->userData;
+
+		
 
 		//list of players
 		$players = $this->Game->get_team_players($userData['fb_id']);
@@ -796,10 +800,132 @@ class ManageController extends AppController {
 		
 		$this->set('next_match',$next_match['match']);
 
+		$instruction_points = $this->getInstructionPoints();
+		$upcoming_matchday = $this->getUpcomingMatchday();
+		
+		if($this->request->is('post')){
+			$save_success = $this->saveTactics($next_match['match'],$instruction_points,$upcoming_matchday);
+
+			if(!$save_success){
+				$this->set("msg","Tactic tidak berhasil disimpan karena melebih instruction points !");
+			}else{
+				$this->set("msg","Tactic loe sudah berhasil disimpan !");
+			}
+		}
 		
 		$this->set('lineup',$lineup['lineup']);
+
+		//get current tactics
+		$current_tactics = $this->getCurrentTactics($upcoming_matchday);
+
+		$this->set('tactics',$current_tactics);
+
+
 		//banners
 		$sidebar_banner = $this->getBanners('INSIDE_SIDEBAR',2,true);
 		$this->set('sidebar_banner',$sidebar_banner);
+
+
+		//instruction points
+		$this->set('INSTRUCTION_POINTS',$instruction_points);
+	}
+
+	private function saveTactics($next_match,$instruction_points,$upcoming_matchday){
+
+		$is_ok = false;
+
+		
+		
+		$this->Game->query("DELETE FROM ffgame.game_team_instructions 
+							WHERE game_team_id = {$this->userData['team']['id']} AND matchday = {$upcoming_matchday}");
+
+		$sql = "INSERT INTO ffgame.game_team_instructions
+				(game_team_id,
+				matchday,
+				player_id,
+				instruction_id,
+				amount) VALUES ";
+				
+		$total_spend = 0;
+		for($i=0;$i<sizeof($this->request->data['instruction']);$i++){
+			$total_spend += $this->request->data['points'][$i];
+			if($i>0){
+				$sql.=",";
+			}
+			$sql.="({$this->userData['team']['id']},
+					{$upcoming_matchday},
+					'{$this->request->data['player'][$i]}',
+					{$this->request->data['instruction'][$i]},
+					{$this->request->data['points'][$i]})";
+
+		}
+		$sql.="
+				ON DUPLICATE KEY UPDATE
+				amount = VALUES(amount);";
+
+
+		if($total_spend <= $instruction_points){
+			$is_ok = true;
+		}
+		if($is_ok){
+			$this->Game->query($sql);
+		}
+		return $is_ok;
+	}
+	//get upcoming matchday
+	//these is useful for saving lineup / formations and tactics.
+	private function getUpcomingMatchday(){
+		$check = $this->Game->query("SELECT * FROM (SELECT matchday,MAX(is_processed) AS match_status
+											FROM ffgame.game_fixtures GROUP BY matchday) a 
+											WHERE match_status = 0 ORDER BY matchday ASC LIMIT 1;");
+		
+	
+		$upcoming_matchday = $check[0]['a']['matchday'];
+		return $upcoming_matchday;
+	}
+	// instruction points is 1% of the average weekly points
+	// for example, if average weekly points is 1000, then the instruction points is 10
+	private function getInstructionPoints(){
+
+		$team_id = $this->userDetail['Team']['id'];
+		$minimum_ip = Configure::read('MINIMUM_INSTRUCTION_POINTS');
+
+		$rs = $this->Game->query("SELECT (points+extra_points) as total_points 
+											FROM fantasy.points a
+											WHERE team_id={$team_id} LIMIT 1");
+
+		$total_points = intval(@$rs[0]['a']['total_points']);
+		$total_matches =  $this->Game->query("SELECT matchday FROM ffgame.game_fixtures a
+											 WHERE period='FullTime' AND is_processed = 1 
+											 ORDER BY matchday DESC LIMIT 1;");
+
+		$total_matchday = intval(@$total_matches[0]['a']['matchday']);
+		if($total_matchday > 0){
+			$average_points = round($total_points / $total_matchday);	
+		}else{
+			$average_points = 0;
+		}
+		
+
+		$instruction_points = $average_points * 0.01;
+		if($instruction_points < $minimum_ip){
+			$instruction_points = $minimum_ip;
+		}
+		return $instruction_points;
+	}
+
+	private function getCurrentTactics($upcoming_matchday){
+		$game_team_id = $this->userData['team']['id'];
+		$sql = "SELECT * FROM ffgame.game_team_instructions a
+				WHERE game_team_id = {$game_team_id} 
+				AND matchday={$upcoming_matchday} 
+				LIMIT 16";
+		$rs = $this->Game->query($sql);
+
+		$tactics = array();
+		for($i=0;$i<sizeof($rs);$i++){
+			$tactics[] = $rs[$i]['a'];
+		}
+		return $tactics;
 	}
 }

@@ -35,15 +35,12 @@ function open_squad_file(squad_file,done){
 				if(!err){
 					done(null,data);
 				}else{
-					handleError(err);
+					done(err,'<xml><error>1</error></xml>');
 				}
 			});
 		}else{
 			console.log(err.message);
-			handleError(err);
+			done(err,'<xml><error>1</error></xml>');
 		}
 	}
-}
-function handleError(err){
-	done(err,'<xml><error>1</error></xml>');
 }

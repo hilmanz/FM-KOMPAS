@@ -41,7 +41,6 @@ class ApiController extends AppController {
 	private $finance_total_items_raw = null;
 	private $tickets_sold = null;
 	public function auth(){
-
 		$fb_id = $this->request->query('fb_id');
 		$user = $this->User->findByFb_id($fb_id);
 		$check_current_session = $this->Session->read('API_CURRENT_ACCESS_TOKEN');
@@ -49,9 +48,7 @@ class ApiController extends AppController {
 			$this->gameApiAccessToken = $check_current_session;
 			$api_session = $this->readAccessToken();
 			$session_fb_id = $api_session['fb_id'];
-
 			CakeLog::write('debug', $fb_id.' == '.$session_fb_id);
-
 			if($fb_id==$session_fb_id){
 				$this->set('response',array('status'=>1,'access_token'=>$check_current_session));	
 			}else{
@@ -89,6 +86,40 @@ class ApiController extends AppController {
 			$this->Session->write('API_CURRENT_ACCESS_TOKEN',null);
 			CakeLog::write('AUTH_ERROR', 'auth - '.$fb_id.' - '.$session_fb_id.' - '.$this->Session->read('API_CURRENT_ACCESS_TOKEN').' DELETED');
 
+		}
+		$this->render('default');
+	}
+	//api for login using email & password
+	public function login(){
+		$email = Sanitize::clean($this->request->query['email']);
+		$password = Sanitize::clean($this->request->query['password']);
+		
+		if(strlen($email) > 0){
+			$user = $this->User->findByEmail($email);
+			$passHasher 	= new PasswordHash(8, true);
+			$check_password = $passHasher->CheckPassword($password.$user['User']['secret'] ,
+									$user['User']['password']);
+			if($check_password){
+				$rs = $this->Apikey->findByApi_key($this->request->query['api_key']);
+				$fb_id = $user['User']['fb_id'];
+				if(isset($rs['Apikey']) && $rs['Apikey']['api_key']!=null){
+					$access_token = encrypt_param(serialize(array('fb_id'=>$fb_id,
+															'api_key'=>$rs['Apikey']['api_key'],
+															  'valid_until'=>time()+24*60*60)));
+					
+					$this->redisClient->set($access_token,serialize(array('api_key'=>$rs['Apikey']['api_key'],
+																		  'fb_id'=>$fb_id)));
+					$this->redisClient->expire($access_token,24*60*60);//expires in 1 day
+					$this->Session->write('API_CURRENT_ACCESS_TOKEN',$access_token);
+					$this->set('response',array('status'=>1,'access_token'=>$access_token));
+				}else{
+					$this->set('response',array('status'=>403,'error'=>'invalid api_key'));
+				}
+			}else{
+				$this->set('response',array('status'=>401,'error'=>'Wrong username / password'));
+			}
+		}else{
+			$this->set('response',array('status'=>400,'error'=>'user not found'));
 		}
 		$this->render('default');
 	}
@@ -522,15 +553,15 @@ class ApiController extends AppController {
 						'game_id'=>$p['Weekly_point']['game_id'],
 						'matchday'=>$p['Weekly_point']['matchday'],
 						'matchdate'=>$p['Weekly_point']['matchdate'],
-						'points'=>$p[0]['TotalPoints']
+						'points'=>@$p[0]['TotalPoints']
 					);
 			}
 		}else{
 			$weekly_team_points[] = array(
 						'game_id'=>'',
-						'matchday'=>$p['Weekly_point']['matchday'],
-						'matchdate'=>$p['Weekly_point']['matchdate'],
-						'points'=>$p[0]['TotalPoints']
+						'matchday'=>@$p['Weekly_point']['matchday'],
+						'matchdate'=>@$p['Weekly_point']['matchdate'],
+						'points'=>@$p[0]['TotalPoints']
 					);
 		}
 		
@@ -1651,7 +1682,7 @@ class ApiController extends AppController {
 		
 		$this->nextMatch = $nextMatch;
 		
-		$previous_match = $this->nextMatch['match']['previous_setup'];
+		$previous_match = @$this->nextMatch['match']['previous_setup'];
 				
 		$upcoming_match = $this->nextMatch['match']['matchday_setup'];
 		
@@ -1725,13 +1756,13 @@ class ApiController extends AppController {
 			}
 		}
 
-		$this->closeTime = $close_time;
+		$this->closeTime = @$close_time;
 
 		
 
 		//formation open time
 		
-		$this->openTime = $open_time;
+		$this->openTime = @$open_time;
 				
 	}
 
@@ -2128,7 +2159,7 @@ class ApiController extends AppController {
 	/**
 	* sale a player
 	*/
-	public function sale(){
+	public function sale($player_id){
 		$this->loadModel('Team');
 		$this->loadModel('User');
 		$api_session = $this->readAccessToken();
@@ -2145,7 +2176,7 @@ class ApiController extends AppController {
 
 		$game_team = $this->Game->getTeam($fb_id);
 
-		$player_id = Sanitize::clean($this->request->data['player_id']);
+		$player_id = Sanitize::clean($player_id);
 
 		$window = $this->Game->transfer_window();
 
@@ -2240,7 +2271,7 @@ class ApiController extends AppController {
 	/**
 	* buy a player
 	*/
-	public function buy(){
+	public function buy($player_id){
 		$this->loadModel('Team');
 		$this->loadModel('User');
 		$api_session = $this->readAccessToken();
@@ -2256,7 +2287,7 @@ class ApiController extends AppController {
 
 		$game_team = $this->Game->getTeam($fb_id);
 
-		$player_id = Sanitize::clean($this->request->data['player_id']);
+		$player_id = Sanitize::clean($player_id);
 
 		$window = $this->Game->transfer_window();
 		$window_id = intval(@$window['id']);

@@ -365,9 +365,13 @@ class ManageController extends AppController {
 					AND a.is_processed = 1
 					ORDER BY a.matchday DESC";
 
+			try{
 
-			$rs = $this->Game->query($sql);
-			
+
+				$rs = $this->Game->query($sql);
+			}catch(Exception $err){
+				$rs = array();
+			}
 			
 
 			foreach($rs as $n=>$r){

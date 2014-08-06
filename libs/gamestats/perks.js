@@ -8,6 +8,7 @@ var async = require('async');
 * @params conn 
 * @params game_team_id
 * @params new_stats , the new generated stats before the points added with perk point bonuses
+
 */
 exports.apply_player_perk = function(conn,game_team_id,player_id,new_stats,matchday,done){
 

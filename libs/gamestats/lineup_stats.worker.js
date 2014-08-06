@@ -558,6 +558,7 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 													//periksa apakah jumlah pemain didalam tim lebih dari 23 ?
 													//jika lebih dari 23, maka pemain akan kena penalty poin 
 													//sebesar 100*selisih kelebihan pemainnya
+													/*
 													console.log('ISSUE 4','check if tim is overcapacity ?');
 													var my_team_id = item.id;
 													var rooster_overlimit = false;
@@ -570,6 +571,8 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 																 	}
 																 	cb(err,rooster_overlimit,check[0].total);
 																 });
+													*/
+													cb(null,false,0);
 												},
 												function(rooster_overlimit,total_game_players,cb){
 													if(rooster_overlimit){
@@ -602,7 +605,7 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 													}else{
 														console.log('ISSUE','OVERLIMIT_CHECK',
 																	total_game_players,'OK');
-														cb(null,rooster_overlimit,overlimit_penalty);
+														cb(null,rooster_overlimit,0);
 													}
 												},
 												function(rooster_overlimit,penalty,cb){

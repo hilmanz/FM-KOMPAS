@@ -65,40 +65,63 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
             <h3>
                 Set Up Tactics for Matchday <?=$next_match['matchday']?>
             </h3>
+            <?php if(isset($msg)):?>
+            <div class="msg">
+                <?=$msg?>
+            </div>
+            <?php endif;?>
+            <form id="frmTactic" action="<?=$this->Html->url('/manage/tactics')?>" method="POST" enctype="application/x-www-form-urlencoded">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <thead>
+                        <tr>
+                            <th width="160px" align="center">Pemain</th>
+                            <th class="aligncenter" width="60" align="center">Instruction</th>
+                            <th class="aligncenter" width="1" align="center">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="myplayerlist">
+                        <?php for($i=0;$i<sizeof($lineup);$i++):?>
 
-            <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                <thead>
-                    <tr>
-                        <th width="160px" align="center">Pemain</th>
-                        <th class="aligncenter" width="60" align="center">Instruction</th>
-                        <th class="aligncenter" width="1" align="center">Amount</th>
-                    </tr>
-                </thead>
-                <tbody id="myplayerlist">
-                    <?php for($i=0;$i<sizeof($lineup);$i++):?>
-                    <tr>
-                        <td><?=$lineup[$i]['name']?></td>
-                        <td>
-                            <select name="instruction">
-                                <option value="0">Tidak Ada</option>
-                                <option value="1">More Shoots</option>
-                                <option value="2">More Crosses</option>
-                                <option value="3">Focus on Through Ball</option>
-                                <option value="4">Create Chances</option>
-                                <option value="5">More Tackles</option>
-                                <option value="6">More Aerial Defense</option>
-                                <option value="7">More Blocks</option>
-                                <option value="8">More Hard Challenges</option>
-                            </select>
-                        </td>
-                        <td>
-                            <input type="text" name="points" value="0"/>
-                        </td>
-                    </tr>
-                    <?php endfor;?>
-                </tbody>
-            </table>
-            <a href="<?=$this->Html->url('/manage/team')?>" class="button">KEMBALI KE FORMASI</a><a href="#" class="button">SIMPAN TAKTIK</a>
+                        <?php
+                        $instruction_id = 0;
+                        $amount = 0;
+
+                        for($j=0;$j<sizeof($tactics);$j++){
+                            if($lineup[$i]['player_id']==$tactics[$j]['player_id']){
+                                $instruction_id = intval(@$tactics[$j]['instruction_id']);
+
+                                $amount = intval(@$tactics[$j]['amount']);
+                                break;
+                            }
+                        }
+
+                        ?>
+                        <tr>
+                            <td><?=$lineup[$i]['name']?></td>
+                            <td>
+                                <select name="instruction[]">
+                                    <option value="0" <?php if($instruction_id == 0): echo 'selected="selected"';endif;?>>Tidak Ada</option>
+                                    <option value="1" <?php if($instruction_id == 1): echo 'selected="selected"';endif;?>>More Shoots</option>
+                                    <option value="2" <?php if($instruction_id == 2): echo 'selected="selected"';endif;?>>More Crosses</option>
+                                    <option value="3" <?php if($instruction_id == 3): echo 'selected="selected"';endif;?>>Focus on Through Ball</option>
+                                    <option value="4" <?php if($instruction_id == 4): echo 'selected="selected"';endif;?>>Create Chances</option>
+                                    <option value="5" <?php if($instruction_id == 5): echo 'selected="selected"';endif;?>>More Tackles</option>
+                                    <option value="6" <?php if($instruction_id == 6): echo 'selected="selected"';endif;?>>More Aerial Defense</option>
+                                    <option value="7" <?php if($instruction_id == 7): echo 'selected="selected"';endif;?>>More Blocks</option>
+                                    <option value="8" <?php if($instruction_id == 8): echo 'selected="selected"';endif;?>>More Hard Challenges</option>
+                                </select>
+
+                            </td>
+                            <td>
+                                <input type="text" name="points[]" value="<?=$amount?>"/>
+                                <input type="hidden" name="player[]" value="<?=$lineup[$i]['player_id']?>"/>
+                            </td>
+                        </tr>
+                        <?php endfor;?>
+                    </tbody>
+                </table>
+                <a href="<?=$this->Html->url('/manage/team')?>" class="button">KEMBALI KE FORMASI</a><a href="#" class="button btn-save-tactic">SIMPAN TAKTIK</a>
+            </form>
         </div><!-- end .box3 -->
         <div class="box4 fr" id="boxSquad">
             <div class="widget tr squad-team-name">
@@ -128,7 +151,28 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
 
             </div><!-- end .widget -->
             <div class="widget tr squad-team-name">
-                <h3>INSTRUCTION POINTS <span class="yellow">10</span></h3>
+                <h3>INSTRUCTION POINTS : <span class="yellow"><?=$INSTRUCTION_POINTS?></span></h3>
+            </div><!-- end .widget -->
+            <div class="widget tr squad-team-name">
+                <h3>HOW TO USE TACTICS</h3>
+                <ul>
+                    <li>
+                        Lorem ipsum dolor sit amet
+                    </li>
+                    <li>
+                        Lorem ipsum dolor sit amet
+                    </li>
+                    <li>
+                        Lorem ipsum dolor sit amet
+                    </li>
+                    <li>
+                        Lorem ipsum dolor sit amet
+                    </li>
+                    <li>
+                        Lorem ipsum dolor sit amet
+                    </li>
+
+                </ul>
             </div><!-- end .widget -->
         </div><!-- end .box4 -->
     </div><!-- end #thecontent -->
@@ -148,3 +192,10 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
     </div><!-- END .popupContainer -->
 </div><!-- END .popup --> 
 
+
+
+<script>
+$(".btn-save-tactic").click(function(){
+    $('#frmTactic').submit();
+});
+</script>

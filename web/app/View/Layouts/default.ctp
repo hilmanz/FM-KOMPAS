@@ -110,6 +110,9 @@
                             <a href="<?=$this->Html->url('/market')?>">Bursa Transfer</a>
                         </li>
                         <li>
+                            <a href="<?=$this->Html->url('/privateleague')?>">Private League</a>
+                        </li>
+                        <li>
                             <a href="<?=$this->Html->url('/merchandises')?>">Online Catalog</a>
                         </li>
                         <!--<li><a href="<?=$this->Html->url('/pages/faq')?>">Bantuan & FAQ</a></li>-->

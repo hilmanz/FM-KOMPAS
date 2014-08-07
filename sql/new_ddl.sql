@@ -420,3 +420,9 @@ CREATE TABLE `fantasy`.`league_invitations` (
   `email` VARCHAR(64) NULL,
   `n_status` VARCHAR(1) NULL,
   PRIMARY KEY (`id`));
+
+ALTER TABLE `fantasy`.`league_invitations` 
+ADD COLUMN `is_processed` VARCHAR(1) NULL DEFAULT 0 AFTER `email`;
+
+ALTER TABLE `fantasy`.`league_member` 
+ADD UNIQUE INDEX `UNIQUE` (`team_id` ASC);

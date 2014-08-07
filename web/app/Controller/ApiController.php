@@ -4591,8 +4591,8 @@ class ApiController extends AppController {
 					'message' => 'Mohon maaf, akun kamu sudah terdaftar sebelumnya. !'));
 		}
 		else if(isset($check2['User']) 
-					&& $check2['User']['email'] == $data['email']
-					&& $check2['User']['register_completed'] != 0)
+					|| $check2['User']['email'] == $data['email']
+					|| $check2['User']['register_completed'] != 0)
 		{
 
 			$this->set('response',array('status'=>0, 

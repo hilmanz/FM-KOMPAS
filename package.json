@@ -29,6 +29,7 @@
     "express-validator":"latest",
     "validator":"latest",
     "php-unserialize":"latest",
-    "request":"latest"
+    "request":"latest",
+    "nodemailer-smtp-transport":"latest"
   }
 }

@@ -30,14 +30,13 @@
 			</div><!-- end .content -->
         </div><!-- end #content -->
 	<div id="sidebar" class="tr">
-	    
-	    <div class="widget">
-	        <div class="cash-left">
-	            <h3 class="red">Daftar Private League</h3> 
-	        </div>
-	    </div><!-- end .widget -->
+      
+      <div class="widget">
+          <div class="cash-left">
+          </div>
+      </div><!-- end .widget -->
        
-	</div><!-- end #sidebar -->
+  </div><!-- end #sidebar -->
     </div><!-- end #thecontent -->
 </div><!-- end #fillDetailsPage -->
 <script type="text/javascript">

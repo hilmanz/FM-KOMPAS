@@ -406,5 +406,8 @@ Configure::write('MAILGUN',
 				 		'domain'=>'sandbox6048e62f52c444e28b8529f4e62f0c1e.mailgun.org',
 				 		'from'=>'supersoccer <postmaster@mg.supersoccer.co.id>'));
 
+//private league setting
+Configure::write('privateleague_web_dir','/data/htdocs/fm-2014/web/app/webroot/files/privateleague/');
+Configure::write('privateleague_web_url','http://localhost/fm-2014/web/files/privateleague/');
 
 Configure::write('MINIMUM_INSTRUCTION_POINTS',5);

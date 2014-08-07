@@ -37,6 +37,7 @@ $overall = isset($overall) ? "selected='selected'":"";
                 </thead>
                 <tbody>
                   <?php
+                    if(count($rs_leaderboard) > 0):
                     $no=1;
                     foreach ($rs_leaderboard as $key => $value):
                   ?>
@@ -49,6 +50,13 @@ $overall = isset($overall) ? "selected='selected'":"";
                   <?php
                   $no++;
                   endforeach;
+                  else:
+                  ?>
+                    <tr class="odd">
+                      <td colspan="4">Belum Ada Data</td>
+                    </tr>
+                  <?php 
+                  endif;
                   ?>
                 </tbody>
             </table>

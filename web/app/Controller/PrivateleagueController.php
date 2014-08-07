@@ -260,6 +260,7 @@ class PrivateleagueController extends AppController {
 												INNER JOIN users d ON c.user_id = d.id
 												WHERE b.league_id='{$rs_league[0]['b']['id']}' 
 												AND b.matchday='{$matchday}'
+												GROUP BY b.team_id
 												ORDER BY b.points DESC
 												LIMIT 1000");
 

@@ -5,6 +5,7 @@ var async = require('async');
 var mysql = require('mysql');
 var S = require('string');
 var frontend_schema = config.database.frontend_schema;
+var template = require('./privateleague_mailer_template').template;
 
 var transport = nodemailer.createTransport(smtpTransport({
     host: 'smtp.mailgun.org',
@@ -24,9 +25,8 @@ var pool  = mysql.createPool({
 var mailOption = {
 					from: config.mailgun.from,
 					to: "",
-					subject: "test nodemailer smtp",
-					text: "hello world",
-					html: "<b>Hello world</b>"
+					subject: "Private League Invitation",
+					html: template.invite
 				};
 
 
@@ -95,7 +95,7 @@ function sendMail(users,done){
 			
 	    },
 	    function (err) {
-	        console.log("Selesai");
+	    	transport.close();
 	    }
 	);
 }

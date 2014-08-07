@@ -42,26 +42,46 @@ pool.getConnection(function(err, conn){
 		},
 		function(result, matchday, game_id, cb){
 			if(result[0].total > 0 && result.length == 1){
-				getPlayer(conn, matchday, game_id, cb);
-			}
-		},
-		function(result_player, matchday, game_id, done){
-			async.each(result_player, function(player, next){
-				async.waterfall([
-					function(cb){
-						//console.log('player',player);
-						getWeeklyPoint(conn, matchday, game_id, player, function(err){
-							//cb(err, null);
+				var start = 0;
+				var limit = 1;
+				var loop = true;
+				async.whilst(
+				    function () { return loop; },
+				    function (callback) {
+				        conn.query("SELECT league_id, team_id FROM \
+				        			fantasy.league_member LIMIT ?,?", [start,limit],
+						function(err, rs){
+							console.log("getPlayer", rs);
+							if(rs.length > 0){
+								start += limit;
+								async.each(rs, function(player, next){
+									async.waterfall([
+										function(cb){
+											//console.log('player',player);
+											getWeeklyPoint(conn, matchday, game_id, player, function(err){
+												//cb(err, null);
+											});
+										}
+									],
+									function(err){
+										next();
+									});
+								},
+								function(err){
+									done(err);
+								});
+						 		callback();
+							}else{
+								loop = false;
+								callback();
+							}
 						});
-					}
-				],
-				function(err){
-					next();
-				});
-			},
-			function(err){
-				done(err);
-			});
+				    },
+				    function (err) {
+				        console.log("Selesai");
+				    }
+				);
+			}
 		}
 	], function(err){
 		conn.release();
@@ -74,6 +94,7 @@ function getCurrentMatchday(conn, cb){
 				WHERE is_processed = 0 \
 				ORDER BY id ASC LIMIT 1;",
 				[],function(err, rs){
+					console.log("getCurrentMatchday",rs);
 					if(rs != null && rs.length == 1){
 						cb(err,rs[0].matchday);
 					}else{
@@ -88,6 +109,7 @@ function getGameIdsByMatchday(conn, matchday, cb){
 				WHERE matchday = ? \
 				ORDER BY id ASC LIMIT 40;",
 				[matchday],function(err, rs){
+					console.log("getGameIdsByMatchday",rs);
 					if(rs != null && rs.length > 0){
 						cb(err, matchday, rs);
 					}else{
@@ -99,6 +121,7 @@ function getGameIdsByMatchday(conn, matchday, cb){
 function checkGameId(conn, matchday, game_id, length_game_id, cb){
 	conn.query("SELECT id FROM ffgame_stats.job_queue WHERE game_id IN (?) GROUP BY game_id",
 				[game_id], function(err, rs){
+					console.log("checkGameId", rs);
 					//console.log('GAME_TEAM_POINTS',S(this.sql).collapseWhitespace().s);
 					cb(err, game_id, matchday, length_game_id, rs.length);
 				});
@@ -127,39 +150,7 @@ function compareResultJob(conn, game_id, matchday, cb){
 				        AND n_status = 2)";
 	conn.query(sql,[],
 				function(err, rs){
+					console.log("compareResultJob", rs);
 			 		cb(err, rs, matchday, game_id);
-				});
-}
-
-function getPlayer(conn, matchday, game_id, cb){
-	conn.query("SELECT league_id, team_id FROM fantasy.league_member LIMIT 100000",[],
-				function(err, rs){
-			 		cb(err, rs, matchday, game_id);
-
-				});
-}
-
-function getWeeklyPoint(conn, matchday, game_id, player, cb){
-	conn.query("SELECT * FROM fantasy.weekly_points \
-				WHERE game_id IN(?) AND team_id=? AND matchday = ? LIMIT 10000", 
-				[game_id, player.team_id, matchday],
-				function(err, rs){
-					if(rs!=null && rs.length > 0){
-						async.each(rs, function(value, next){
-							conn.query("INSERT INTO fantasy.league_table\
-								(league_id, team_id, game_id, matchday, matchdate, points) \
-								VALUES(?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE points=?",
-									[player.league_id, player.team_id, value.game_id,
-									 value.matchday, value.matchdate, 
-									 value.points+value.extra_points,
-									 value.points+value.extra_points],
-									function(err, rs){
-										cb(err);
-									});
-						},
-						function(err){
-							next();
-						});
-					}
 				});
 }

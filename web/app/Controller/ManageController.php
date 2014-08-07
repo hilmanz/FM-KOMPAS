@@ -33,6 +33,7 @@ class ManageController extends AppController {
 		$this->loadModel('Team');
 		$this->loadModel('User');
 		
+
 		
 		if(!$this->hasTeam()){
 			$this->redirect('/login/expired');
@@ -460,7 +461,8 @@ class ManageController extends AppController {
 		$this->set('team_bugdet',$budget);
 
 		//club
-		$club = $this->Team->findByUser_id($user['User']['id']);
+		$club = $this->Team->find('first',array('conditions'=>array('user_id'=>$user['User']['id'],
+																	'league'=>$_SESSION['league'])));
 		$this->set('club',$club['Team']);
 
 		$this->set('game_team_id',$userData['team']['id']);

@@ -253,9 +253,8 @@ class ProfileController extends AppController {
 	
 	public function register_team(){
 		$userData = $this->getUserData();
-
-
-		if(@$userData['register_completed']!=1){
+		
+		if(@$userData['register_completed']!=1 || $userData['team']==null){
 			$team = $this->Session->read('TeamRegister');
 			$this->set('previous_team',$team);
 
@@ -321,7 +320,7 @@ class ProfileController extends AppController {
 
 	public function create_team(){
 		$userData = $this->getUserData();
-		if(@$userData['register_completed']!=1){
+		if(@$userData['register_completed']!=1 || $userData['team']==null){
 			$team = $this->Session->read('TeamRegister');
 			$players = explode(',',$this->request->data['players']);
 			$data = array(
@@ -353,7 +352,8 @@ class ProfileController extends AppController {
 				$InsertTeam = $this->Team->save(array(
 					'user_id'=>$user['User']['id'],
 					'team_id'=>Sanitize::paranoid($team['team_id']),
-					'team_name'=>Sanitize::clean($team['team_name'])
+					'team_name'=>Sanitize::clean($team['team_name']),
+					'league'=>$_SESSION['league']
 				));
 				$this->Session->write('Userlogin.info',$userData);
 				$this->Session->write('TeamRegister',null);
@@ -367,7 +367,7 @@ class ProfileController extends AppController {
 	* diakses kalo user uda ada register
 	*/
 	public function select_player(){
-		if(@$userData['register_completed']!=1){
+		if(@$userData['register_completed']!=1 || $userData['team']==null){
 
 			$userData = $this->getUserData();
 			$selected_team = $this->Session->read('TeamRegister');
@@ -396,7 +396,7 @@ class ProfileController extends AppController {
 		}
 	}
 	public function register_staff(){
-		if(@$this->userData['register_completed']==1){
+		if(@$this->userData['register_completed']==1 || $userData['team']==null){
 			$this->redirect('/');
 		}	
 		$userData = $this->getUserData();

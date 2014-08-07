@@ -19,7 +19,11 @@ var PHPUnserialize = require('php-unserialize');
 var redisClient = {};
 
 var config = {};
+var league = 'epl';
 
+exports.setLeague = function(l){
+	league = l;
+}
 var match = require(path.resolve('./libs/api/match'));
 var officials = require(path.resolve('./libs/api/officials'));
 
@@ -49,8 +53,8 @@ function getLineup(redisClient,game_team_id,callback){
 				function(callback){
 					//check if we have the cached data
 					console.log('LINEUP','CHECKING LINEUP');
-					console.log('LINEUP','REDIS KEY : ','game_team_lineup_'+game_team_id);
-					redisClient.get('game_team_lineup_'+game_team_id,function(err,lineup){
+					console.log('LINEUP','REDIS KEY : ','game_team_lineup_'+league+'_'+game_team_id);
+					redisClient.get('game_team_lineup_'+league+'_'+game_team_id,function(err,lineup){
 						var rs = JSON.parse(lineup);
 						console.log('LINEUP','-->',rs);
 						callback(err,rs);
@@ -74,7 +78,7 @@ function getLineup(redisClient,game_team_id,callback){
 						[game_team_id],
 						function(err,rs){
 								redisClient.set(
-									'game_team_lineup_'+game_team_id
+									'game_team_lineup_'+league+'_'+game_team_id
 									,JSON.stringify(rs)
 									,function(err,lineup){
 										console.log('LINEUP','store to cache',rs);
@@ -221,7 +225,7 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 					conn.query(sql,data,function(err,rs){
 						console.log('LINEUP','game_team_lineup_'+game_team_id,' saving lineup for matchday : ',upcoming_matchday);
 						console.log('LINEUP','game_team_lineup_'+game_team_id,S(this.sql).collapseWhitespace().s);
-									callback(err,rs,the_matchday);
+						callback(err,rs,the_matchday);
 					});
 				},
 				function(result,upcoming_matchday,callback){
@@ -241,7 +245,7 @@ function setLineup(redisClient,game_team_id,setup,formation,done){
 				function(result,upcoming_matchday,callback){
 					//reset the cache
 					redisClient.set(
-									'game_team_lineup_'+game_team_id
+									'game_team_lineup_'+league+'_'+game_team_id
 									,JSON.stringify(null)
 									,function(err,lineup){
 										console.log('LINEUP','reset the cache',lineup);
@@ -920,7 +924,12 @@ function next_match(team_id,done){
 										WHERE period IN ('FullTime') ORDER BY matchday DESC LIMIT 1;",
 										[],function(err,m){
 											console.log(S(this.sql).collapseWhitespace().s);
-											rs.push({next_match:null,matchday:m[0].matchday+1});
+											if(m.length==0){
+												m = [{matchday:0}];
+											}
+											
+											rs.push({next_match:null,matchday:m[0].matchday+1});	
+											
 											conn.query("SELECT match_date \
 											FROM \
 											"+config.database.database+".game_fixtures \
@@ -1040,8 +1049,8 @@ function best_match(game_team_id,done){
 								ON c.fb_id = b.fb_id\
 								INNER JOIN "+frontend_schema+".teams d\
 								ON d.user_id = c.id\
-								WHERE a.id = ? LIMIT 1;",
-								[game_team_id],function(err,rs){
+								WHERE a.id = ? AND d.league = ? LIMIT 1;",
+								[game_team_id,league],function(err,rs){
 									console.log(S(this.sql).collapseWhitespace().s);
 									callback(err,rs[0]);
 								});

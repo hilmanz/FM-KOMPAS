@@ -8,7 +8,7 @@ App::uses('AppModel', 'Model');
  * @property topics $topics
  */
 class User extends AppModel {
-	public $hasOne = array('Team');
+	//public $hasOne = array('Team');
 
 	public function checkLogin($user_login,$user_pass){
 		$rs = $this->findByUser_login($user_login);

@@ -14,7 +14,7 @@ var auth = require('./libs/api/auth');
 var argv = require('optimist').argv;
 var config = require('./config').config;
 
-
+var league = 'epl';
 if(typeof argv.league !== 'undefined'){
 	switch(argv.league){
 		case 'ita':
@@ -26,7 +26,11 @@ if(typeof argv.league !== 'undefined'){
 			config = require('./config').config;
 		break;
 	}
+	league = argv.league;
+
 }
+
+
 console.log(config);
 
 
@@ -36,7 +40,7 @@ var team = require('./libs/services/team'); // soccer team
 //var player = require('./libs/services/player'); //soccer player 
 var gameplay = require('./libs/services/gameplay'); // gameplay service
 
-
+gameplay.setLeague(league);
 
 //mysql pool
 var pool  = mysql.createPool({
@@ -52,6 +56,9 @@ auth.setConfig(config);
 auth.setPool(pool);
 users.setConfig(config);
 users.setPool(pool);
+users.setLeague(league);
+
+
 var app = express();
 var RedisStore = require('connect-redis')(express);
 

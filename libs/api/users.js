@@ -1,13 +1,16 @@
 /**
 api related to user management.
 */
+var config = {};
+exports.setConfig = function(c){
+	config = c;
+}
 
 var crypto = require('crypto');
 var fs = require('fs');
 var path = require('path');
 var xmlparser = require('xml2json');
 var async = require('async');
-var config = require(path.resolve('./config')).config;
 var mysql = require('mysql');
 var dateFormat = require('dateformat');
 var redis = require('redis');
@@ -30,7 +33,7 @@ function authenticate(req,res){
 function register(data,callback){
 	
 	prepareDb(function(conn){
-		conn.query("INSERT INTO ffgame.game_users\
+		conn.query("INSERT INTO "+config.database.database+".game_users\
 					(name,email,phone,fb_id,n_status,access_key,register_date)\
 					VALUES(?,?,?,?,?,?,NOW());",
 					[data.name,data.email,data.phone,data.fb_id,1,''],function(err,rs){
@@ -43,7 +46,7 @@ function register(data,callback){
 }
 function removeByFbId(fb_id,callback){
 	prepareDb(function(conn){
-		conn.query("DELETE FROM ffgame.game_users\
+		conn.query("DELETE FROM "+config.database.database+".game_users\
 					WHERE fb_id = ?",
 					[fb_id],function(err,rs){
 						conn.release();

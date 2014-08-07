@@ -11,14 +11,32 @@ var mysql = require('mysql');
 var redis = require('redis');
 var dummy_api_key = '1234567890';
 var auth = require('./libs/api/auth');
+var argv = require('optimist').argv;
 var config = require('./config').config;
+
+
+if(typeof argv.league !== 'undefined'){
+	switch(argv.league){
+		case 'ita':
+			console.log('Serie A Activated');
+			config = require('./config.ita').config;
+		break;
+		default:
+			console.log('EPL Activated');
+			config = require('./config').config;
+		break;
+	}
+}
+console.log(config);
+
+
 //our api libs
 var users = require('./libs/services/users');
 var team = require('./libs/services/team'); // soccer team
 //var player = require('./libs/services/player'); //soccer player 
 var gameplay = require('./libs/services/gameplay'); // gameplay service
 
-var argv = require('optimist').argv;
+
 
 //mysql pool
 var pool  = mysql.createPool({
@@ -26,10 +44,13 @@ var pool  = mysql.createPool({
    user     : config.database.username,
    password : config.database.password,
 });
-
+team.setConfig(config);
 team.setPool(pool);
+gameplay.setConfig(config);
 gameplay.setPool(pool);
+auth.setConfig(config);
 auth.setPool(pool);
+users.setConfig(config);
 users.setPool(pool);
 var app = express();
 var RedisStore = require('connect-redis')(express);
@@ -40,6 +61,7 @@ var app_port =  config.port;
 if(typeof argv.port !== 'undefined'){
 	app_port = argv.port;
 }
+
 
 app.set('port', app_port);
 app.set('views', __dirname + '/views');

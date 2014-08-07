@@ -426,3 +426,9 @@ ADD COLUMN `is_processed` VARCHAR(1) NULL DEFAULT 0 AFTER `email`;
 
 ALTER TABLE `fantasy`.`league_member` 
 ADD UNIQUE INDEX `UNIQUE` (`team_id` ASC);
+
+
+
+ALTER TABLE `fantasy`.`teams` ADD COLUMN `league` VARCHAR(3) DEFAULT 'epl' NULL AFTER `team_name`;
+ALTER TABLE `fantasy`.`teams` ADD INDEX `IDX_LEAGUE` (`user_id`, `league`);
+ALTER TABLE `fantasy`.`teams` DROP KEY `IDX_LEAGUE`, ADD UNIQUE `IDX_LEAGUE` (`user_id`, `league`);

@@ -5,12 +5,19 @@
 */
 var mysql = require('mysql');
 var async = require('async');
-var config = require('../config').config;
-var pool  = mysql.createPool({
-   host     : config.database.host,
+
+var config = {};
+var pool = {};
+
+exports.setConfig = function(c){
+	config = c;
+	pool  = mysql.createPool({
+			  host     : config.database.host,
 			  user     : config.database.username,
 			  password : config.database.password,
-});
+			});
+}
+
 exports.update_team_data = function(data,callback){
 		pool.getConnection(function(err,conn){
 			async.waterfall([

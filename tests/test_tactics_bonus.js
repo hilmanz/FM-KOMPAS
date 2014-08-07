@@ -25,6 +25,7 @@ var game_team_id = 2;
 var matchday = 1;
 console.log('player id ',player_id);
 var weekly=[];
+
 weekly.push({
 			game_id:'f123',
 			category:'passing_and_attacking',

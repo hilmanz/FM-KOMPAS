@@ -100,7 +100,7 @@ class PagesController extends AppController {
 		$this->set('sidebar_banner',$sidebar_banner);
 
 		//-->
-
+		
 		if($path[0]=='home'&&$this->userDetail['Team']['id']>0){
 			if($this->Session->read('pending_redirect')!=null){
 				$redirect_url = $this->Session->read('pending_redirect');

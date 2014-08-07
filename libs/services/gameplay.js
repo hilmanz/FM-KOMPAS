@@ -2,7 +2,13 @@ var path = require('path');
 var gameplay = require(path.resolve('./libs/api/gameplay'));
 var ecash = require(path.resolve('./libs/api/ecash'));
 
+var config = {};
+exports.setConfig = function(c){
+	config = c;
+	ecash.setConfig(config);
+	gameplay.setConfig(config);
 
+}
 exports.setPool = function(pool){
 	gameplay.setPool(pool);
 }

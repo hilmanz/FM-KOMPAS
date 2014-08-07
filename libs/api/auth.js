@@ -7,11 +7,19 @@ var fs = require('fs');
 var path = require('path');
 var xmlparser = require('xml2json');
 var async = require('async');
-var config = require(path.resolve('./config')).config;
+
 var mysql = require('mysql');
 var dateFormat = require('dateformat');
 var redis = require('redis');
 var pool = {};
+
+var config = {};
+
+exports.setConfig = function(c){
+	config = c;
+	service = config.ecash;
+}
+
 function prepareDb(callback){
 	pool.getConnection(function(err,conn){
 		callback(conn);
@@ -31,7 +39,7 @@ function authenticate(req,res){
 function askForChallengeCode(req,res,api_key){
 	
 	prepareDb(function(conn){
-		conn.query("SELECT * FROM ffgame.api_keys WHERE api_key = ? LIMIT 1",
+		conn.query("SELECT * FROM "+config.database.database+".api_keys WHERE api_key = ? LIMIT 1",
 					[api_key],function(err,rs){
 						conn.release();
 						
@@ -57,7 +65,7 @@ function authenticateCode(req,res,api_key,request_code){
 	console.log('session',req.session);
 	if(typeof req.session.challenge_code !== 'undefined'){
 		prepareDb(function(conn){
-			conn.query("SELECT * FROM ffgame.api_keys WHERE api_key = ? LIMIT 1",
+			conn.query("SELECT * FROM "+config.database.database+".api_keys WHERE api_key = ? LIMIT 1",
 						[api_key],function(err,rs){
 							conn.release();
 								if(!err){

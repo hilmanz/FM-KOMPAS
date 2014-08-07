@@ -53,6 +53,22 @@ class AppController extends Controller {
 					'/events/redeem?osign='.$this->request->query['osign']);
 		
 		}
+
+		//filter the league.
+		//the default league is epl
+		
+		if(isset($this->request->query['league'])){
+			if(@$this->request->query['league']=='ita'){
+				$_SESSION['league'] = 'ita';
+			}else{
+				$_SESSION['league'] = 'epl';
+			}
+			
+			$endpoints = Configure::read('API_ENDPOINTS');
+			Configure::write('API_URL',$endpoints[$_SESSION['league']]);
+			$this->Session->write('API_URL',null);
+		}
+	
 		/*
 		if($this->request->is('mobile') &&
 			$this->request->params['pass'][0]!='mobile'){
@@ -322,6 +338,7 @@ class AppController extends Controller {
 			}
 			//news ticker
 			$this->set('tickers',$this->Ticker->find('all',array('limit'=>5)));
+
 		}
 		
 	}
@@ -462,7 +479,7 @@ class AppController extends Controller {
 		return $access_token;
 	}
 	public function initAccessToken(){
-		
+			
 		if($this->getAccessToken()!=null){
 			
 			$check = $this->api_call('/checkSession',array('access_token'=>$this->getAccessToken()));
@@ -505,6 +522,7 @@ class AppController extends Controller {
 	}
 	public function getAPIUrl(){
 		$in_session = $this->Session->read('API_URL');
+
 		if(isset($in_session)){
 			return $in_session;
 		}else{
@@ -536,6 +554,7 @@ class AppController extends Controller {
 	}
 	public function api_call($uri,$params,$cookie_file='',$timeout=15){
 		App::import("Vendor","common");
+
 		if($this->getAccessToken()!=null){
 			$params['access_token'] = $this->getAccessToken();
 		}

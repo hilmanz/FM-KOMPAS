@@ -11,10 +11,15 @@ var payment_URI = '/ecommgateway/payment.html';
 var validation_URI = '/ecommgateway/validation.html';
 var auth_URI = '/ecommgateway/services/ecommgwws';
 
-var config = require('../../config').config;
-var service = config.ecash;
 
+var service = '';
 
+var config = {};
+
+exports.setConfig = function(c){
+	config = c;
+	service = config.ecash;
+}
 
 exports.getEcashUrl = function(transaction_id,clientIpAddress,description,amount,source,callback){
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';

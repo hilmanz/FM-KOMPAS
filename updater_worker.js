@@ -16,9 +16,23 @@ PS : these only process the master data.
 let's process unprocessed match.
 **/
 /////THE MODULES/////////
+if(typeof argv.league !== 'undefined'){
+	switch(argv.league){
+		case 'ita':
+			console.log('Serie A Activated');
+			config = require('./config.ita').config;
+		break;
+		default:
+			console.log('EPL Activated');
+			config = require('./config').config;
+		break;
+	}
+}
+console.log(config);
+
+
 var fs = require('fs');
 var path = require('path');
-var config = require('./config').config;
 var xmlparser = require('xml2json');
 var master = require('./libs/master');
 var async = require('async');
@@ -89,7 +103,7 @@ http.request(options, function(response){
 				console.log('DONE');
 				async.waterfall([
 					function(cb){
-						conn.query("UPDATE ffgame_stats.job_queue SET finished_dt = NOW(),n_status=2 WHERE id = ?",
+						conn.query("UPDATE "+config.database.statsdb+"..job_queue SET finished_dt = NOW(),n_status=2 WHERE id = ?",
 							[queue_id],function(err,rs){
 								console.log('flag queue as done');
 								cb(err);
@@ -97,7 +111,7 @@ http.request(options, function(response){
 					},
 					function(cb){
 						conn.query("INSERT IGNORE INTO\
-									ffgame_stats.job_queue_rank\
+									"+config.database.statsdb+"..job_queue_rank\
 									(game_id,since_id,until_id,worker_id,queue_dt,current_id,n_done,n_status)\
 									VALUES\
 									(?,?,?,0,NOW(),0,0,0);",
@@ -131,7 +145,7 @@ http.request(options, function(response){
 
 
 /*
-@todo generate master player performance summary ( ffgame_stats.master_player_performance)
+@todo generate master player performance summary ( "+config.database.statsdb+"..master_player_performance)
 */
 function process_report(queue_id,game_id,since_id,until_id,done){
 	console.log('process report #',game_id);

@@ -1,5 +1,12 @@
 var path = require('path');
 var users = require(path.resolve('./libs/api/users'));
+
+var config = {};
+exports.setConfig = function(c){
+	config = c;
+	users.setConfig(config);
+
+}
 exports.setPool = function(pool){
 	users.setPool(pool);
 }

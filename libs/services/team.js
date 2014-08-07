@@ -1,6 +1,13 @@
 var path = require('path');
 var team = require(path.resolve('./libs/api/team'));
 
+var config = {};
+exports.setConfig = function(c){
+	config = c;
+	team.setConfig(config);
+
+}
+
 exports.setPool = function(pool){
 	team.setPool(pool);
 }

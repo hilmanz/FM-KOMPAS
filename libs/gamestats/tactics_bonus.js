@@ -48,7 +48,7 @@ exports.apply_bonus = function(conn,game_team_id,player_id,new_stats,matchday,do
 		var bonuses = [];
 		async.waterfall([
 			function(cb){
-				conn.query("SELECT * FROM ffgame.game_team_instructions \
+				conn.query("SELECT * FROM "+config.database.database+".game_team_instructions \
 							WHERE game_team_id=? \
 							AND matchday=? \
 							AND player_id = ?\
@@ -108,7 +108,7 @@ exports.apply_bonus = function(conn,game_team_id,player_id,new_stats,matchday,do
 
 
 function saveExtraPoint(conn,game_id,matchday,game_team_id,modifier_name,extra_points,callback){
-	conn.query("INSERT INTO ffgame_stats.game_team_extra_points\
+	conn.query("INSERT INTO "+config.database.statsdb+".game_team_extra_points\
 				(game_id,matchday,game_team_id,modifier_name,extra_points)\
 				VALUES\
 				(?,?,?,?,?)\

@@ -305,7 +305,7 @@ function position_valid(players,setup,formation){
 //get user's players
 function getPlayers(game_team_id,callback){
 	
-	redisClient.get('getPlayers_'+game_team_id,function(err,rs){
+	redisClient.get('getPlayers_'+league+'_'+game_team_id,function(err,rs){
 		if(JSON.parse(rs)==null){
 			console.log('getPlayers',game_team_id,'get from db');
 			prepareDb(function(conn){
@@ -393,7 +393,7 @@ function getPlayers(game_team_id,callback){
 					console.log('getPlayers',result);
 					
 					conn.release();
-					redisClient.set('getPlayers_'+game_team_id,
+					redisClient.set('getPlayers_'+league+'_'+game_team_id,
 									JSON.stringify(result),
 									function(err,redis_status){
 						callback(err,result);	
@@ -553,7 +553,7 @@ function getPlayerOverallStats(game_team_id,player_id,callback){
 * get player's team stats
 */
 function getPlayerTeamStats(game_team_id,player_id,callback){
-	redisClient.get('getPlayerTeamStats_'+game_team_id+'_'+player_id,function(err,rs){
+	redisClient.get('getPlayerTeamStats_'+league+'_'+game_team_id+'_'+player_id,function(err,rs){
 		if(JSON.parse(rs)==null){
 			console.log('getPlayerTeamStats','query from db');
 			var sql = "SELECT a.game_id,SUM(b.points) AS points,a.performance,b.matchday\
@@ -573,7 +573,7 @@ function getPlayerTeamStats(game_team_id,player_id,callback){
 									function(err,rs){
 										console.log(S(this.sql).collapseWhitespace().s);
 										conn.release();
-										redisClient.set('getPlayerTeamStats_'+game_team_id+'_'+player_id,
+										redisClient.set('getPlayerTeamStats_'+league+'_'+game_team_id+'_'+player_id,
 														JSON.stringify(rs),
 														function(err,result){
 											callback(err,rs);	
@@ -600,7 +600,7 @@ function isEmptyObject(obj) {
 /**get player daily stats relative to game_team
 */
 function getPlayerDailyTeamStats(game_team_id,player_id,player_pos,done){
-	redisClient.get('getPlayerDailyTeamStats_'+game_team_id+'_'+player_id,function(err,rs){
+	redisClient.get('getPlayerDailyTeamStats_'+league+'_'+game_team_id+'_'+player_id,function(err,rs){
 		
 		rs = JSON.parse(rs);
 		console.log('getPlayerDailyTeamStats',typeof rs);
@@ -701,7 +701,7 @@ function getPlayerDailyTeamStats(game_team_id,player_id,player_pos,done){
 				],
 				function(err,result){
 					conn.release();
-					redisClient.set('getPlayerDailyTeamStats_'+game_team_id+'_'+player_id,
+					redisClient.set('getPlayerDailyTeamStats_'+league+'_'+game_team_id+'_'+player_id,
 									JSON.stringify(result),
 									function(err,rs){
 										done(err,result);
@@ -1576,7 +1576,7 @@ function sale(redisClient,window_id,game_team_id,player_id,done){
 					async.waterfall([
 						function(cb){
 							redisClient.set(
-								'game_team_lineup_'+game_team_id
+								'game_team_lineup_'+league+'_'+game_team_id
 								,JSON.stringify(null)
 								,function(err,lineup){
 									console.log('LINEUP',game_team_id,'sale- reset the cache',lineup);
@@ -1585,7 +1585,7 @@ function sale(redisClient,window_id,game_team_id,player_id,done){
 						},
 						function(cb){
 							redisClient.set(
-								'getPlayers_'+game_team_id
+								'getPlayers_'+league+'_'+game_team_id
 								,JSON.stringify(null)
 								,function(err,lineup){
 									console.log('LINEUP',game_team_id,'sale - reset getPlayers',lineup);
@@ -1596,7 +1596,7 @@ function sale(redisClient,window_id,game_team_id,player_id,done){
 							//when we sale a player.. the cache must be destroyed
 							
 							redisClient.del(
-								'getPlayerTeamStats_'+game_team_id+'_'+player_id
+								'getPlayerTeamStats_'+league+'_'+game_team_id+'_'+player_id
 								,function(err,lineup){
 									console.log('LINEUP',
 												'sale - remove getPlayerTeamStats_'+game_team_id+'_'+player_id,
@@ -1608,7 +1608,7 @@ function sale(redisClient,window_id,game_team_id,player_id,done){
 							//when we sale a player.. the cache must be destroyed
 							
 							redisClient.del(
-								'getPlayerDailyTeamStats_'+game_team_id+'_'+player_id
+								'getPlayerDailyTeamStats_'+league+'_'+game_team_id+'_'+player_id
 								,function(err,lineup){
 									console.log('LINEUP',
 												'sale - remove getPlayerDailyTeamStats_'+game_team_id+'_'+player_id,
@@ -1874,7 +1874,7 @@ function buy(redisClient,window_id,game_team_id,player_id,done){
 					async.waterfall([
 						function(cb){
 							redisClient.set(
-								'game_team_lineup_'+game_team_id
+								'game_team_lineup_'+league+'_'+game_team_id
 								,JSON.stringify(null)
 								,function(err,lineup){
 									console.log('LINEUP',game_team_id,'buy reset the cache',lineup);
@@ -1883,7 +1883,7 @@ function buy(redisClient,window_id,game_team_id,player_id,done){
 						},
 						function(cb){
 							redisClient.set(
-								'getPlayers_'+game_team_id
+								'getPlayers_'+league+'_'+game_team_id
 								,JSON.stringify(null)
 								,function(err,lineup){
 									console.log('LINEUP',game_team_id,'buy reset getPlayers',lineup);
@@ -2496,7 +2496,7 @@ exports.setPostponedStatus = function(redisClient,game_id,toggle,callback){
 			],
 			function(err,rs){
 				conn.release();
-				redisClient.set('postponed-'+game_id,1,function(err,rs){
+				redisClient.set('postponed-'+league+'_'+game_id,1,function(err,rs){
 					console.log('postponed-'+game_id+'->'+rs);
 					callback(err);
 				});
@@ -2522,7 +2522,7 @@ exports.setPostponedStatus = function(redisClient,game_id,toggle,callback){
 			],
 			function(err,rs){
 				conn.release();
-				redisClient.del('postponed-'+game_id,
+				redisClient.del('postponed-'+league+'_'+game_id,
 				function(err,rs){
 					callback(err);
 				});
@@ -2534,7 +2534,7 @@ exports.setPostponedStatus = function(redisClient,game_id,toggle,callback){
 //-->
 
 exports.bet_info = function(redisClient,game_id,callback){
-	redisClient.get('bet_info_'+game_id,function(err,rs){
+	redisClient.get('bet_info_'+league+'_'+game_id,function(err,rs){
 		console.log('bet_info',game_id,'result : ',rs);
 		if(rs==null){
 			rs = {

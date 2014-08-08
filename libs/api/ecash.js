@@ -32,14 +32,21 @@ exports.getEcashUrl = function(transaction_id,clientIpAddress,description,amount
 		},
 		function(body,statusCode,cb){
 			var response = JSON.parse(xmlparser.toJson(body));
-			var retId = response['soap:Envelope']['soap:Body']['ns2:generateResponse']['return'];
-			console.log('CALL','ecash return id',retId);
-			console.log('CALL','redirect url : ',service.protocol+'://'+service.host+payment_URI+'?id='+retId);
-			if(retId!=null){
-				cb(null,service.protocol+'://'+service.host+payment_URI+'?id='+retId);	
-			}else{
+			console.log(response);
+			try{
+				var retId = response['soap:Envelope']['soap:Body']['ns2:generateResponse']['return'];
+				console.log('CALL','ecash return id',retId);
+				console.log('CALL','redirect url : ',service.protocol+'://'+service.host+payment_URI+'?id='+retId);
+				if(retId!=null){
+					cb(null,service.protocol+'://'+service.host+payment_URI+'?id='+retId);	
+				}else{
+					cb(null,'#');
+				}
+			}catch(e){
+				console.log(e.message);
 				cb(null,'#');
 			}
+			
 			
 		}
 

@@ -46,6 +46,28 @@ class ManageController extends AppController {
 		}
 		$this->set('is_new_user',$is_new_user);	
 		
+
+		$userData = $this->userData;
+
+		//list of players
+		$players = $this->Game->get_team_players($userData['fb_id']);
+		$this->set('players',$players);
+
+		//user data
+		$user = $this->userDetail;
+		$this->set('user',$user['User']);
+		
+
+		//budget
+		$this->budget = $this->Game->getBudget($userData['team']['id']);
+		$this->set('team_bugdet',$this->budget);
+
+		//club
+		$this->club = $this->Team->find('first',array('conditions'=>array('user_id'=>$user['User']['id'],
+																	'league'=>$_SESSION['league'])));
+		$this->set('club',$this->club['Team']);
+
+		$this->set('game_team_id',$userData['team']['id']);
 		//$this->logTime($this->ActivityLog);
 	}
 	public function hasTeam(){
@@ -62,23 +84,10 @@ class ManageController extends AppController {
 		$this->loadModel('Weekly_rank');
 
 		$userData = $this->userData;
-		//user data
+		
 		$user = $this->userDetail;
-		
-		$this->set('user',$user['User']);
 
-		//budget
-		$budget = $this->Game->getBudget($userData['team']['id']);
-		
-		$this->set('team_bugdet',$budget);
-
-		//club
-		$club = $this->Team->findByUser_id($user['User']['id']);
-		$this->set('club',$club['Team']);
-		$this->set('game_team_id',$userData['team']['id']);
-
-	
-
+		$club = $this->club;
 		//get original club
 		$original_club = $this->Game->getClub($club['Team']['team_id']);
 		$this->set('original',$original_club);
@@ -445,28 +454,10 @@ class ManageController extends AppController {
 	}
 	public function team(){
 		
-		$userData = $this->userData;
-
-		//list of players
-		$players = $this->Game->get_team_players($userData['fb_id']);
-		$this->set('players',$players);
-
-		//user data
-		$user = $this->userDetail;
-		$this->set('user',$user['User']);
 		
-
-		//budget
-		$budget = $this->Game->getBudget($userData['team']['id']);
-		$this->set('team_bugdet',$budget);
-
-		//club
-		$club = $this->Team->find('first',array('conditions'=>array('user_id'=>$user['User']['id'],
-																	'league'=>$_SESSION['league'])));
-		$this->set('club',$club['Team']);
-
-		$this->set('game_team_id',$userData['team']['id']);
-	
+		$club = $this->club;
+		$userData = $this->userData;
+		
 		$next_match = $this->nextMatch;
 		$next_match['match']['home_original_name'] = @$next_match['match']['home_name'];
 		$next_match['match']['away_original_name'] = @$next_match['match']['away_name'];

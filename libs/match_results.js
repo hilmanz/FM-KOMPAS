@@ -5,9 +5,28 @@ var fs = require('fs');
 var path = require('path');
 var async = require('async');
 var xmlparser = require('xml2json');
+var argv = require('optimist').argv;
 var config = require(path.resolve('./config')).config;
+
+
 var mysql = require('mysql');
 var S = require('string');
+
+
+if(typeof argv.league !== 'undefined'){
+	switch(argv.league){
+		case 'ita':
+			console.log('Serie A Activated');
+			config = require(path.resolve('./config.ita')).config;
+
+		break;
+		default:
+			console.log('EPL Activated');
+			config = require(path.resolve('./config')).config;
+		break;
+	}
+}
+
 
 var pool  = mysql.createPool({
    host     : config.database.host,

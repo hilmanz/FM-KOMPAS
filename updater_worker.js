@@ -16,6 +16,9 @@ PS : these only process the master data.
 let's process unprocessed match.
 **/
 /////THE MODULES/////////
+var argv = require('optimist').argv;
+var config = require('./config').config;
+var league = 'epl';
 if(typeof argv.league !== 'undefined'){
 	switch(argv.league){
 		case 'ita':
@@ -27,6 +30,7 @@ if(typeof argv.league !== 'undefined'){
 			config = require('./config').config;
 		break;
 	}
+	league = argv.league;
 }
 console.log(config);
 
@@ -38,7 +42,7 @@ var master = require('./libs/master');
 var async = require('async');
 var mysql = require('mysql');
 var util = require('util');
-var argv = require('optimist').argv;
+
 var redis = require('redis');
 /////DECLARATIONS/////////
 var FILE_PREFIX = config.updater_file_prefix+config.competition.id+'-'+config.competition.year;
@@ -64,6 +68,10 @@ redisClient.on("error", function (err) {
 
 //attach redisClient to the following modules
 lineup_stats.setRedisClient(redisClient);
+lineup_stats.setConfig(config);
+lineup_stats.setLeague(league);
+business_stats.setConfig(config);
+business_stats.setLeague(league);
 
 /////THE LOGICS///////////////
 var conn = mysql.createConnection({
@@ -83,6 +91,7 @@ var options = {
   path: '/job/?bot_id='+bot_id
 };
 console.log(options);
+
 http.request(options, function(response){
 	var str = '';
 	response.on('data', function (chunk) {
@@ -103,7 +112,7 @@ http.request(options, function(response){
 				console.log('DONE');
 				async.waterfall([
 					function(cb){
-						conn.query("UPDATE "+config.database.statsdb+"..job_queue SET finished_dt = NOW(),n_status=2 WHERE id = ?",
+						conn.query("UPDATE "+config.database.statsdb+".job_queue SET finished_dt = NOW(),n_status=2 WHERE id = ?",
 							[queue_id],function(err,rs){
 								console.log('flag queue as done');
 								cb(err);
@@ -111,7 +120,7 @@ http.request(options, function(response){
 					},
 					function(cb){
 						conn.query("INSERT IGNORE INTO\
-									"+config.database.statsdb+"..job_queue_rank\
+									"+config.database.statsdb+".job_queue_rank\
 									(game_id,since_id,until_id,worker_id,queue_dt,current_id,n_done,n_status)\
 									VALUES\
 									(?,?,?,0,NOW(),0,0,0);",
@@ -145,7 +154,7 @@ http.request(options, function(response){
 
 
 /*
-@todo generate master player performance summary ( "+config.database.statsdb+"..master_player_performance)
+@todo generate master player performance summary ( ffgame_stats.master_player_performance)
 */
 function process_report(queue_id,game_id,since_id,until_id,done){
 	console.log('process report #',game_id);

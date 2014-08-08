@@ -19,22 +19,37 @@ var path = require('path');
 var async = require('async');
 var xmlparser = require('xml2json');
 var config = require(path.resolve('./config')).config;
+
+
 var S = require('string');
 var mysql = require('mysql');
-var pool  = mysql.createPool({
-   host     : config.database.host,
-   user     : config.database.username,
-   password : config.database.password,
-});
+var pool  = {};
 var punishment = require(path.resolve('./libs/gamestats/punishment_rules'));
 var perks = require(path.resolve('./libs/gamestats/perks'));
 var player_stats_category = require(path.resolve('./libs/game_config')).player_stats_category;
 var tactics = require(path.resolve('./libs/gamestats/tactics_bonus'));
 var redisClient = null;
+
+
 exports.setRedisClient = function(client){
 	redisClient = client;
 }
+exports.setConfig = function(c){
+	config = c;
+	pool = mysql.createPool({
+	   host     : config.database.host,
+	   user     : config.database.username,
+	   password : config.database.password,
+	})
+	perks.setConfig(c);
+	punishment.setConfig(c);
+	tactics.setConfig(c);
 
+}
+var league = 'epl';
+exports.setLeague = function(l){
+	league = l;
+}
 
 console.log('lineup_stats - creating pool');
 exports.update = function(queue_id,game_id,since_id,until_id,done){
@@ -829,7 +844,7 @@ function getPlayerDailyTeamStats(conn,game_team_id,player_id,player_pos,matchday
 		},
 		function(weekly,result,callback){
 			tactics.apply_bonus(conn,game_team_id,player_id,weekly,matchday,function(err){
-				cb(err,weekly);
+				callback(err,weekly);
 			});	
 		},
 		function(result,callback){
@@ -837,7 +852,7 @@ function getPlayerDailyTeamStats(conn,game_team_id,player_id,player_pos,matchday
 			async.waterfall([
 				function(cb){
 					console.log('lineup_stats','reset cache','getPlayerTeamStats_'+game_team_id+'_'+player_id);
-					redisClient.set('getPlayerTeamStats_'+game_team_id+'_'+player_id,
+					redisClient.set('getPlayerTeamStats_'+league+'_'+game_team_id+'_'+player_id,
 									JSON.stringify(null),
 									function(err,rs){
 										if(err){
@@ -849,7 +864,7 @@ function getPlayerDailyTeamStats(conn,game_team_id,player_id,player_pos,matchday
 				},
 				function(cb){
 					console.log('lineup_stats','reset cache','getPlayerDailyTeamStats_'+game_team_id+'_'+player_id);
-					redisClient.set('getPlayerDailyTeamStats_'+game_team_id+'_'+player_id,
+					redisClient.set('getPlayerDailyTeamStats_'+league+'_'+game_team_id+'_'+player_id,
 									JSON.stringify(null),
 									function(err,rs){
 										if(err){
@@ -860,7 +875,7 @@ function getPlayerDailyTeamStats(conn,game_team_id,player_id,player_pos,matchday
 				},
 				function(cb){
 					console.log('lineup_stats','reset cache','getPlayers_'+game_team_id);
-					redisClient.set('getPlayers_'+game_team_id,
+					redisClient.set('getPlayers_'+league+'_'+game_team_id,
 									JSON.stringify(null),
 									function(err,rs){
 										if(err){

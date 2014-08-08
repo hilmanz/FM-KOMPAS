@@ -26,7 +26,7 @@ var mysql = require('mysql');
 var S = require('string');
 var redis = require('redis');
 /////DECLARATIONS/////////
-var FILE_PREFIX = config.updater_file_prefix+config.competition.id+'-'+config.competition.year;
+
 var stat_maps = require('./libs/stats_map').getStats();
 
 
@@ -35,7 +35,25 @@ var match_results = require('./libs/match_results');
 var lineup_stats = require('./libs/gamestats/lineup_stats');
 var business_stats = require('./libs/gamestats/business_stats');
 var ranks = require(path.resolve('./libs/gamestats/ranks'));
+var league = 'epl';
+var argv = require('optimist').argv;
+var config = require('./config').config;
+if(typeof argv.league !== 'undefined'){
+	switch(argv.league){
+		case 'ita':
+			console.log('Serie A Activated');
+			config = require('./config.ita').config;
+		break;
+		default:
+			console.log('EPL Activated');
+			config = require('./config').config;
+		break;
+	}
+	league = argv.league;
+}
+console.log(config);
 
+var FILE_PREFIX = config.updater_file_prefix+config.competition.id+'-'+config.competition.year;
 
 //REDIS SETUP
 var redisClient = redis.createClient(config.redis.port,config.redis.host);
@@ -52,7 +70,7 @@ var pool = mysql.createPool({
 		});
 
 pool.getConnection(function(err,conn){
-	conn.query("SELECT * FROM ffgame.game_fixtures \
+	conn.query("SELECT * FROM "+config.database.database+".game_fixtures \
 			WHERE is_processed=0 \
 			ORDER BY id ASC LIMIT 10;",[],function(err,games){
 				conn.release();
@@ -88,7 +106,7 @@ function generateReports(games){
 
 
 /*
-@todo generate master player performance summary ( ffgame_stats.master_player_performance)
+@todo generate master player performance summary ( "+config.database.statsdb+".master_player_performance)
 */
 function process_report(game_id,done){
 	console.log('process report #',game_id);
@@ -152,7 +170,7 @@ function distribute_jobs(game_id,done){
 	pool.getConnection(function(err,conn){
 		async.waterfall([
 			function(cb){
-				conn.query("SELECT COUNT(*) AS total FROM ffgame.game_teams;",[],
+				conn.query("SELECT COUNT(*) AS total FROM "+config.database.database+".game_teams;",[],
 					function(err,rs){
 						cb(err,rs[0].total);
 				});
@@ -165,7 +183,7 @@ function distribute_jobs(game_id,done){
 				var queue = [];
 				async.doWhilst(
 					function(callback){
-						conn.query("SELECT id FROM ffgame.game_teams ORDER BY id ASC LIMIT ?,?",
+						conn.query("SELECT id FROM "+config.database.database+".game_teams ORDER BY id ASC LIMIT ?,?",
 						[
 							start,
 							limit
@@ -196,7 +214,7 @@ function distribute_jobs(game_id,done){
 			function(queue,cb){
 				console.log(queue);
 				async.eachSeries(queue,function(q,next){
-					conn.query("INSERT IGNORE INTO ffgame_stats.job_queue\
+					conn.query("INSERT IGNORE INTO "+config.database.statsdb+".job_queue\
 					(game_id,since_id,until_id,worker_id,queue_dt,finished_dt,current_id,n_done,n_status)\
 					VALUES\
 					(?,?,?,0,NOW(),NULL,0,0,0)",
@@ -229,7 +247,7 @@ function reduce_perks_usage(matchday,done){
 		async.waterfall([
 			function(cb){
 				console.log('reduce_perks_usage','check if the perk has reduced for the current matchday');
-				redisClient.get('perk_reduced-'+matchday,function(err,rs){
+				redisClient.get('perk_reduced-'+league+'-'+matchday,function(err,rs){
 					console.log('reduce_perks_usage','perk_reduced-'+matchday,'->',rs);
 					var canReduce = false;
 					if(rs==null || JSON.parse(rs) == 0){
@@ -242,9 +260,9 @@ function reduce_perks_usage(matchday,done){
 			},
 			function(canReduce,cb){
 				if(canReduce){
-					conn.query("UPDATE ffgame.digital_perks SET available = available - 1 \
+					conn.query("UPDATE "+config.database.database+".digital_perks SET available = available - 1 \
 							WHERE master_perk_id IN (\
-							SELECT id FROM ffgame.master_perks\
+							SELECT id FROM "+config.database.database+".master_perks\
 							WHERE perk_name \
 							IN \
 							(\
@@ -263,9 +281,9 @@ function reduce_perks_usage(matchday,done){
 			},
 			function(canReduce,cb){
 				if(canReduce){
-					conn.query("UPDATE ffgame.digital_perks SET n_status=0,available=0\
+					conn.query("UPDATE "+config.database.database+".digital_perks SET n_status=0,available=0\
 							WHERE master_perk_id IN (\
-							SELECT id FROM ffgame.master_perks\
+							SELECT id FROM "+config.database.database+".master_perks\
 							WHERE perk_name \
 							IN \
 							(\
@@ -289,7 +307,7 @@ function reduce_perks_usage(matchday,done){
 				//so we dont have to reduce it again in the future
 				if(canReduce){
 					console.log('perk_reduced-'+matchday);
-					redisClient.set('perk_reduced-'+matchday,1,function(err,rs){
+					redisClient.set('perk_reduced-'+league+'-'+matchday,1,function(err,rs){
 						if(err){
 							console.log('reduce_perks_usage',err.message);
 						}

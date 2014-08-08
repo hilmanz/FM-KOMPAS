@@ -4,7 +4,10 @@
 var PHPUnserialize = require('php-unserialize');
 var async = require('async');
 var S = require('string');
-
+var config = {};
+exports.setConfig = function(c){
+	config = c;
+}
 var affected_stats = {
 	'1':[
 			'att_ibox_target',

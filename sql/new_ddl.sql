@@ -438,3 +438,6 @@ ADD COLUMN `paid_member` INT(1) NULL DEFAULT 0 AFTER `activation_code`;
 
 ALTER TABLE `fantasy`.`users` 
 ADD COLUMN `paid_member_status` INT(1) NULL DEFAULT 0 AFTER `paid_member`;
+
+ALTER TABLE `ffgame_stats`.`game_team_extra_points`
+CHANGE `modifier_name` `modifier_name` VARCHAR(41) CHARACTER SET utf8 COLLATE utf8_general_ci NULL ;

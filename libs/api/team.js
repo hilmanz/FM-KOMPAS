@@ -160,20 +160,32 @@ function create(data,callback){
 								[data.fb_id],
 								function(err,rs){
 									//console.log(this.sql);
+									console.log(S(this.sql).collapseWhitespace().s);
 									callback(null,rs[0]);
 								});
 					
 				},
 				function(user,callback){
+					
+					if(user==null || (typeof user === 'undefined')){
+						console.log(user);
+						recreate_game_user(conn,data.fb_id,function(err,rs){
+							callback(err,rs);
+						});
+					}else{
+						callback(null,user);
+					}
+				},
+				function(user,callback){
 					if(user==null){
-						callback(new Error('no user'),'');
+						cb(new Error('user not found'),null);
 					}else{
 						console.log(user);
 						conn.query("INSERT INTO "+config.database.database+".game_teams\
 								(user_id,team_id,created_date,n_status)\
 								VALUES\
 								(?,?,NOW(),1);",[user.id,data.team_id],function(err,rs){
-									console.log(this.sql);
+									console.log(S(this.sql).collapseWhitespace().s);
 									if(err){
 										console.log(err.message);
 									}
@@ -198,7 +210,7 @@ function create(data,callback){
 							d.push(data.players[i]);
 						}
 						conn.query(sql,d,function(err,rs){
-							console.log(this.sql);
+							console.log(S(this.sql).collapseWhitespace().s);
 							callback(err,result.insertId);
 						});
 					}else{
@@ -232,7 +244,34 @@ function create(data,callback){
 	
 	
 }
-
+function recreate_game_user(conn,fb_id,done){
+	async.waterfall([
+		function(cb){
+			conn.query("INSERT IGNORE INTO "+config.database.database+".game_users \
+						(name,email,phone,fb_id,n_status,access_key,register_date) \
+						SELECT name,email,'',fb_id,1,'',NOW() \
+						FROM "+config.database.frontend_schema+".users \
+						WHERE fb_id=? LIMIT 1",
+						[fb_id],
+						function(err,rs){
+							console.log(S(this.sql).collapseWhitespace().s);
+							cb(err,rs);
+						});
+		},
+		function(rs,cb){
+			conn.query("SELECT id FROM "+config.database.database+".game_users WHERE fb_id=? LIMIT 1",
+			[fb_id],
+			function(err,rs){
+				//console.log(this.sql);
+				console.log(S(this.sql).collapseWhitespace().s);
+				cb(err,rs[0]);
+			});
+		}
+	],
+	function(err,rs){
+		done(err,rs);
+	});
+}
 /**
 remove user team
 **/

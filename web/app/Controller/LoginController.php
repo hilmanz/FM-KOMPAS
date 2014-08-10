@@ -203,7 +203,7 @@ class LoginController extends AppController {
 		}
 	}
 
-	private function afterLogin(){
+	public function afterLogin(){
 		
 		$this->loadModel('User');
 		
@@ -213,6 +213,8 @@ class LoginController extends AppController {
 		$rs = $this->User->findByFb_id($user_session['fb_id']);
 
 		if(@$rs['User']['fb_id']==$user_session['fb_id']&&$user_session['fb_id']>0){
+		
+
 			$user_session['fb_id'] = $rs['User']['fb_id'];
 			$user_session['username'] = $rs['User']['name'];
 			$user_session['name'] = $rs['User']['name'];
@@ -231,6 +233,7 @@ class LoginController extends AppController {
 				$this->Session->write('Userlogin.is_login', false);
 				$this->redirect('/profile/create_password');
 			}else if($user_session['team']==null){
+			
 				$this->redirect('/profile/register_team');
 			}else if($user_session['team']!=null&&$user_session['register_completed']==0){
 				$this->redirect('/profile/register_staff');

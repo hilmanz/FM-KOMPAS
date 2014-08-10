@@ -1,16 +1,16 @@
 exports.config = {
-	competition: {id:8,year:2013},
+	competition: {id:4,year:2013},
 	updater_file_prefix: 'srml-',
 	database:{
 		host:'localhost',
 		username:'root',
 		password:'root',
-		database:'ffgame',
+		database:'ffgame_ita',
+		statsdb:'ffgame_stats_ita',
 		frontend_schema:'fantasy',
-		statsdb:'ffgame_stats',
 		optadb: 'optadb'
 	},
-	port: 3002,
+	port: 3022,
 	redis:{
 		host:'localhost',
 		port:6379
@@ -26,8 +26,7 @@ exports.config = {
 		returnUrl: 'http://localhost/fm_2014/merchandises/payment',
 		returnUrl2: 'http://localhost/duf/supersoccer_fork/onlinecatalog/complete',
 		returnUrl3: 'http://localhost/fm_2014/merchandises/pay/return',
-		returnUrl4: 'http://localhost/duf/supersoccer_fork/onlinecatalog/pay/success',
-		returnUrl5: 'http://localhost/fm_2014/upgrade/member_success'
+		returnUrl4: 'http://localhost/duf/supersoccer_fork/onlinecatalog/pay/success'
 	},
 	mailer:{
 		host:'http://localhost:3101',

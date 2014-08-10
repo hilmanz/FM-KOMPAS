@@ -9,6 +9,9 @@ exports.setConfig = function(c){
 	gameplay.setConfig(config);
 
 }
+exports.setLeague = function(l){
+	gameplay.setLeague(l);
+}
 exports.setPool = function(pool){
 	gameplay.setPool(pool);
 }

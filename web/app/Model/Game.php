@@ -12,7 +12,7 @@ class Game extends AppModel {
 	public $useTable = false; //kita gak pake table database, karena nembak API langsung.
 
 	public function getTeam($fb_id){
-		pr("yey");
+		
 		$response = $this->api_call('/team/get/'.$fb_id,array());
 		
 		if(!isset($response['error'])){

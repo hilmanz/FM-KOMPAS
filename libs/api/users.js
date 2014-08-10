@@ -6,6 +6,10 @@ exports.setConfig = function(c){
 	config = c;
 }
 
+var league = '';
+exports.setLeague = function(l){
+	league = l;
+}
 var crypto = require('crypto');
 var fs = require('fs');
 var path = require('path');

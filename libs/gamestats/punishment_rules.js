@@ -11,8 +11,12 @@
 *
 */
 var path = require('path');
-var config = require(path.resolve('./config')).config;
+var config = {};
 
+
+exports.setConfig = function(c){
+	config = c;
+}
 //income dikurangi untuk 2 home game berikutnya atau sampai transfer window berikutnya
 var home_income_cuts = function(){
 	return {income_cuts:0.75,balance_cuts:0,terms:{type:'2home_or_next_transfer',amount:1}};
@@ -179,7 +183,7 @@ exports.check_violation = function(conn,game_id,game_team_id,original_team_id,ca
 		function(check,game_type,cb){
 			//rule dicabut dulu
 			//untuk babak knockout Worldcup
-			/*
+			
 			if((check.original/check.total) < 0.5){
 				
 				add_rules(conn,game_id,game_team_id,game_type,function(err){
@@ -189,9 +193,7 @@ exports.check_violation = function(conn,game_id,game_team_id,original_team_id,ca
 				
 			}else{
 				cb(null,null);
-			}*/
-			console.log('ORIGINAL_TEAM_CHECK',game_id,'#',game_team_id,check.original,'of',check.total,'SKIPPED FOR KO STAGE');
-			cb(null,null);
+			}
 		}
 	],
 	function(err,rs){

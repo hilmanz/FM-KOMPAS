@@ -67,8 +67,13 @@ class AppController extends Controller {
 			$endpoints = Configure::read('API_ENDPOINTS');
 			Configure::write('API_URL',$endpoints[$_SESSION['league']]);
 			$this->Session->write('API_URL',null);
+			if($this->isUserLogin()){
+				$this->renewUserData();
+			}
 		}
-	
+		if(!isset($_SESSION['league'])){
+			$_SESSION['league'] = 'epl';
+		}
 		/*
 		if($this->request->is('mobile') &&
 			$this->request->params['pass'][0]!='mobile'){
@@ -122,11 +127,17 @@ class AppController extends Controller {
 				$this->loadModel('User');
 				$this->loadModel('Point');
 				$this->loadModel('Info');
+				$this->loadModel('Team');
 				
 
 
 				$this->userDetail = $this->User->findByFb_id($this->userData['fb_id']);
-				
+
+				//get the team
+				$team = $this->Team->find('first',array('conditions'=>array('user_id'=>$this->userDetail['User']['id'],
+																			'league'=>$_SESSION['league'])));
+				$this->userDetail['Team'] = @$team['Team'];
+
 				$point = $this->Point->findByTeam_id(@$this->userDetail['Team']['id']);
 				$this->userPoints = @$point['Point']['points'] + @$point['Point']['extra_points'];
 				$this->userRank = @$point['Point']['rank'];
@@ -342,7 +353,13 @@ class AppController extends Controller {
 		}
 		
 	}
-
+	private function renewUserData(){
+		$this->loadModel('Game');
+		$user_session = $this->getUserData();
+		//get team 
+		$user_session['team'] = $this->Game->getTeam($user_session['fb_id']);
+		$this->Session->write('Userlogin.info',$user_session);
+	}
 	//initializes user's perks
 	//also we need to enable immediately any accessories perks like jersey, custom stadium, etc.
 	protected function initPerks(){

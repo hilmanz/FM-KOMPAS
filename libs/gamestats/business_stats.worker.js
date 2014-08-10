@@ -26,13 +26,28 @@ var stadium_earnings = require(path.resolve('./libs/game_config')).stadium_earni
 var cost_mods = require(path.resolve('./libs/game_config')).cost_modifiers;
 var mysql = require('mysql');
 var S = require('string');
-var pool  = mysql.createPool({
-   host     : config.database.host,
-   user     : config.database.username,
-   password : config.database.password,
-});
+var pool  = {};
 var punishment = require(path.resolve('./libs/gamestats/punishment_rules'));
-var frontend_schema = config.database.frontend_schema;
+var frontend_schema = "";
+
+
+var league = 'epl';
+exports.setLeague = function(l){
+	league = l;
+}
+exports.setConfig = function(c){
+	config = c;
+	pool = mysql.createPool({
+	   host     : config.database.host,
+	   user     : config.database.username,
+	   password : config.database.password,
+	});
+	punishment.setConfig(config);
+	frontend_schema = config.database.frontend_schema;
+}
+
+
+
 var total_teams = 0;
 console.log('business_stats : pool opened');
 exports.update = function(since_id,until_id,game_id,done){

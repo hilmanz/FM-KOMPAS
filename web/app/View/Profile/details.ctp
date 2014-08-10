@@ -21,6 +21,9 @@
             	<div class="row-2">
                     <h1 class="red">PROFIL SAYA</h1>
                     <p>Tampilan informasi seputar profil Fantasy Football League Anda. Selain melihat statistik personal, Anda juga dapat mengubah info dan foto kapan saja.</p>
+                    <p class="fr">
+                        <a class="button" href="<?=$this->Html->url('/upgrade/member')?>">Upgrade</a>
+                    </p>
     			</div><!-- end .row-2 -->
                 <form class="theForm" action="<?=$this->Html->url('/profile/update')?>" 
                   enctype="multipart/form-data" method="post">

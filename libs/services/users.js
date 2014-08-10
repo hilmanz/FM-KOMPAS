@@ -2,10 +2,15 @@ var path = require('path');
 var users = require(path.resolve('./libs/api/users'));
 
 var config = {};
+var league = '';
 exports.setConfig = function(c){
 	config = c;
 	users.setConfig(config);
 
+}
+exports.setLeague = function(l){
+	league = l;
+	users.setLeague = league;
 }
 exports.setPool = function(pool){
 	users.setPool(pool);

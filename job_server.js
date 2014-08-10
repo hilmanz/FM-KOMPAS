@@ -11,12 +11,29 @@ var mysql = require('mysql');
 var redis = require('redis');
 var dummy_api_key = '1234567890';
 var auth = require('./libs/api/auth');
+var argv = require('optimist').argv;
 var config = require('./config').config;
 //our api libs
 var users = require('./libs/services/users');
 var team = require('./libs/services/team'); // soccer team
 //var player = require('./libs/services/player'); //soccer player 
 var gameplay = require('./libs/services/gameplay'); // gameplay service
+
+var league = 'epl';
+if(typeof argv.league !== 'undefined'){
+	switch(argv.league){
+		case 'ita':
+			console.log('Serie A Activated');
+			config = require('./config.ita').config;
+		break;
+		default:
+			console.log('EPL Activated');
+			config = require('./config').config;
+		break;
+	}
+	league = argv.league;
+
+}
 
 //mysql pool
 var pool  = mysql.createPool({
@@ -128,7 +145,7 @@ http.createServer(app).listen(3099, function(){
 
 function assignQueue(bot_id,queue,done){
 	pool.getConnection(function(err,conn){
-		conn.query("UPDATE ffgame_stats.job_queue SET n_done=0,worker_id=?,n_status=1 WHERE id=?",
+		conn.query("UPDATE "+config.database.statsdb+".job_queue SET n_done=0,worker_id=?,n_status=1 WHERE id=?",
 					[bot_id,queue.id],function(err,rs){
 						conn.release();
 						done(err);
@@ -138,7 +155,7 @@ function assignQueue(bot_id,queue,done){
 
 function getQueues(done){
 	pool.getConnection(function(err,conn){
-		conn.query("SELECT * FROM ffgame_stats.job_queue WHERE n_status=0 ORDER BY id ASC LIMIT 100;",
+		conn.query("SELECT * FROM "+config.database.statsdb+".job_queue WHERE n_status=0 ORDER BY id ASC LIMIT 100;",
 					[],function(err,rs){
 						conn.release();
 						done(err,rs);
@@ -152,7 +169,7 @@ function getQueues(done){
 //we only need at least 1 job in active.
 function getActiveJobs(done){
 	pool.getConnection(function(err,conn){
-		conn.query("SELECT * FROM ffgame_stats.job_queue WHERE n_status=1 ORDER BY id ASC LIMIT 1;",
+		conn.query("SELECT * FROM "+config.database.statsdb+".job_queue WHERE n_status=1 ORDER BY id ASC LIMIT 1;",
 					[],function(err,rs){
 						conn.release();
 						done(err,rs);

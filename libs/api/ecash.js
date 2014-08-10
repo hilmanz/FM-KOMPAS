@@ -69,6 +69,8 @@ function step1(transaction_id,clientIpAddress,description,amount,source,callback
 		returnUrl = service.returnUrl3;
 	}else if(source=='SSPAY'){
 		returnUrl = service.returnUrl4;
+	}else if(source=='FMUPGRADE'){
+		returnUrl = service.returnUrl5;
 	}else{
 		returnUrl = service.returnUrl2;
 	}

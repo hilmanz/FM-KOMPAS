@@ -432,3 +432,9 @@ ADD UNIQUE INDEX `UNIQUE` (`team_id` ASC);
 ALTER TABLE `fantasy`.`teams` ADD COLUMN `league` VARCHAR(3) DEFAULT 'epl' NULL AFTER `team_name`;
 ALTER TABLE `fantasy`.`teams` ADD INDEX `IDX_LEAGUE` (`user_id`, `league`);
 ALTER TABLE `fantasy`.`teams` DROP KEY `IDX_LEAGUE`, ADD UNIQUE `IDX_LEAGUE` (`user_id`, `league`);
+
+ALTER TABLE `fantasy`.`users` 
+ADD COLUMN `paid_member` INT(1) NULL DEFAULT 0 AFTER `activation_code`;
+
+ALTER TABLE `fantasy`.`users` 
+ADD COLUMN `paid_member_status` INT(1) NULL DEFAULT 0 AFTER `paid_member`;

@@ -45,10 +45,10 @@ class SponsorsController extends AppController {
 		$game_team_id = intval($this->request->query['game_team_id']);
 		$slot = $this->request->query['slot'];
 		//get Sponsorship
-		$sponsor = $this->Game->query("SELECT * FROM ffgame.game_team_sponsors TeamSponsor
+		$sponsor = $this->Game->query("SELECT * FROM ".$_SESSION['ffgamedb'].".game_team_sponsors TeamSponsor
 										WHERE game_team_id={$game_team_id} LIMIT 1");
 		if(sizeof($sponsor)>0){
-			$rs = $this->Game->query("SELECT * FROM ffgame.game_sponsorship_banners Banner
+			$rs = $this->Game->query("SELECT * FROM ".$_SESSION['ffgamedb'].".game_sponsorship_banners Banner
 							WHERE sponsor_id={$sponsor[0]['TeamSponsor']['sponsor_id']} AND slot='{$slot}' 
 							ORDER BY RAND() LIMIT 10;");
 			return $rs;
@@ -65,7 +65,7 @@ class SponsorsController extends AppController {
 		if(strlen($c)>0){
 			$data = unserialize(decrypt_param($c));
 			$sponsor = $this->Game->query("SELECT * 
-								FROM ffgame.game_sponsorships Sponsor
+								FROM ".$_SESSION['ffgamedb'].".game_sponsorships Sponsor
 								WHERE id = ".intval($data['sponsor_id'])." 
 								LIMIT 1");
 			
@@ -144,7 +144,7 @@ class SponsorsController extends AppController {
 			$t_click = 0;
 			$t_view = 1;
 		}
-		$sql = "INSERT INTO ffgame.sponsor_banner_logs
+		$sql = "INSERT INTO ".$_SESSION['ffgamedb'].".sponsor_banner_logs
 				(banner_id,current_month,location,t_click,t_view)
 				VALUES
 				({$banner_id},".date('m').",'{$location}',{$t_click},{$t_view})
@@ -170,7 +170,7 @@ class SponsorsController extends AppController {
 			$t_click = 0;
 			$t_view = 1;
 		}
-		$sql = "INSERT INTO ffgame.sponsor_banner_logs
+		$sql = "INSERT INTO ".$_SESSION['ffgamedb'].".sponsor_banner_logs
 				(banner_id,current_month,location,t_click,t_view)
 				VALUES
 				({$banner_id},".date('m').",'{$location}',{$t_click},{$t_view})

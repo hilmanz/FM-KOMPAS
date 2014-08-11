@@ -31,7 +31,7 @@ class LeaderboardController extends AppController {
 		}
 		$user = $this->userDetail;
 		$this->set('user',$user['User']);
-
+		$this->set('club',$user['Team']);
 		$this->getFinanceSummary($this->userData['fb_id']);
 
 		//banners
@@ -44,13 +44,16 @@ class LeaderboardController extends AppController {
 	public function hasTeam(){
 		$userData = $this->getUserData();
 		if(is_array($userData['team'])){
+
 			return true;
 		}
 	}
 	private function getTier($myRank){
 		$ranks = $this->Point->query("SELECT MAX(rank) as total FROM points a
 									INNER JOIN teams b
-									ON a.team_id = b.id;");
+									ON a.team_id = b.id 
+									AND a.league = b.league
+									WHERE a.league = '{$_SESSION['league']}';");
 		
 		$max_rank = intval($ranks[0][0]['total']);
 		$q1 = ceil(0.25 * $max_rank);
@@ -90,7 +93,7 @@ class LeaderboardController extends AppController {
 		$this->Weekly_point->virtualFields['TotalPoints'] = 'SUM(Weekly_point.points + Weekly_point.extra_points)';
 		
 		$this->paginate = array(
-								'conditions'=>array('matchday'=>$matchday),
+								'conditions'=>array('matchday'=>$matchday,'league'=>$_SESSION['league']),
 								'limit'=>100,
 								'order'=> array('rank'=>'asc')
 							);
@@ -106,7 +109,8 @@ class LeaderboardController extends AppController {
 		    	$poin = $this->Weekly_point->find('first',array(
 		    									'conditions'=>array(
 		    										'Weekly_point.team_id'=>$r['Weekly_rank']['team_id'],
-		    										'matchday'=>$matchday
+		    										'matchday'=>$matchday,
+		    										'Weekly_point.league'=>$_SESSION['league']
 		    									)
 		    								));
 		    	$rs[$n]['Weekly_point'] = $poin['Weekly_point'];
@@ -115,8 +119,8 @@ class LeaderboardController extends AppController {
 		    	$rs[$n]['Team'] = $poin['Team'];
 		    	//get manager's name
 		    	$manager = $this->User->findById($poin['Team']['user_id']);
-		    	$game_team = $this->Game->query("SELECT b.id as id FROM ffgame.game_users a
-							INNER JOIN ffgame.game_teams b
+		    	$game_team = $this->Game->query("SELECT b.id as id FROM ".$_SESSION['ffgamedb'].".game_users a
+							INNER JOIN ".$_SESSION['ffgamedb'].".game_teams b
 							ON a.id = b.user_id WHERE fb_id = '{$manager['User']['fb_id']}' LIMIT 1;");
 
 		    	$rs[$n]['Manager'] = @$manager['User'];
@@ -181,13 +185,14 @@ class LeaderboardController extends AppController {
 		  	}
 	   	}
 	  	
-
+	   	pr($current_month);
 	  	
 
 	  	$available_months = $this->Monthly_point->query("SELECT 
 														bln,
 														thn 
 														FROM monthly_points
+														WHERE league='{$_SESSION['league']}'
 														GROUP BY thn,bln;");
 	  	
 
@@ -196,7 +201,8 @@ class LeaderboardController extends AppController {
 	  	
 		$this->paginate = array(
 			'conditions'=>array('bln'=>$current_month,
-	  							'thn'=>$current_year),
+	  							'thn'=>$current_year,
+	  							'Monthly_point.league'=>$_SESSION['league']),
 	        'limit' => 100,
 	        'order' => array(
 	            'Monthly_point.points' => 'desc'
@@ -205,7 +211,7 @@ class LeaderboardController extends AppController {
 	  	$rs =  $this->paginate('Monthly_point');
 	  	
 
-	  	
+		
 	  
 	  	foreach($rs as $n=>$r){
 	    	$rs[$n]['Point'] = $rs[$n]['Monthly_point'];
@@ -220,11 +226,13 @@ class LeaderboardController extends AppController {
 	    $myRank = $this->Monthly_point->find('first',
 	    										array('conditions'=>array(	
 	    													'Monthly_point.team_id'=>$this->userDetail['Team']['id'],
+	    													'Monthly_point.league'=>$_SESSION['league'],
 	    													'bln'=>$current_month,
 	  														'thn'=>$current_year),
 
 	    										)
 	    									);
+
 	    
 	    $this->set('team',$rs);
 	    $this->set('monthly',true);
@@ -240,7 +248,7 @@ class LeaderboardController extends AppController {
 	    $this->loadModel('User');
 	    $this->Point->virtualFields['TotalPoints'] = '(Point.points + Point.extra_points)';
 	    $this->paginate = array(
-	    	'conditions'=>array('NOT'=>array('rank'=>0)),
+	    	'conditions'=>array('NOT'=>array('rank'=>0),'Point.league'=>$_SESSION['league']),
 	        'limit' => 100,
 	        'order' => array(
 	            'Point.rank' => 'asc'
@@ -251,7 +259,8 @@ class LeaderboardController extends AppController {
 	   
 	    foreach($rs as $n=>$r){
 	    	//get manager's name
-	    	$manager = $this->User->findById($r['Team']['user_id']);
+	    	$manager = $this->User->find('first',array('conditions'=>array('User.id'=>$r['Team']['user_id'],
+	    																  'Team.league'=>$_SESSION['league'])));
 	    	$rs[$n]['Manager'] = @$manager['User'];
 	    }
 	    

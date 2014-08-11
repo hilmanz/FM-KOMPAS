@@ -55,7 +55,7 @@ class EventsController extends AppController {
 		
 		//make sure that the offer is available just before the next matchday.
 		//the possible next match will be : 
-		$closest_fixture = $this->Game->query("SELECT matchday FROM ffgame.game_fixtures 
+		$closest_fixture = $this->Game->query("SELECT matchday FROM ".$_SESSION['ffgamedb'].".game_fixtures 
 							WHERE match_date > '{$offer['TriggeredEvents']['schedule_dt']}'
 							AND (home_id = '{$original_team_id}' OR away_id = '{$original_team_id}')
 							ORDER BY matchday ASC
@@ -64,7 +64,7 @@ class EventsController extends AppController {
 		
 		if(isset($offer['TriggeredEvents']['id'])){
 			//also make sure that the user hasnt answer the offer yet.
-			$perks = $this->Game->query("SELECT * FROM ffgame.game_perks
+			$perks = $this->Game->query("SELECT * FROM ".$_SESSION['ffgamedb'].".game_perks
 									 WHERE event_id={$offer['TriggeredEvents']['id']}
 									 AND game_team_id={$game_team_id}
 									 LIMIT 1;");
@@ -211,7 +211,7 @@ class EventsController extends AppController {
 		
 		//make sure that the offer is available just before the next matchday.
 		//the possible next match will be : 
-		$closest_fixture = $this->Game->query("SELECT game_id,matchday FROM ffgame.game_fixtures 
+		$closest_fixture = $this->Game->query("SELECT game_id,matchday FROM ".$_SESSION['ffgamedb'].".game_fixtures 
 							WHERE match_date > '{$offer['TriggeredEvents']['schedule_dt']}'
 							AND (home_id = '{$original_team_id}' OR away_id = '{$original_team_id}')
 							ORDER BY matchday ASC
@@ -220,7 +220,7 @@ class EventsController extends AppController {
 		$event_next_game_id = $closest_fixture[0]['game_fixtures']['game_id'];
 		
 		//also make sure that the user hasnt answer the offer yet.
-		$perks = $this->Game->query("SELECT * FROM ffgame.game_perks
+		$perks = $this->Game->query("SELECT * FROM ".$_SESSION['ffgamedb'].".game_perks
 									 WHERE event_id={$offer['TriggeredEvents']['id']}
 									 AND game_team_id={$game_team_id}
 									 LIMIT 1;");
@@ -314,11 +314,11 @@ class EventsController extends AppController {
 					//can spend money ?
 					$money = $this->Game->query("SELECT SUM(budget+balance) AS money FROM (
 												SELECT budget, 0 AS balance 
-												FROM ffgame.game_team_purse 
+												FROM ".$_SESSION['ffgamedb'].".game_team_purse 
 												WHERE game_team_id={$game_team_id}
 													UNION
 												SELECT 0 AS budget,SUM(amount) AS balance 
-												FROM ffgame.game_team_expenditures 
+												FROM ".$_SESSION['ffgamedb'].".game_team_expenditures 
 												WHERE game_team_id = {$game_team_id}) a;",
 												false);
 					//ChangeLog
@@ -339,7 +339,7 @@ class EventsController extends AppController {
 						if($item['event_type']==1 || $item['event_type']==2){
 							//deduct the money if event_type 1 and 2
 							$cost = $item['money_cost'];
-							$this->Game->query("INSERT IGNORE INTO ffgame.game_team_expenditures
+							$this->Game->query("INSERT IGNORE INTO ".$_SESSION['ffgamedb'].".game_team_expenditures
 												(game_team_id,item_name,item_type,
 												 amount,game_id,match_day,item_total,base_price)
 												VALUES
@@ -412,19 +412,19 @@ class EventsController extends AppController {
 		//check if the player is not owned by the club
 		$check = $this->Game->query("SELECT COUNT(id) AS total
 						FROM 
-						ffgame.game_team_players 
+						".$_SESSION['ffgamedb'].".game_team_players 
 						WHERE game_team_id={$game_team_id} 
 						AND player_id = '{$item['offered_player_id']}' 
 						LIMIT 1;",false);
 
 		if($check[0][0]['total']==0){
 			//insert the player into game_team_players
-			$rs = $this->Game->query("INSERT IGNORE INTO ffgame.game_team_players
+			$rs = $this->Game->query("INSERT IGNORE INTO ".$_SESSION['ffgamedb'].".game_team_players
 										 (game_team_id,player_id)
 										 VALUES({$game_team_id},'{$item['offered_player_id']}');",false);
 			if(isset($rs)){
 				//deduct the price
-				$this->Game->query("INSERT INTO ffgame.game_team_expenditures
+				$this->Game->query("INSERT INTO ".$_SESSION['ffgamedb'].".game_team_expenditures
 											(game_team_id,item_name,item_type,amount,game_id,match_day)
 											VALUES
 											({$game_team_id},'buy_player',2,-{$item['money_cost']},
@@ -443,18 +443,18 @@ class EventsController extends AppController {
 		//check if the player is not owned by the club
 		$check = $this->Game->query("SELECT COUNT(id) AS total
 						FROM 
-						ffgame.game_team_players 
+						".$_SESSION['ffgamedb'].".game_team_players 
 						WHERE game_team_id={$game_team_id} 
 						AND player_id = '{$item['offered_player_id']}' 
 						LIMIT 1;");
 		if($check[0][0]['total']==1){
 			//remove the player from game_team_players
-			$rs = $this->Game->query("DELETE FROM ffgame.game_team_players
+			$rs = $this->Game->query("DELETE FROM ".$_SESSION['ffgamedb'].".game_team_players
 										 WHERE game_team_id = {$game_team_id}
 										  AND player_id = '{$item['offered_player_id']}';");
 			if(isset($rs)){
 				//deduct the price
-				$this->Game->query("INSERT INTO ffgame.game_team_expenditures
+				$this->Game->query("INSERT INTO ".$_SESSION['ffgamedb'].".game_team_expenditures
 											(game_team_id,item_name,item_type,amount,game_id,match_day)
 											VALUES
 											({$game_team_id},'player_sold',1,{$item['money_cost']},

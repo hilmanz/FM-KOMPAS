@@ -32,15 +32,7 @@ class ManageController extends AppController {
 		parent::beforeFilter();
 		$this->loadModel('Team');
 		$this->loadModel('User');
-		$this->User->bindModel(array(
-				'hasOne'=>array(
-					'Team'=>array(
-						'conditions' => array(
-							'Team.league' => $_SESSION['league'])
-						)
-				)
-			)
-		);
+		
 
 		
 		if(!$this->hasTeam()){
@@ -215,7 +207,8 @@ class ManageController extends AppController {
 							'SUM(Weekly_point.points+Weekly_point.extra_points) AS TotalPoints',
 							'Team.id', 'Team.user_id', 
 							'Team.team_id','Team.team_name'),
-			'conditions'=>array('Weekly_point.team_id'=>$user['Team']['id']),
+			'conditions'=>array('Weekly_point.team_id'=>$user['Team']['id'],
+								'Weekly_point.league'=>$_SESSION['league']),
 	        'limit' => 100,
 	        'group' => 'Weekly_point.matchday',
 	        'order' => array(
@@ -343,14 +336,14 @@ class ManageController extends AppController {
 			/*
 			$sql = "SELECT game_id,home_id,away_id,b.name AS home_name,c.name AS away_name,
 					a.matchday,a.match_date,a.home_score,a.away_score
-					FROM ffgame.game_fixtures a
-					INNER JOIN ffgame.master_team b
+					FROM ".$_SESSION['ffgamedb'].".game_fixtures a
+					INNER JOIN ".$_SESSION['ffgamedb'].".master_team b
 					ON a.home_id = b.uid
-					INNER JOIN ffgame.master_team c
+					INNER JOIN ".$_SESSION['ffgamedb'].".master_team c
 					ON a.away_id = c.uid
 					WHERE (a.home_id = '{$this->userData['team']['team_id']}' 
 							OR a.away_id = '{$this->userData['team']['team_id']}')
-					AND EXISTS (SELECT 1 FROM ffgame_stats.game_match_player_points d
+					AND EXISTS (SELECT 1 FROM ".$_SESSION['ffgamestatsdb'].".game_match_player_points d
 								WHERE d.game_id = a.game_id 
 								AND d.game_team_id = {$this->userData['team']['id']} LIMIT 1)
 					ORDER BY a.matchday DESC";
@@ -358,7 +351,7 @@ class ManageController extends AppController {
 		
 			//get the game_id stored in lineup history
 
-			$sql = "SELECT game_id FROM ffgame.game_team_lineups_history a
+			$sql = "SELECT game_id FROM ".$_SESSION['ffgamedb'].".game_team_lineups_history a
 					WHERE game_team_id={$this->userData['team']['id']} GROUP BY game_id;";
 					
 			$current_game_ids = $this->Game->query($sql,false);
@@ -372,10 +365,10 @@ class ManageController extends AppController {
 
 			$sql = "SELECT game_id,home_id,away_id,b.name AS home_name,c.name AS away_name,
 					a.matchday,a.match_date,a.home_score,a.away_score
-					FROM ffgame.game_fixtures a
-					INNER JOIN ffgame.master_team b
+					FROM ".$_SESSION['ffgamedb'].".game_fixtures a
+					INNER JOIN ".$_SESSION['ffgamedb'].".master_team b
 					ON a.home_id = b.uid
-					INNER JOIN ffgame.master_team c
+					INNER JOIN ".$_SESSION['ffgamedb'].".master_team c
 					ON a.away_id = c.uid
 					WHERE a.game_id IN ({$gids})
 					AND a.is_processed = 1
@@ -529,7 +522,7 @@ class ManageController extends AppController {
 		
 		$userData = $this->userData;
 		//user data
-		$user = $this->User->findByFb_id($userData['fb_id']);
+		$user = $this->userDetail;
 		$this->set('user',$user['User']);
 
 		//budget
@@ -550,7 +543,7 @@ class ManageController extends AppController {
 				foreach($rs['data']['daily_stats'] as $n=>$v){
 					$fixture = $this->Team->query("SELECT matchday,match_date,
 										UNIX_TIMESTAMP(match_date) as ts
-										FROM ffgame.game_fixtures 
+										FROM ".$_SESSION['ffgamedb'].".game_fixtures 
 										WHERE game_id='{$n}' 
 										LIMIT 1");
 
@@ -563,7 +556,7 @@ class ManageController extends AppController {
 		}
 		
 		//stats modifier
-		$modifier = $this->Game->query("SELECT * FROM ffgame.game_matchstats_modifier as Modifier");
+		$modifier = $this->Game->query("SELECT * FROM ".$_SESSION['ffgamedb'].".game_matchstats_modifier as Modifier");
 		$this->set('modifiers',$modifier);
 
 		//enable OPTA Widget
@@ -581,12 +574,12 @@ class ManageController extends AppController {
 
 		$userData = $this->userData;
 		//user data
-		$user = $this->User->findByFb_id($userData['fb_id']);
+		$user = $this->userDetail;
 		$this->set('user',$user['User']);
 
 		//club
 		$club = $this->Team->findByUser_id($user['User']['id']);
-		$this->set('club',$club['Team']);
+		$this->set('club',$user['Team']);
 
 		$this->set('match',$match);
 		$this->set('r',$this->request->query['r']);
@@ -609,7 +602,7 @@ class ManageController extends AppController {
 										d as Defender,
 										m as Midfielder,
 										f as Forward
-										FROM ffgame.game_matchstats_modifier as stats;");
+										FROM ".$_SESSION['ffgamedb'].".game_matchstats_modifier as stats;");
 
 		$modifier = array();
 		foreach($rs as $r){
@@ -634,12 +627,12 @@ class ManageController extends AppController {
 		
 		$userData = $this->userData;
 		//user data
-		$user = $this->User->findByFb_id($userData['fb_id']);
+		$user = $this->userDetail;
 		$this->set('user',$user['User']);
 
 		//club
 		$club = $this->Team->findByUser_id($user['User']['id']);
-		$this->set('club',$club['Team']);
+		$this->set('club',$user['Team']);
 
 		//match details
 
@@ -657,7 +650,7 @@ class ManageController extends AppController {
 										d as Defender,
 										m as Midfielder,
 										f as Forward
-										FROM ffgame.game_matchstats_modifier as stats;");
+										FROM ".$_SESSION['ffgamedb'].".game_matchstats_modifier as stats;");
 
 		$modifier = array();
 		foreach($rs as $r){
@@ -689,9 +682,9 @@ class ManageController extends AppController {
 				// remove di database game
 				$user_id = $this->userData['team']['user_id'];
 				$team_id = $this->userData['team']['id'];
-				$this->User->query("DELETE FROM ffgame.game_users WHERE id ={$user_id};");
-				$this->User->query("DELETE FROM ffgame.game_teams WHERE id = {$team_id};");
-				$this->User->query("DELETE FROM ffgame.game_team_players WHERE game_team_id = {$team_id};");
+				$this->User->query("DELETE FROM ".$_SESSION['ffgamedb'].".game_users WHERE id ={$user_id};");
+				$this->User->query("DELETE FROM ".$_SESSION['ffgamedb'].".game_teams WHERE id = {$team_id};");
+				$this->User->query("DELETE FROM ".$_SESSION['ffgamedb'].".game_team_players WHERE game_team_id = {$team_id};");
 				//remove di database frontend.
 
 				$user = $this->User->findByFb_id($this->userData['fb_id']);
@@ -719,7 +712,7 @@ class ManageController extends AppController {
 			$club = $this->Team->findByUser_id($user['User']['id']);
 			$next_match = $this->Game->getNextMatch($userData['team']['team_id']);
 			$this->loadModel('Team');
-			$rs = $this->Team->query("UPDATE ffgame.game_fixtures SET is_processed = 0 
+			$rs = $this->Team->query("UPDATE ".$_SESSION['ffgamedb'].".game_fixtures SET is_processed = 0 
 								WHERE id={$next_match['match']['id']}");
 		}else{
 			$this->redirect('/manage/team');
@@ -728,7 +721,7 @@ class ManageController extends AppController {
 	public function reset_matches(){
 		if(Configure::read('debug')>0){
 			$this->loadModel('Team');
-			$rs = $this->Team->query("UPDATE ffgame.game_fixtures 
+			$rs = $this->Team->query("UPDATE ".$_SESSION['ffgamedb'].".game_fixtures 
 										SET period='PreMatch',is_processed = 1");
 		}else{
 			$this->redirect('/manage/team');
@@ -741,7 +734,7 @@ class ManageController extends AppController {
 			$club = $this->Game->getTeam($userData['fb_id']);
 			
 			$this->loadModel('Team');
-			$rs = $this->Team->query("DELETE FROM ffgame.game_team_expenditures
+			$rs = $this->Team->query("DELETE FROM ".$_SESSION['ffgamedb'].".game_team_expenditures
 								WHERE game_team_id={$club['id']}");
 		}else{
 			$this->redirect('/manage/team');
@@ -839,10 +832,10 @@ class ManageController extends AppController {
 
 		
 		
-		$this->Game->query("DELETE FROM ffgame.game_team_instructions 
+		$this->Game->query("DELETE FROM ".$_SESSION['ffgamedb'].".game_team_instructions 
 							WHERE game_team_id = {$this->userData['team']['id']} AND matchday = {$upcoming_matchday}");
 
-		$sql = "INSERT INTO ffgame.game_team_instructions
+		$sql = "INSERT INTO ".$_SESSION['ffgamedb'].".game_team_instructions
 				(game_team_id,
 				matchday,
 				player_id,
@@ -879,7 +872,7 @@ class ManageController extends AppController {
 	//these is useful for saving lineup / formations and tactics.
 	private function getUpcomingMatchday(){
 		$check = $this->Game->query("SELECT * FROM (SELECT matchday,MAX(is_processed) AS match_status
-											FROM ffgame.game_fixtures GROUP BY matchday) a 
+											FROM ".$_SESSION['ffgamedb'].".game_fixtures GROUP BY matchday) a 
 											WHERE match_status = 0 ORDER BY matchday ASC LIMIT 1;");
 		
 	
@@ -898,7 +891,7 @@ class ManageController extends AppController {
 											WHERE team_id={$team_id} LIMIT 1");
 
 		$total_points = intval(@$rs[0]['a']['total_points']);
-		$total_matches =  $this->Game->query("SELECT matchday FROM ffgame.game_fixtures a
+		$total_matches =  $this->Game->query("SELECT matchday FROM ".$_SESSION['ffgamedb'].".game_fixtures a
 											 WHERE period='FullTime' AND is_processed = 1 
 											 ORDER BY matchday DESC LIMIT 1;");
 
@@ -919,7 +912,7 @@ class ManageController extends AppController {
 
 	private function getCurrentTactics($upcoming_matchday){
 		$game_team_id = $this->userData['team']['id'];
-		$sql = "SELECT * FROM ffgame.game_team_instructions a
+		$sql = "SELECT * FROM ".$_SESSION['ffgamedb'].".game_team_instructions a
 				WHERE game_team_id = {$game_team_id} 
 				AND matchday={$upcoming_matchday} 
 				LIMIT 16";

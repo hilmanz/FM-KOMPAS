@@ -1098,7 +1098,7 @@ class MerchandisesController extends AppController {
 					$result['order_id'] = $this->MerchandiseOrder->id;
 					//time to deduct the money
 					$this->Game->query("
-					INSERT IGNORE INTO ffgame.game_transactions
+					INSERT IGNORE INTO ".$_SESSION['ffgamedb'].".game_transactions
 					(game_team_id,transaction_name,transaction_dt,amount,
 					 details)
 					VALUES
@@ -1108,10 +1108,10 @@ class MerchandisesController extends AppController {
 						'{$data['po_number']} - {$result['order_id']}');");
 					
 					//update cash summary
-					$this->Game->query("INSERT INTO ffgame.game_team_cash
+					$this->Game->query("INSERT INTO ".$_SESSION['ffgamedb'].".game_team_cash
 					(game_team_id,cash)
 					SELECT game_team_id,SUM(amount) AS cash 
-					FROM ffgame.game_transactions
+					FROM ".$_SESSION['ffgamedb'].".game_transactions
 					WHERE game_team_id = {$data['game_team_id']}
 					GROUP BY game_team_id
 					ON DUPLICATE KEY UPDATE
@@ -1502,7 +1502,7 @@ class MerchandisesController extends AppController {
 				$matchday = $match['matchday'];
 				//time to deduct the money
 				$this->Game->query("
-				INSERT IGNORE INTO ffgame.game_team_expenditures
+				INSERT IGNORE INTO ".$_SESSION['ffgamedb'].".game_team_expenditures
 				(game_team_id,item_name,item_type,
 				 amount,game_id,match_day,item_total,base_price)
 				VALUES
@@ -1587,7 +1587,7 @@ class MerchandisesController extends AppController {
 				$matchday = $match['matchday'];
 				//time to deduct the money
 				$this->Game->query("
-				INSERT IGNORE INTO ffgame.game_transactions
+				INSERT IGNORE INTO ".$_SESSION['ffgamedb'].".game_transactions
 				(game_team_id,transaction_name,transaction_dt,amount,
 				 details)
 				VALUES
@@ -1597,10 +1597,10 @@ class MerchandisesController extends AppController {
 					'{$data['po_number']} - {$item['MerchandiseItem']['name']}');");
 				
 				//update cash summary
-				$this->Game->query("INSERT INTO ffgame.game_team_cash
+				$this->Game->query("INSERT INTO ".$_SESSION['ffgamedb'].".game_team_cash
 				(game_team_id,cash)
 				SELECT game_team_id,SUM(amount) AS cash 
-				FROM ffgame.game_transactions
+				FROM ".$_SESSION['ffgamedb'].".game_transactions
 				WHERE game_team_id = {$data['game_team_id']}
 				GROUP BY game_team_id
 				ON DUPLICATE KEY UPDATE
@@ -1682,7 +1682,7 @@ class MerchandisesController extends AppController {
 	}
 	private function apply_free_player_perk($game_team_id,$player_id,$unique_id,$amount){
 		//check if the user has the player
-		$my_player = $this->Game->query("SELECT * FROM ffgame.game_team_players a
+		$my_player = $this->Game->query("SELECT * FROM ".$_SESSION['ffgamedb'].".game_team_players a
 							WHERE game_team_id={$game_team_id} 
 							AND player_id='{$player_id}'",false);
 		if($my_player[0]['a']['player_id'] == $player_id){
@@ -1691,7 +1691,7 @@ class MerchandisesController extends AppController {
 			return $this->apply_money_perk($game_team_id,$unique_id,$amount);
 		}else{
 			CakeLog::write('apply_digital_perk',date("Y-m-d H:i:s").' - '.$game_team_id.' - '.$unique_id.' - free player : '.$player_id);
-			return $this->Game->query("INSERT IGNORE INTO ffgame.game_team_players
+			return $this->Game->query("INSERT IGNORE INTO ".$_SESSION['ffgamedb'].".game_team_players
 								(game_team_id,player_id)
 								VALUES({$game_team_id},'{$player_id}')",false);
 		}

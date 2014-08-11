@@ -11,6 +11,6 @@ class Point extends AppModel {
 	public $belongsTo = array(
 		'Team' => array(
 			'type'=>'INNER'
-		)
+		),
 	);
 }

@@ -193,7 +193,7 @@ class MarketController extends AppController {
 				foreach($rs['data']['daily_stats'] as $n=>$v){
 					$fixture = $this->Team->query("SELECT matchday,match_date,
 										UNIX_TIMESTAMP(match_date) as ts
-										FROM ffgame.game_fixtures 
+										FROM ".$_SESSION['ffgamedb'].".game_fixtures 
 										WHERE game_id='{$n}' 
 										LIMIT 1");
 					
@@ -206,7 +206,7 @@ class MarketController extends AppController {
 		}
 		
 		//stats modifier
-		$modifier = $this->Game->query("SELECT * FROM ffgame.game_matchstats_modifier as Modifier");
+		$modifier = $this->Game->query("SELECT * FROM ".$_SESSION['ffgamedb'].".game_matchstats_modifier as Modifier");
 		$this->set('modifiers',$modifier);
 
 		//enable OPTA Widget

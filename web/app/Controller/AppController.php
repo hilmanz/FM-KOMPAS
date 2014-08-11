@@ -60,8 +60,12 @@ class AppController extends Controller {
 		if(isset($this->request->query['league'])){
 			if(@$this->request->query['league']=='ita'){
 				$_SESSION['league'] = 'ita';
+				$_SESSION['ffgamedb'] = 'ffgame_ita';
+				$_SESSION['ffgamestatsdb'] = 'ffgame_stats_ita';
 			}else{
 				$_SESSION['league'] = 'epl';
+				$_SESSION['ffgamedb'] = 'ffgame';
+				$_SESSION['ffgamestatsdb'] = 'ffgame_stats';
 			}
 			
 			$endpoints = Configure::read('API_ENDPOINTS');
@@ -70,10 +74,16 @@ class AppController extends Controller {
 			if($this->isUserLogin()){
 				$this->renewUserData();
 			}
+		}else{
+			$_SESSION['ffgamedb'] = 'ffgame';
+			$_SESSION['ffgamestatsdb'] = 'ffgame_stats';
 		}
 		if(!isset($_SESSION['league'])){
 			$_SESSION['league'] = 'epl';
+			$_SESSION['ffgamedb'] = 'ffgame';
+			$_SESSION['ffgamestatsdb'] = 'ffgame_stats';
 		}
+		
 		/*
 		if($this->request->is('mobile') &&
 			$this->request->params['pass'][0]!='mobile'){
@@ -129,16 +139,23 @@ class AppController extends Controller {
 				$this->loadModel('Info');
 				$this->loadModel('Team');
 				
+				
 
-
+				
+				$this->User->bindModel(array(
+						'hasOne'=>array(
+							'Team'=>array(
+								'conditions' => array(
+									'Team.league' => $_SESSION['league'])
+								)
+						)
+					)
+				);
 				$this->userDetail = $this->User->findByFb_id($this->userData['fb_id']);
-
-				//get the team
-				$team = $this->Team->find('first',array('conditions'=>array('user_id'=>$this->userDetail['User']['id'],
-																			'league'=>$_SESSION['league'])));
-				$this->userDetail['Team'] = @$team['Team'];
-
-				$point = $this->Point->findByTeam_id(@$this->userDetail['Team']['id']);
+				
+				$point = $this->Point->find('first',
+									array('conditions'=>array('Point.team_id'=>@$this->userDetail['Team']['id'],
+															 'Point.league'=>$_SESSION['league'])));
 				$this->userPoints = @$point['Point']['points'] + @$point['Point']['extra_points'];
 				$this->userRank = @$point['Point']['rank'];
 

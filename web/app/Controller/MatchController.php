@@ -65,7 +65,7 @@ class MatchController extends AppController {
 		$game_id = Sanitize::paranoid($game_id);
 		$rs = $this->Game->getMatchDetails($game_id);
 		$modifier = $this->Team->query("SELECT name 
-										FROM ffgame.game_matchstats_modifier as stats;");
+										FROM ".$_SESSION['ffgamedb'].".game_matchstats_modifier as stats;");
 		$stats = array();
 		foreach($modifier as $mod){
 			$stats[] = $mod['stats']['name'];
@@ -80,7 +80,7 @@ class MatchController extends AppController {
 		
 		$rs = $this->Game->getMatchDetails($game_id);
 		$modifier = $this->Team->query("SELECT name 
-										FROM ffgame.game_matchstats_modifier as stats;");
+										FROM ".$_SESSION['ffgamedb'].".game_matchstats_modifier as stats;");
 		$stats = array();
 		foreach($modifier as $mod){
 			$stats[] = $mod['stats']['name'];

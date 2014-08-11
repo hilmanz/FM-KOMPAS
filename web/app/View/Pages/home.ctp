@@ -91,7 +91,7 @@
 <div id="sidebar">
     <?php if(!isset($disable_login)):?>
     <div id="loginbox" class="widgets tr" >
-        <a href="<?=$this->Html->url('/login');?>" class="boxButton loginBtn">&nbsp;</a>
+        <a href="<?=$this->Html->url('/pages/liga');?>" class="boxButton loginBtn">&nbsp;</a>
         <a href="<?=$this->Html->url('/login/register');?>" class="boxButton createAccount">&nbsp;</a>
     </div>
     <?php endif;?>

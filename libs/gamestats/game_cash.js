@@ -8,7 +8,12 @@ var S = require('string');
 */
 
 //please note that, we process 1 team at a time.
+var config = {};
 
+
+exports.setConfig = function(c){
+	config = c;
+}
 //adding cash
 function adding_cash(conn,game_team_id,transaction_name,amount,details,callback){
 	conn.query("INSERT INTO "+config.database.database+".game_transactions\

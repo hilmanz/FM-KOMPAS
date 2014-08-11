@@ -17,12 +17,7 @@ var cost_mods = require(path.resolve('./libs/game_config')).cost_modifiers;
 var S = require('string');
 var mysql = require('mysql');
 var pool = {};
-/*var pool  = mysql.createPool({
-   host     : config.database.host,
-   user     : config.database.username,
-   password : config.database.password,
-});
-*/
+
 var punishment = require(path.resolve('./libs/gamestats/punishment_rules'));
 var cash = require(path.resolve('./libs/gamestats/game_cash'));
 
@@ -30,6 +25,16 @@ var frontend_schema = config.database.frontend_schema;
 var total_teams = 0;
 var limit  = 100;
 console.log('ranks updater : pool opened');
+
+var league = 'epl';
+exports.setLeague = function(l){
+	league = l;
+}
+exports.setConfig = function(c){
+	config = c;
+	cash.setConfig(config);
+	punishment.setConfig(config);
+}
 
 exports.setPool = function(p){
 	pool = p;
@@ -59,9 +64,9 @@ exports.update = function(conn,since_id,until_id,update_rank,game_id,done){
 					ON b.fb_id = c.fb_id\
 					INNER JOIN "+config.database.database+".game_teams d\
 					ON d.user_id = c.id\
-					WHERE d.id BETWEEN ? AND ?\
+					WHERE a.league = ? AND d.id BETWEEN ? AND ?\
 					LIMIT ?;",
-					[since_id,until_id,limit],
+					[league,since_id,until_id,limit],
 					function(err,rs){
 						console.log(S(this.sql).collapseWhitespace().s);
 						if(rs.length>0){
@@ -124,7 +129,7 @@ function recalculate_ranks(conn,done){
 	console.log('recalculate ranks');
 	async.waterfall([
 		function(callback){
-			conn.query("CALL "+frontend_schema+".recalculate_rank;",[],function(err,rs){
+			conn.query("CALL "+frontend_schema+".recalculate_rank(?);",[league],function(err,rs){
 				if(err) console.log(err);
 				callback(err);
 			});
@@ -138,8 +143,8 @@ function recalculate_ranks(conn,done){
 		},
 		function(matchdays,callback){
 			async.eachSeries(matchdays,function(matchday,next){
-				conn.query("CALL "+frontend_schema+".recalculate_weekly_rank(?);",
-							[matchday.matchday],function(err,rs){
+				conn.query("CALL "+frontend_schema+".recalculate_weekly_rank(?,?);",
+							[league,matchday.matchday],function(err,rs){
 								console.log('recalculating matchday #',matchday.matchday,' ranks');
 								next();				
 							});
@@ -161,7 +166,7 @@ function recalculate_ranks(conn,done){
 			async.eachSeries(months,function(m,next){
 				var mth = m.bln;
 				var yr = m.thn;
-		        conn.query("CALL "+frontend_schema+".recalculate_monthly_rank(?,?);",[mth,yr],
+		        conn.query("CALL "+frontend_schema+".recalculate_monthly_rank(?,?,?);",[league,mth,yr],
 		        	function(err,rs){
 		        		console.log('recalculate monthly rank ',mth,yr);
 		        		next();
@@ -226,13 +231,13 @@ function updatePoints(conn,team,stats,done){
 				if(team.team_id > 0){
 					console.log(team.team_id,' overall points.');
 					conn.query("INSERT INTO "+frontend_schema+".points\
-						          (team_id,points,extra_points)\
+						          (team_id,points,extra_points,league)\
 						          VALUES\
-						          (?,?,?)\
+						          (?,?,?,?)\
 						          ON DUPLICATE KEY UPDATE\
 						          points = VALUES(points),\
 						          extra_points = VALUES(extra_points);",
-						          [team.team_id,points,extra_points],
+						          [team.team_id,points,extra_points,league],
 						          function(err,rs){
 						          	console.log(S(this.sql).collapseWhitespace().s);
 						          	cb(err);
@@ -287,7 +292,7 @@ function updatePoints(conn,team,stats,done){
 
 function updateWeeklyPoints(conn,team_id,game_points,done){
 	var sql = "INSERT INTO "+frontend_schema+".weekly_points\
-	                (team_id,game_id,matchday,matchdate,points,extra_points)\
+	                (team_id,game_id,matchday,matchdate,points,extra_points,league)\
 	                VALUES ?";
 
 	if(game_points.length > 0){
@@ -302,6 +307,7 @@ function updateWeeklyPoints(conn,team_id,game_points,done){
 			params.push(weekly.match_date);
 			params.push(weekly.total_points);
 			params.push(weekly.extra_points);
+			params.push(league);
 			bulks.push(params);
 		}
 		console.log(bulks);
@@ -697,7 +703,7 @@ function generate_summary(conn,user,modifier,done){
 		function(game_team_id,money,import_player_counts,statsgroup,callback){
 			conn.query("INSERT INTO "+frontend_schema+".team_summary\
                       (game_team_id,money,import_player_counts,games,passing_and_attacking,\
-                      	defending,goalkeeping,mistakes_and_errors,last_update)\
+                      	defending,goalkeeping,mistakes_and_errors,last_update,league)\
                       VALUES\
                       (?,\
                         ?,\
@@ -707,7 +713,7 @@ function generate_summary(conn,user,modifier,done){
                         ?,\
                         ?,\
                         ?,\
-                        NOW())\
+                        NOW(),?)\
                       ON DUPLICATE KEY UPDATE\
                       money = VALUES(money),\
                       import_player_counts = VALUES(import_player_counts),\
@@ -718,7 +724,7 @@ function generate_summary(conn,user,modifier,done){
                       mistakes_and_errors = VALUES(mistakes_and_errors),\
                       last_update = VALUES(last_update);",
                       [game_team_id,money,import_player_counts,statsgroup.games,statsgroup.passing_and_attacking,
-                      statsgroup.defending,statsgroup.goalkeeper,statsgroup.mistakes_and_errors],
+                      statsgroup.defending,statsgroup.goalkeeper,statsgroup.mistakes_and_errors,league],
                       function(err,rs){
                       	console.log(S(this.sql).collapseWhitespace().s);
                       	callback(err,rs);
@@ -743,7 +749,6 @@ function give_weekly_cash(since_id,until_id,matchday,conn,done){
 				LIMIT 100;",[since_id,until_id],function(err,rs){
 					console.log('CASH',S(this.sql).collapseWhitespace().s);
 					if(rs!=null && rs.length > 0){
-						
 						distribute_weekly_cash(conn,rs,matchday,function(err){
 							done(err);
 						});
@@ -787,9 +792,9 @@ function distribute_weekly_cash(conn,teams,matchday,done){
 									ON a.id = b.user_id\
 									INNER JOIN "+frontend_schema+".weekly_points c\
 									ON b.id = c.team_id\
-									WHERE a.fb_id= ?\
+									WHERE a.fb_id= ? AND b.league = ?\
 									AND c.matchday = ?;",
-									[team.fb_id,last_matchday],
+									[team.fb_id,league,last_matchday],
 									function(err,rs){
 										console.log('CASH',S(this.sql).collapseWhitespace().s);
 										if(rs!=null && rs.length == 1){

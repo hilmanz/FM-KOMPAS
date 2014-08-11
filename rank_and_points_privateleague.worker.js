@@ -38,6 +38,8 @@ pool.getConnection(function(err, conn){
 		function(game_id, matchday, length_game_id, length, cb){
 			if(length_game_id == length){
 				compareResultJob(conn, game_id, matchday, cb);
+			}else{
+				cb(new Error('Game_Ids not complete'),null,null,null);
 			}
 		},
 		function(result, matchday, game_id, cb){
@@ -60,6 +62,7 @@ pool.getConnection(function(err, conn){
 											//console.log('player',player);
 											getWeeklyPoint(conn, matchday, game_id, player, function(err){
 												//cb(err, null);
+												cb(err);
 											});
 										}
 									],
@@ -68,9 +71,9 @@ pool.getConnection(function(err, conn){
 									});
 								},
 								function(err){
-									done(err);
+									callback();
 								});
-						 		callback();
+						 		
 							}else{
 								loop = false;
 								callback();
@@ -79,8 +82,11 @@ pool.getConnection(function(err, conn){
 				    },
 				    function (err) {
 				        console.log("Selesai");
+				        cb(err);
 				    }
 				);
+			}else{
+				cb(err);
 			}
 		}
 	], function(err){
@@ -96,15 +102,19 @@ function getCurrentMatchday(conn, cb){
 	conn.query("SELECT matchday FROM \
 				ffgame.game_fixtures \
 				WHERE is_processed = 0 \
-				ORDER BY id ASC LIMIT 1;",
+				ORDER BY matchday ASC LIMIT 1;",
 				[],function(err, rs){
+					console.log(S(this.sql).collapseWhitespace().s);
 					console.log("getCurrentMatchday",rs);
+
 					if(rs != null && rs.length == 1){
-						cb(err,rs[0].matchday);
+						cb(err,(rs[0].matchday - 1));
 					}else{
 						cb(new Error('no matchday found'),0);
 					}
 				});
+
+
 }
 
 function getGameIdsByMatchday(conn, matchday, cb){
@@ -113,7 +123,7 @@ function getGameIdsByMatchday(conn, matchday, cb){
 				WHERE matchday = ? \
 				ORDER BY id ASC LIMIT 40;",
 				[matchday],function(err, rs){
-					console.log("getGameIdsByMatchday",rs);
+					console.log("getGameIdsByMatchday #",matchday,rs);
 					if(rs != null && rs.length > 0){
 						cb(err, matchday, rs);
 					}else{
@@ -126,7 +136,7 @@ function checkGameId(conn, matchday, game_id, length_game_id, cb){
 	conn.query("SELECT id FROM ffgame_stats.job_queue WHERE game_id IN (?) GROUP BY game_id",
 				[game_id], function(err, rs){
 					console.log("checkGameId", rs);
-					//console.log('GAME_TEAM_POINTS',S(this.sql).collapseWhitespace().s);
+					console.log('GAME_TEAM_POINTS',S(this.sql).collapseWhitespace().s);
 					cb(err, game_id, matchday, length_game_id, rs.length);
 				});
 }

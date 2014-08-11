@@ -441,3 +441,19 @@ ADD COLUMN `paid_member_status` INT(1) NULL DEFAULT 0 AFTER `paid_member`;
 
 ALTER TABLE `ffgame_stats`.`game_team_extra_points`
 CHANGE `modifier_name` `modifier_name` VARCHAR(41) CHARACTER SET utf8 COLLATE utf8_general_ci NULL ;
+
+
+ALTER TABLE `fantasy`.`monthly_points`     ADD COLUMN `league` VARCHAR(5) DEFAULT 'epl' NULL AFTER `rank`;
+
+ALTER TABLE `fantasy`.`weekly_points`     ADD COLUMN `league` VARCHAR(5) DEFAULT 'epl' NULL AFTER `extra_points`;
+ALTER TABLE `fantasy`.`weekly_ranks`     ADD COLUMN `league` VARCHAR(5) DEFAULT 'epl' NULL AFTER `rank`;
+ALTER TABLE `fantasy`.`points`     ADD COLUMN `league` VARCHAR(5) DEFAULT 'epl' NULL AFTER `extra_points`;
+
+
+ALTER TABLE `fantasy`.`monthly_points` DROP KEY `UNIQUE_MONTHLY`, ADD UNIQUE `UNIQUE_MONTHLY` (`team_id`, `bln`, `thn`, `league`);
+
+ALTER TABLE `fantasy`.`weekly_ranks` DROP KEY `unique_team_game`, ADD UNIQUE `unique_team_game` (`team_id`, `matchday`, `league`);
+
+ALTER TABLE `fantasy`.`weekly_points` DROP KEY `UNIQUE_TEAM_GAMES`, ADD UNIQUE `UNIQUE_TEAM_GAMES` (`team_id`, `game_id`, `league`);
+
+ALTER TABLE `fantasy`.`points` DROP KEY `UNIQUE_TEAM`, ADD UNIQUE `UNIQUE_TEAM` (`team_id`, `league`);

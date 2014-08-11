@@ -407,7 +407,7 @@ Configure::write('MAILGUN',
 				 		'from'=>'supersoccer <postmaster@mg.supersoccer.co.id>'));
 
 //private league setting
-Configure::write('privateleague_web_dir','/data/htdocs/fm-2014/web/app/webroot/files/privateleague/');
-Configure::write('privateleague_web_url','http://localhost/fm-2014/web/files/privateleague/');
+Configure::write('privateleague_web_dir','/home/duf/node_workspace/fm_2014/web/app/webroot/files/privateleague/');
+Configure::write('privateleague_web_url','http://localhost/fm_2014/files/privateleague/');
 
 Configure::write('MINIMUM_INSTRUCTION_POINTS',5);

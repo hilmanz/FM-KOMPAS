@@ -14,7 +14,7 @@ var util = require('util');
 var argv = require('optimist').argv;
 var S = require('string');
 /////DECLARATIONS/////////
-var FILE_PREFIX = config.updater_file_prefix+config.competition.id+'-'+config.competition.year;
+
 var stat_maps = require('./libs/stats_map').getStats();
 
 var http = require('http');
@@ -25,6 +25,24 @@ var lineup_stats = require('./libs/gamestats/lineup_stats.worker');
 var business_stats = require('./libs/gamestats/business_stats');
 var ranks = require(path.resolve('./libs/gamestats/ranks.worker'));
 
+var league = 'epl';
+if(typeof argv.league !== 'undefined'){
+	switch(argv.league){
+		case 'ita':
+			console.log('Serie A Activated');
+			config = require('./config.ita').config;
+		break;
+		default:
+			console.log('EPL Activated');
+			config = require('./config').config;
+		break;
+	}
+	league = argv.league;
+}
+
+
+var FILE_PREFIX = config.updater_file_prefix+config.competition.id+'-'+config.competition.year;
+
 /////THE LOGICS///////////////
 
 var pool  = mysql.createPool({
@@ -33,6 +51,7 @@ var pool  = mysql.createPool({
    password : config.database.password,
 });
 ranks.setPool(pool);
+ranks.setConfig(config);
 var bot_id = (typeof argv.bot_id !=='undefined') ? argv.bot_id : Math.round(1000+(Math.random()*999999));
 
 var options = {

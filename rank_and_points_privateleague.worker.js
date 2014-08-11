@@ -85,6 +85,10 @@ pool.getConnection(function(err, conn){
 		}
 	], function(err){
 		conn.release();
+		//close the pool as we no longer need it.
+		pool.end(function(err){
+			console.log('done');
+		});
 	});
 });
 

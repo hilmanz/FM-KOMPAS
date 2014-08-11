@@ -32,7 +32,15 @@ class ManageController extends AppController {
 		parent::beforeFilter();
 		$this->loadModel('Team');
 		$this->loadModel('User');
-		
+		$this->User->bindModel(array(
+				'hasOne'=>array(
+					'Team'=>array(
+						'conditions' => array(
+							'Team.league' => $_SESSION['league'])
+						)
+				)
+			)
+		);
 
 		
 		if(!$this->hasTeam()){
@@ -57,15 +65,13 @@ class ManageController extends AppController {
 		$user = $this->userDetail;
 		$this->set('user',$user['User']);
 		
+		
 
 		//budget
 		$this->budget = $this->Game->getBudget($userData['team']['id']);
 		$this->set('team_bugdet',$this->budget);
 
-		//club
-		$this->club = $this->Team->find('first',array('conditions'=>array('user_id'=>$user['User']['id'],
-																	'league'=>$_SESSION['league'])));
-		$this->set('club',$this->club['Team']);
+		$this->set('club',$user['Team']);
 
 		$this->set('game_team_id',$userData['team']['id']);
 		//$this->logTime($this->ActivityLog);

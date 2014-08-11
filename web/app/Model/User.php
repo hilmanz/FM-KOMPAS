@@ -7,8 +7,10 @@ App::uses('AppModel', 'Model');
  * @property document_types $document_types
  * @property topics $topics
  */
+
+
 class User extends AppModel {
-	//public $hasOne = array('Team');
+	public $hasOne = array('Team');
 
 	public function checkLogin($user_login,$user_pass){
 		$rs = $this->findByUser_login($user_login);

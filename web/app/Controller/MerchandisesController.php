@@ -32,7 +32,9 @@ class MerchandisesController extends AppController {
 		$this->loadModel('MerchandiseOrder');
 		$this->loadModel('Ongkir');
 		$this->loadModel('DigitalPerk');
-
+		$this->loadModel('MasterPerk');
+		$this->MasterPerk->useDbConfig = $_SESSION['ffgamedb'];
+		$this->DigitalPerk->useDbConfig = $_SESSION['ffgamedb'];
 		$userData = $this->getUserData();
 		$user = $this->userDetail;
 		$this->set('user',$user['User']);
@@ -1633,6 +1635,8 @@ class MerchandisesController extends AppController {
 	}
 	private function apply_digital_perk($game_team_id,$perk_id,$unique=false){
 		$this->loadModel('MasterPerk');
+		$this->MasterPerk->useDbConfig = $_SESSION['ffgamedb'];
+		
 		CakeLog::write('apply_digital_perk',date("Y-m-d H:i:s").' - '.$game_team_id.' - '.$perk_id);
 		$perk = $this->MasterPerk->findById($perk_id);
 		$perk['MasterPerk']['data'] = unserialize($perk['MasterPerk']['data']);
@@ -1706,7 +1710,7 @@ class MerchandisesController extends AppController {
 
 
 		//so we disabled all existing jersey
-		$this->loadModel('DigitalPerk');
+		
 		$this->DigitalPerk->bindModel(
 			array('belongsTo'=>array(
 				'MasterPerk'=>array(

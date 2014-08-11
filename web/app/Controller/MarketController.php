@@ -243,7 +243,8 @@ class MarketController extends AppController {
 	private function getActiveTransferWindowPerk(){
 		$this->loadModel('DigitalPerk');
 		$this->loadModel('MasterPerk');
-
+		$this->MasterPerk->useDbConfig = $_SESSION['ffgamedb'];
+		$this->DigitalPerk->useDbConfig = $_SESSION['ffgamedb'];
 		$this->DigitalPerk->bindModel(array(
 							'belongsTo'=>array('MasterPerk'=>array('type'=>'INNER'))));
 		$perks =  $this->DigitalPerk->find('all',array(

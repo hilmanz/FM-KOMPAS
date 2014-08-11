@@ -139,7 +139,7 @@ class AppController extends Controller {
 				$this->loadModel('Info');
 				$this->loadModel('Team');
 				
-				
+
 
 				
 				$this->User->bindModel(array(
@@ -419,6 +419,8 @@ class AppController extends Controller {
 		if(!is_array($perks)){
 			$this->loadModel('DigitalPerk');
 			$this->loadModel('MasterPerk');
+			$this->MasterPerk->useDbConfig = $_SESSION['ffgamedb'];
+			$this->DigitalPerk->useDbConfig = $_SESSION['ffgamedb'];
 			$this->DigitalPerk->bindModel(
 				array('belongsTo'=>
 						array('MasterPerk'=>array('type'=>'INNER'))

@@ -3338,7 +3338,8 @@ class ApiController extends AppController {
 	
 	private function apply_digital_perk($game_team_id,$perk_id,$unique=false){
 		$this->loadModel('MasterPerk');
-
+		$this->MasterPerk->useDbConfig = $_SESSION['ffgamedb'];
+		
 		$perk = $this->MasterPerk->findById($perk_id);
 		$perk['MasterPerk']['data'] = unserialize($perk['MasterPerk']['data']);
 		switch($perk['MasterPerk']['data']['type']){
@@ -3409,6 +3410,8 @@ class ApiController extends AppController {
 	}
 	private function apply_jersey_perk($game_team_id,$perk_data){
 		$this->loadModel('DigitalPerk');
+
+		$this->DigitalPerk->useDbConfig = $_SESSION['ffgamedb'];
 		$this->DigitalPerk->cache = false;
 
 
@@ -3416,7 +3419,6 @@ class ApiController extends AppController {
 
 
 		//so we disabled all existing jersey
-		$this->loadModel('DigitalPerk');
 		$this->DigitalPerk->bindModel(
 			array('belongsTo'=>array(
 				'MasterPerk'=>array(

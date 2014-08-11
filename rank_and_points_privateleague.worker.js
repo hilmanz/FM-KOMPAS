@@ -154,3 +154,27 @@ function compareResultJob(conn, game_id, matchday, cb){
 			 		cb(err, rs, matchday, game_id);
 				});
 }
+function getWeeklyPoint(conn, matchday, game_id, player, cb){
+	conn.query("SELECT * FROM fantasy.weekly_points \
+				WHERE game_id IN(?) AND team_id=? AND matchday = ? LIMIT 10000", 
+				[game_id, player.team_id, matchday],
+				function(err, rs){
+					if(rs!=null && rs.length > 0){
+						async.each(rs, function(value, next){
+							conn.query("INSERT INTO fantasy.league_table\
+								(league_id, team_id, game_id, matchday, matchdate, points) \
+								VALUES(?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE points=?",
+									[player.league_id, player.team_id, value.game_id,
+									 value.matchday, value.matchdate, 
+									 value.points+value.extra_points,
+									 value.points+value.extra_points],
+									function(err, rs){
+										cb(err);
+									});
+						},
+						function(err){
+							next();
+						});
+					}
+				});
+}

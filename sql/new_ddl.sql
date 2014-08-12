@@ -480,3 +480,26 @@ CREATE TABLE `member_billings` (
   `expire` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+CREATE TABLE fantasy.game_team_cash (
+  `id` bigint(21) NOT NULL AUTO_INCREMENT,
+  `fb_id` varchar(50) DEFAULT NULL,
+  `game_team_id` bigint(21) DEFAULT NULL,
+  `cash` bigint(11) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `IDX_GAME_TEAM_ID` (`fb_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+
+CREATE TABLE fantasy.game_transactions (
+  `id` bigint(21) NOT NULL AUTO_INCREMENT,
+  `fb_id` varchar(50) DEFAULT NULL,
+  `game_team_id` bigint(21) DEFAULT NULL,
+  `transaction_dt` datetime DEFAULT NULL,
+  `transaction_name` varchar(140) DEFAULT NULL,
+  `amount` int(11) DEFAULT '0',
+  `details` varchar(140) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UNIQUE_TRANSACTION` (`transaction_name`,`fb_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;

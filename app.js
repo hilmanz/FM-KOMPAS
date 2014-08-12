@@ -123,7 +123,7 @@ app.get('/game/rank',user.list);
 app.post('/sale',[auth.canAccess],gameplay.sale);
 app.post('/buy',[auth.canAccess],gameplay.buy);
 app.post('/add_expenditure',[auth.canAccess],gameplay.add_expenditure);
-app.get('/cash/:game_team_id', [auth.canAccess],gameplay.getCash);
+app.get('/cash/:fb_id', [auth.canAccess],gameplay.getCash);
 app.get('/getEcashUrl', [auth.canAccess],gameplay.getEcashUrl);
 app.get('/ecash_validate', [auth.canAccess],gameplay.EcashValidate);
 app.get('/bet_info/:game_id',[auth.canAccess],gameplay.bet_info);

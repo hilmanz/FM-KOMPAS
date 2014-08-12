@@ -625,7 +625,7 @@ class MerchandisesController extends AppController {
 			if($this->request->data['payment_method']=='coins'){
 				//cek user if CANT_USE_COIN 
 				$users = $this->User->findByFb_id($this->userData['fb_id']);
-				$rs_banned = $this->Game->query("SELECT * FROM fantasy.banned_users
+				$rs_banned = $this->Game->query("SELECT * FROM ".Configure::read('FRONTEND_SCHEMA').".banned_users
 												WHERE user_id = '{$users['User']['id']}'
 												AND banned_type = 'CANT_USE_COIN' LIMIT 1");
 				if(count($rs_banned) != 0)
@@ -1100,22 +1100,22 @@ class MerchandisesController extends AppController {
 					$result['order_id'] = $this->MerchandiseOrder->id;
 					//time to deduct the money
 					$this->Game->query("
-					INSERT IGNORE INTO ".$_SESSION['ffgamedb'].".game_transactions
-					(game_team_id,transaction_name,transaction_dt,amount,
+					INSERT IGNORE INTO ".Configure::read('FRONTEND_SCHEMA').".game_transactions
+					(fb_id,transaction_name,transaction_dt,amount,
 					 details)
 					VALUES
-					({$data['game_team_id']},'purchase_{$data['po_number']}',
+					({$data['fb_id']},'purchase_{$data['po_number']}',
 						NOW(),
 						-{$total_coins},
 						'{$data['po_number']} - {$result['order_id']}');");
 					
 					//update cash summary
-					$this->Game->query("INSERT INTO ".$_SESSION['ffgamedb'].".game_team_cash
-					(game_team_id,cash)
-					SELECT game_team_id,SUM(amount) AS cash 
-					FROM ".$_SESSION['ffgamedb'].".game_transactions
-					WHERE game_team_id = {$data['game_team_id']}
-					GROUP BY game_team_id
+					$this->Game->query("INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_team_cash
+					(fb_id,cash)
+					SELECT fb_id,SUM(amount) AS cash 
+					FROM ".Configure::read('FRONTEND_SCHEMA').".game_transactions
+					WHERE fb_id = {$data['fb_id']}
+					GROUP BY fb_id
 					ON DUPLICATE KEY UPDATE
 					cash = VALUES(cash);");
 
@@ -1445,12 +1445,12 @@ class MerchandisesController extends AppController {
 	private function ReduceStock($item_id,$qty=1){
 		try{
 			$item_id = intval($item_id);
-			$sql1 = "UPDATE fantasy.merchandise_items SET stock = stock - {$qty} WHERE id = {$item_id}";
+			$sql1 = "UPDATE ".Configure::read('FRONTEND_SCHEMA').".merchandise_items SET stock = stock - {$qty} WHERE id = {$item_id}";
 			$this->MerchandiseItem->query($sql1);
 
 			Cakelog::write('api_stock', 'Merchandise.ReduceStock type:sql1 sql:'.$sql1);
 
-			$sql2 = "UPDATE fantasy.merchandise_items SET stock = 0 WHERE id = {$item_id} AND stock < 0";
+			$sql2 = "UPDATE ".Configure::read('FRONTEND_SCHEMA').".merchandise_items SET stock = 0 WHERE id = {$item_id} AND stock < 0";
 			$this->MerchandiseItem->query($sql2);
 
 			Cakelog::write('api_stock', 'Merchandise.ReduceStock type:sql2 sql:'.$sql2);
@@ -1534,6 +1534,7 @@ class MerchandisesController extends AppController {
 		$data['merchandise_item_id'] = $this->Session->read('po_item_id');
 		$data['game_team_id'] = $this->userData['team']['id'];
 		$data['user_id'] = $this->userDetail['User']['id'];
+		$data['fb_id'] = $this->userDetail['User']['fb_id'];
 		$data['order_type'] = 1;
 		$data['n_status'] = 0;
 		$data['order_date'] = date("Y-m-d H:i:s");
@@ -1589,22 +1590,22 @@ class MerchandisesController extends AppController {
 				$matchday = $match['matchday'];
 				//time to deduct the money
 				$this->Game->query("
-				INSERT IGNORE INTO ".$_SESSION['ffgamedb'].".game_transactions
-				(game_team_id,transaction_name,transaction_dt,amount,
+				INSERT IGNORE INTO ".Configure::read('FRONTEND_SCHEMA').".game_transactions
+				(fb_id,transaction_name,transaction_dt,amount,
 				 details)
 				VALUES
-				({$data['game_team_id']},'purchase_{$data['po_number']}',
+				({$data['fb_id']},'purchase_{$data['po_number']}',
 					NOW(),
 					-{$item['MerchandiseItem']['price_credit']},
 					'{$data['po_number']} - {$item['MerchandiseItem']['name']}');");
 				
 				//update cash summary
-				$this->Game->query("INSERT INTO ".$_SESSION['ffgamedb'].".game_team_cash
-				(game_team_id,cash)
-				SELECT game_team_id,SUM(amount) AS cash 
-				FROM ".$_SESSION['ffgamedb'].".game_transactions
-				WHERE game_team_id = {$data['game_team_id']}
-				GROUP BY game_team_id
+				$this->Game->query("INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_team_cash
+				(fb_id,cash)
+				SELECT fb_id,SUM(amount) AS cash 
+				FROM ".Configure::read('FRONTEND_SCHEMA').".game_transactions
+				WHERE game_team_id = {$data['fb_id']}
+				GROUP BY fb_id
 				ON DUPLICATE KEY UPDATE
 				cash = VALUES(cash);");
 

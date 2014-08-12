@@ -411,3 +411,6 @@ Configure::write('privateleague_web_dir','/home/duf/node_workspace/fm_2014/web/a
 Configure::write('privateleague_web_url','http://localhost/fm_2014/files/privateleague/');
 
 Configure::write('MINIMUM_INSTRUCTION_POINTS',5);
+
+
+Configure::write('FRONTEND_SCHEMA','fantasy');

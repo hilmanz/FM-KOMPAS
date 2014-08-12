@@ -2116,38 +2116,36 @@ function getTeamResultStats(conn,team_id,callback){
 		}
 	);
 }
-function getCash(game_team_id,done){
+function getCash(fb_id,done){
 	prepareDb(function(conn){
 		async.waterfall([
 			function(callback){
-				conn.query("SELECT cash FROM "+config.database.database+".game_team_cash \
-							WHERE game_team_id=? LIMIT 1;",
-				[game_team_id],
+				conn.query("SELECT cash FROM "+config.database.frontend_schema+".game_team_cash \
+							WHERE fb_id=? LIMIT 1;",
+				[fb_id],
 				function(err,rs){
+					console.log("CASH",S(this.sql).collapseWhitespace().s);
+					console.log('CASH',rs);
 					try{
 						if(rs.length==0){
 							//insert transactions
-							conn.query("INSERT IGNORE INTO "+config.database.database+".game_transactions\
-										(game_team_id,transaction_dt,transaction_name,amount,details)\
-										SELECT ?,NOW(),'OLD_COINS',cash,'OLD COINS'\
-										FROM "+config.database.database+".old_cash a \
-										WHERE EXISTS (SELECT 1 FROM "+config.database.database+".game_teams b\
-										INNER JOIN "+config.database.database+".game_users c ON b.user_id = c.id \
-										WHERE b.id = ? AND c.fb_id = a.fb_id LIMIT 1);",[game_team_id,game_team_id],function(err,rs){
+							conn.query("INSERT IGNORE INTO "+config.database.frontend_schema+".game_transactions\
+										(fb_id,transaction_dt,transaction_name,amount,details)\
+										VALUES(?,NOW(),'START',0,'START')",[fb_id],function(err,rs){
 											
 											//update total cash
-											conn.query("INSERT INTO "+config.database.database+".game_team_cash\
-														(game_team_id,cash)\
-														SELECT game_team_id,SUM(amount) AS cash \
-														FROM "+config.database.database+".game_transactions\
-														WHERE game_team_id = ?\
-														GROUP BY game_team_id\
+											conn.query("INSERT INTO "+config.database.frontend_schema+".game_team_cash\
+														(fb_id,cash)\
+														SELECT fb_id,SUM(amount) AS cash \
+														FROM "+config.database.frontend_schema+".game_transactions\
+														WHERE fb_id = ?\
+														GROUP BY fb_id\
 														ON DUPLICATE KEY UPDATE\
-														cash = VALUES(cash);",[game_team_id],function(err,rs){
+														cash = VALUES(cash);",[fb_id],function(err,rs){
 															
-															conn.query("SELECT cash FROM "+config.database.database+".game_team_cash \
-																WHERE game_team_id=? LIMIT 1;",
-																[game_team_id],function(err,last_rs){
+															conn.query("SELECT cash FROM "+config.database.frontend_schema+".game_team_cash \
+																WHERE fb_id=? LIMIT 1;",
+																[fb_id],function(err,last_rs){
 																	if(last_rs.length > 0){
 																		callback(err,{status:1,cash:last_rs[0].cash});
 																	}else{

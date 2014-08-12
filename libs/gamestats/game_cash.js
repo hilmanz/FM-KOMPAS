@@ -15,14 +15,14 @@ exports.setConfig = function(c){
 	config = c;
 }
 //adding cash
-function adding_cash(conn,game_team_id,transaction_name,amount,details,callback){
-	conn.query("INSERT INTO "+config.database.database+".game_transactions\
-				(game_team_id,transaction_dt,transaction_name,amount,details)\
+function adding_cash(conn,fb_id,transaction_name,amount,details,callback){
+	conn.query("INSERT INTO "+config.database.frontend_schema+".game_transactions\
+				(fb_id,transaction_dt,transaction_name,amount,details)\
 				VALUES\
 				(?,NOW(),?,?,?)\
 				ON DUPLICATE KEY UPDATE\
 				amount = VALUES(amount);",
-				[game_team_id,transaction_name,amount,details],
+				[fb_id,transaction_name,amount,details],
 				function(err,rs){
 					console.log(S(this.sql).collapseWhitespace().s);
 					callback(err,rs);
@@ -32,15 +32,15 @@ function adding_cash(conn,game_team_id,transaction_name,amount,details,callback)
 exports.adding_cash = adding_cash;
 
 //updating the team's cash wallet by summing all cash amounts
-function update_cash_summary(conn,game_team_id,callback){
-	conn.query("INSERT INTO "+config.database.database+".game_team_cash\
-				(game_team_id,cash)\
-				SELECT game_team_id,SUM(amount) AS cash \
-				FROM "+config.database.database+".game_transactions\
-				WHERE game_team_id = ?\
-				GROUP BY game_team_id\
+function update_cash_summary(conn,fb_id,callback){
+	conn.query("INSERT INTO "+config.database.frontend_schema+".game_team_cash\
+				(fb_id,cash)\
+				SELECT fb_id,SUM(amount) AS cash \
+				FROM "+config.database.frontend_schema+".game_transactions\
+				WHERE fb_id = ?\
+				GROUP BY fb_id\
 				ON DUPLICATE KEY UPDATE\
-				cash = VALUES(cash);",[game_team_id],function(err,rs){
+				cash = VALUES(cash);",[fb_id],function(err,rs){
 					callback(err,rs);
 				});
 }

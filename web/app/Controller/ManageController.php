@@ -333,7 +333,7 @@ class ManageController extends AppController {
 			}
 
 			$a_game_ids = implode(',',$game_ids);
-			/*
+			
 			$sql = "SELECT game_id,home_id,away_id,b.name AS home_name,c.name AS away_name,
 					a.matchday,a.match_date,a.home_score,a.away_score
 					FROM ".$_SESSION['ffgamedb'].".game_fixtures a
@@ -347,22 +347,22 @@ class ManageController extends AppController {
 								WHERE d.game_id = a.game_id 
 								AND d.game_team_id = {$this->userData['team']['id']} LIMIT 1)
 					ORDER BY a.matchday DESC";
-			*/
+			
 		
 			//get the game_id stored in lineup history
 
-			$sql = "SELECT game_id FROM ".$_SESSION['ffgamedb'].".game_team_lineups_history a
-					WHERE game_team_id={$this->userData['team']['id']} GROUP BY game_id;";
-					
+			/*$sql = "SELECT game_id FROM ".$_SESSION['ffgamedb'].".game_team_lineups_history a
+					WHERE game_team_id={$this->userData['team']['id']} GROUP BY game_id;";*/
+				
 			$current_game_ids = $this->Game->query($sql,false);
 
 			$gids = array();
 			for($i=0;$i<sizeof($current_game_ids);$i++){
 				$gids[] = "'".$current_game_ids[$i]['a']['game_id']."'";
 			}
-		
+			
 			$gids = implode(",",$gids);
-
+			
 			$sql = "SELECT game_id,home_id,away_id,b.name AS home_name,c.name AS away_name,
 					a.matchday,a.match_date,a.home_score,a.away_score
 					FROM ".$_SESSION['ffgamedb'].".game_fixtures a
@@ -887,7 +887,7 @@ class ManageController extends AppController {
 		$minimum_ip = Configure::read('MINIMUM_INSTRUCTION_POINTS');
 
 		$rs = $this->Game->query("SELECT (points+extra_points) as total_points 
-											FROM fantasy.points a
+											FROM ".Configure::read('FRONTEND_SCHEMA').".points a
 											WHERE team_id={$team_id} LIMIT 1");
 
 		$total_points = intval(@$rs[0]['a']['total_points']);

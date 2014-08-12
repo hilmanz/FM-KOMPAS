@@ -82,8 +82,8 @@ class AppController extends Controller {
 			$_SESSION['league'] = 'epl';
 			$_SESSION['ffgamedb'] = 'ffgame';
 			$_SESSION['ffgamestatsdb'] = 'ffgame_stats';
+
 		}
-		
 		/*
 		if($this->request->is('mobile') &&
 			$this->request->params['pass'][0]!='mobile'){
@@ -160,7 +160,7 @@ class AppController extends Controller {
 				$this->userRank = @$point['Point']['rank'];
 
 				//get recent cash
-				$this->cash = floatval($this->Game->getCash(@$this->userData['team']['id']));
+				$this->cash = floatval($this->Game->getCash(@$this->userDetail['User']['fb_id']));
 				
 				//temporary patch.  remove it after next match.
 				if($this->userPoints==0){

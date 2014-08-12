@@ -1252,7 +1252,7 @@ class ApiController extends AppController {
 		$income = array(
 						array(
 							'name'=>'Tiket Terjual',
-							'description'=>'ss$'.round($finance['tickets_sold']/$total_items['tickets_sold'],2).
+							'description'=>'ss$'.@round($finance['tickets_sold']/$total_items['tickets_sold'],2).
 											' x '.number_format(@$total_items['tickets_sold']),
 							'total'=>'ss$ '.number_format(@$finance['tickets_sold'])
 						),
@@ -3068,7 +3068,7 @@ class ApiController extends AppController {
 		}
 	}
 	/*
-	* generate ticket voucher, and saves it in fantasy.merchandise_vouchers
+	* generate ticket voucher, and saves it in ".Configure::read('FRONTEND_SCHEMA').".merchandise_vouchers
 	*/
 	private function generateVouchers($order_id,$order_data,$shopping_cart){
 		
@@ -3086,7 +3086,7 @@ class ApiController extends AppController {
 					CakeLog::write('generateVoucher',date("Y-m-d H:i:s")." - ".$order_data['po_number'].' - '.$voucher_code);
 					
 					$sql = "
-					INSERT IGNORE INTO fantasy.merchandise_vouchers
+					INSERT IGNORE INTO ".Configure::read('FRONTEND_SCHEMA').".merchandise_vouchers
 					(merchandise_order_id,merchandise_item_id,voucher_code,created_dt,n_status)
 					VALUES
 					({$order_id},
@@ -3106,7 +3106,7 @@ class ApiController extends AppController {
 	}
 	//test function for generate a voucher
 	private function test_generate_voucher(){
-		$rs = $this->Game->query("SELECT * FROM fantasy.merchandise_orders a WHERE id=388 LIMIT 1");
+		$rs = $this->Game->query("SELECT * FROM ".Configure::read('FRONTEND_SCHEMA').".merchandise_orders a WHERE id=388 LIMIT 1");
 		$data = $rs[0]['a'];
 		$shopping_cart = unserialize($data['data']);
 		
@@ -3133,7 +3133,7 @@ class ApiController extends AppController {
 
 	public function view_voucher($id){
 		$id = intval($id);
-		$this->Game->query("UPDATE fantasy.merchandise_vouchers 
+		$this->Game->query("UPDATE ".Configure::read('FRONTEND_SCHEMA').".merchandise_vouchers 
 							SET n_status = 1 WHERE id = {$id}");
 		$this->layout="ajax";
 		$this->set('response',array('status'=>1));
@@ -3211,10 +3211,10 @@ class ApiController extends AppController {
 	private function ReduceStock($item_id,$qty=1){
 		try{
 			$item_id = intval($item_id);
-			$sql1 = "UPDATE fantasy.merchandise_items SET stock = stock - {$qty} WHERE id = {$item_id}";
+			$sql1 = "UPDATE ".Configure::read('FRONTEND_SCHEMA').".merchandise_items SET stock = stock - {$qty} WHERE id = {$item_id}";
 			$this->MerchandiseItem->query($sql1);
 
-			$sql2 = "UPDATE fantasy.merchandise_items SET stock = 0 WHERE id = {$item_id} AND stock < 0";
+			$sql2 = "UPDATE ".Configure::read('FRONTEND_SCHEMA').".merchandise_items SET stock = 0 WHERE id = {$item_id} AND stock < 0";
 			$this->MerchandiseItem->query($sql2);
 			CakeLog::write('api_stock','Api.ReduceStock sql1:'.$sql1);
 			CakeLog::write('api_stock','Api.ReduceStock sql2:'.$sql2);
@@ -3281,6 +3281,7 @@ class ApiController extends AppController {
 			$data['merchandise_item_id'] = 0;
 			$data['game_team_id'] = $game_team_id;
 			$data['user_id'] = 0;
+
 			$data['order_type'] = 1;
 
 			if($all_digital){
@@ -3305,22 +3306,22 @@ class ApiController extends AppController {
 				$result['order_id'] = $this->MerchandiseOrder->id;
 				//time to deduct the money
 				$this->Game->query("
-				INSERT IGNORE INTO ".$_SESSION['ffgamedb'].".game_transactions
-				(game_team_id,transaction_name,transaction_dt,amount,
+				INSERT IGNORE INTO ".Configure::read('FRONTEND_SCHEMA').".game_transactions
+				(fb_id,transaction_name,transaction_dt,amount,
 				 details)
 				VALUES
-				({$game_team_id},'purchase_{$data['po_number']}',
+				({$data['fb_id']},'purchase_{$data['po_number']}',
 					NOW(),
 					-{$total_coins},
 					'{$data['po_number']} - {$result['order_id']}');");
 				
 				//update cash summary
-				$this->Game->query("INSERT INTO ".$_SESSION['ffgamedb'].".game_team_cash
-				(game_team_id,cash)
-				SELECT game_team_id,SUM(amount) AS cash 
-				FROM ".$_SESSION['ffgamedb'].".game_transactions
-				WHERE game_team_id = {$game_team_id}
-				GROUP BY game_team_id
+				$this->Game->query("INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_team_cash
+				(fb_id,cash)
+				SELECT fb_id,SUM(amount) AS cash 
+				FROM ".Configure::read('FRONTEND_SCHEMA').".game_transactions
+				WHERE fb_id = {$data['fb_id']}
+				GROUP BY fb_id
 				ON DUPLICATE KEY UPDATE
 				cash = VALUES(cash);");
 
@@ -3594,10 +3595,10 @@ class ApiController extends AppController {
 				b.po_number,
 				c.data,
 				c.parent_id as item_parent_id
-				FROM fantasy.merchandise_vouchers a
-				INNER JOIN fantasy.merchandise_orders b
+				FROM ".Configure::read('FRONTEND_SCHEMA').".merchandise_vouchers a
+				INNER JOIN ".Configure::read('FRONTEND_SCHEMA').".merchandise_orders b
 				ON a.merchandise_order_id = b.id 
-				INNER JOIN fantasy.merchandise_items c
+				INNER JOIN ".Configure::read('FRONTEND_SCHEMA').".merchandise_items c
 				ON a.merchandise_item_id = c.id
 				WHERE a.merchandise_order_id = {$order_id} LIMIT 100";
 		$voucher = $this->Game->query($sql);
@@ -4086,20 +4087,20 @@ class ApiController extends AppController {
 				}
 				$transaction_name = 'PLACE_BET_'.$game_id;
 				$bet_cost = abs(intval($total_bets)) * -1;
-				$sql = "INSERT INTO ".$_SESSION['ffgamedb'].".game_transactions
-						(game_team_id,transaction_dt,transaction_name,amount,details)
+				$sql = "INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_transactions
+						(fb_id,transaction_dt,transaction_name,amount,details)
 						VALUES
-						('{$game_team_id}',NOW(),'{$transaction_name}',{$bet_cost},'deduction')
+						('{$data['fb_id']}',NOW(),'{$transaction_name}',{$bet_cost},'deduction')
 						ON DUPLICATE KEY UPDATE
 						amount = VALUES(amount);";
 				$this->Game->query($sql,false);
 				CakeLog::write('error',$sql);
-				$sql = "INSERT INTO ".$_SESSION['ffgamedb'].".game_team_cash
-						(game_team_id,cash)
-						SELECT game_team_id,SUM(amount) AS cash 
-						FROM ".$_SESSION['ffgamedb'].".game_transactions
-						WHERE game_team_id = {$game_team_id}
-						GROUP BY game_team_id
+				$sql = "INSERT INTO ".Configure::read('FRONTEND_SCHEMA').".game_team_cash
+						(fb_id,cash)
+						SELECT fb_id,SUM(amount) AS cash 
+						FROM ".Configure::read('FRONTEND_SCHEMA').".game_transactions
+						WHERE fb_id = {$data['fb_id']}
+						GROUP BY fb_id
 						ON DUPLICATE KEY UPDATE
 						cash = VALUES(cash);";
 				$this->Game->query($sql,false);
@@ -4881,11 +4882,11 @@ class ApiController extends AppController {
 		}
 	}
 	private function reduceAgentStock($agent_id,$item_id,$qty){
-		return $this->Game->query("UPDATE fantasy.agent_items SET qty = qty - {$qty} 
+		return $this->Game->query("UPDATE ".Configure::read('FRONTEND_SCHEMA').".agent_items SET qty = qty - {$qty} 
 							WHERE agent_id={$agent_id} AND merchandise_item_id={$item_id}");
 	}
 	/*
-	* generate ticket voucher, and saves it in fantasy.merchandise_vouchers
+	* generate ticket voucher, and saves it in ".Configure::read('FRONTEND_SCHEMA').".merchandise_vouchers
 	*/
 	private function generateAgentVouchers($agent_id,$order_id,$po_number,$item_id,$qty){
 		
@@ -4898,7 +4899,7 @@ class ApiController extends AppController {
 				CakeLog::write('generateAgentVoucher',date("Y-m-d H:i:s")." - ".$po_number.' - '.$voucher_code);
 				
 				$sql = "
-				INSERT IGNORE INTO fantasy.agent_vouchers
+				INSERT IGNORE INTO ".Configure::read('FRONTEND_SCHEMA').".agent_vouchers
 				(agent_id,agent_order_id,merchandise_item_id,voucher_code,created_dt,n_status)
 				VALUES
 				({$agent_id},
@@ -4920,10 +4921,10 @@ class ApiController extends AppController {
 	private function getAgentRequestHistory($agent_id,$start,$total){
 		$this->loadModel('AgentRequest');
 		$rs = $this->AgentRequest->query("SELECT * FROM 
-											fantasy.agent_requests a
-											INNER JOIN fantasy.merchandise_items b
+											".Configure::read('FRONTEND_SCHEMA').".agent_requests a
+											INNER JOIN ".Configure::read('FRONTEND_SCHEMA').".merchandise_items b
 											ON a.merchandise_item_id = b.id
-											INNER JOIN fantasy.merchandise_items c
+											INNER JOIN ".Configure::read('FRONTEND_SCHEMA').".merchandise_items c
 											ON b.parent_id = c.id
 											WHERE a.agent_id = {$agent_id}
 											LIMIT {$start},{$total};");
@@ -4944,8 +4945,8 @@ class ApiController extends AppController {
 	private function getAgentOrders($agent_id,$start,$total){
 		$this->loadModel('AgentRequest');
 		$this->loadModel('MerchandiseItem');
-		$rs = $this->AgentRequest->query("SELECT * FROM fantasy.agent_vouchers a
-											INNER JOIN fantasy.agent_orders b
+		$rs = $this->AgentRequest->query("SELECT * FROM ".Configure::read('FRONTEND_SCHEMA').".agent_vouchers a
+											INNER JOIN ".Configure::read('FRONTEND_SCHEMA').".agent_orders b
 											ON a.agent_order_id = b.id
 											WHERE a.agent_id = {$agent_id} 
 											ORDER BY a.id DESC LIMIT {$start},{$total};");
@@ -4998,7 +4999,7 @@ class ApiController extends AppController {
 			//reduce agent stock
 			$this->reduceAgentStock($agent_id,$item_id,$qty);
 			//increase ss stock
-			$this->Game->query("UPDATE fantasy.merchandise_items SET stock = stock + {$qty} 
+			$this->Game->query("UPDATE ".Configure::read('FRONTEND_SCHEMA').".merchandise_items SET stock = stock + {$qty} 
 								WHERE id={$item_id}");
 			return $rs['AgentReturnedStock'];	
 		}else{
@@ -5022,10 +5023,10 @@ class ApiController extends AppController {
 		$rs = $this->Game->query("SELECT a.id,a.parent_id,a.name,a.description,a.price_money as price,
 							b.qty,b.n_status,c.name AS parent_name,
 							c.description AS parent_description,a.data,1 AS agent_id
-							FROM fantasy.merchandise_items a
-							LEFT JOIN fantasy.agent_items b
+							FROM ".Configure::read('FRONTEND_SCHEMA').".merchandise_items a
+							LEFT JOIN ".Configure::read('FRONTEND_SCHEMA').".agent_items b
 							ON a.id = b.merchandise_item_id AND b.agent_id = {$agent_id}
-							INNER JOIN fantasy.merchandise_items c
+							INNER JOIN ".Configure::read('FRONTEND_SCHEMA').".merchandise_items c
 							ON a.parent_id = c.id
 							WHERE a.merchandise_category_id= ".Configure::read('ticket_category_id')." 
 							AND a.parent_id NOT IN (0,1300,1301) AND a.n_status = 1 LIMIT 1000;");

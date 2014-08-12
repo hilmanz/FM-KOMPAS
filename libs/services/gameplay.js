@@ -48,7 +48,7 @@ exports.getTransferWindow = function(req,res){
 	});
 }
 exports.getCash = function(req,res){
-	gameplay.getCash(req.params.game_team_id,function(err,rs){
+	gameplay.getCash(req.params.fb_id,function(err,rs){
 		if(rs!=null){
 			
 			res.json(200,rs);

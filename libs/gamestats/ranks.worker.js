@@ -815,7 +815,7 @@ function distribute_weekly_cash(conn,teams,matchday,done){
 						}
 						//adding cash
 						cash.adding_cash(conn,
-							team.game_team_id,
+							team.fb_id,
 							team.game_team_id+'_matchday_'+last_matchday,
 							Math.floor(parseFloat(points.total_points) * cash_bonus),
 							'weekly cash',
@@ -830,7 +830,7 @@ function distribute_weekly_cash(conn,teams,matchday,done){
 					function(c){
 						console.log('Weekly_cash','updating #',team.game_team_id,' matchday#',last_matchday);
 						//updating the team's cash
-						cash.update_cash_summary(conn,team.game_team_id,function(err,rs){
+						cash.update_cash_summary(conn,team.fb_id,function(err,rs){
 							c(err);
 						});
 					}

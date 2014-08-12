@@ -172,7 +172,7 @@ class PrivateleagueController extends AppController {
 		$rs_user 	= $this->User->findByFb_id($userData['fb_id']);
 		$email 		= $rs_user['User']['email'];
 
-		$rs_league = $this->League->query("SELECT * FROM fantasy.league_invitations a 
+		$rs_league = $this->League->query("SELECT * FROM ".Configure::read('FRONTEND_SCHEMA').".league_invitations a 
 											INNER JOIN league b ON a.league_id = b.id 
 											INNER JOIN users c ON b.user_id = c.id 
 											WHERE a.email = '{$email}' AND a.n_status = 0

@@ -39,12 +39,16 @@
                                         href="<?=$this->Html->url('/privateleague/leaderboard')?>">
                                             Peringkat
                                         </a>
+                                        <a class="button" 
+                                        href="<?=$this->Html->url('/privateleague/config')?>">
+                                            Atur Liga
+                                        </a>
                                     </td>
                                 </tr>
                             <?php $i++; endforeach; ?>
                         <?php else: ?>
                             <tr class="odd">
-                                <td colspan="5">Loe belom punya private league.</td>
+                                <td colspan="6">Loe belom punya private league.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -52,13 +56,5 @@
                 </form>
 			</div><!-- end .content -->
         </div><!-- end #content -->
-	<div id="sidebar" class="tr">
-	    
-	    <div class="widget">
-	        <div class="cash-left">
-	        </div>
-	    </div><!-- end .widget -->
-       
-	</div><!-- end #sidebar -->
     </div><!-- end #thecontent -->
 </div><!-- end #fillDetailsPage -->

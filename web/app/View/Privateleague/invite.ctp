@@ -41,7 +41,7 @@
 </div><!-- end #fillDetailsPage -->
 <script type="text/javascript">
   $('#add_email').on('click', function(e){
-    $('#t_email').prepend('<div class="row">\
+    $('#t_email').append('<div class="row">\
                         <label>Email</label>\
                         <input id="email" type="text" name="email[]" value="" maxlength="30"/>\
                     </div>');

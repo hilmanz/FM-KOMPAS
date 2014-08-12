@@ -61,9 +61,10 @@ class EmailConfig {
 	public $smtp = array(
 		'transport' => 'Smtp',
 	    'host' => 'ssl://smtp.gmail.com',
-	    'port' => 456,
-	    'username' => 'soccerdesk@supersoccer.co.id',
-	    'password' => '1q2w3e4r5t'
+	    'port' => 465,
+	    'username' => 'noreplysupersoccer@gmail.com',
+	    'password' => 'gatotkaca',
+	    'log' => true,
 	);
 
 

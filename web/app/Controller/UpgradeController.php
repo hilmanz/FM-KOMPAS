@@ -18,7 +18,7 @@ class UpgradeController extends AppController {
 		parent::beforeFilter();
 		$this->loadModel('Game');
 		$this->loadModel('User');
-		$this->loadModel('GameTransaction');
+		$this->loadModel('MembershipTransactions');
 		if(!$this->hasTeam()){
 			$this->redirect('/login/expired');
 		}
@@ -72,24 +72,22 @@ class UpgradeController extends AppController {
 				try{
 					$dataSource = $this->User->getDataSource();
 					$dataSource->begin();
-					$rs_user = $this->User->findByFb_id($userData['fb_id']);
-					$user_id = $rs_user['User']['id'];
 					$save_data = array(
-										'user_id' => $user_id,
+										'fb_id' => $userData['fb_id'],
 										'transaction_dt' => date("Y-m-d H:i:s"),
 										'transaction_name' => $transaction_name,
 										'transaction_type' => 'UPGRADE MEMBER',
 										'amount' => 10000,
 										'details' => $detail
 									);
-					$this->GameTransaction->save($save_data);
-					$this->GameTransaction->query("INSERT INTO member_billings
-												(user_id,log_dt,expire)
-												VALUES('{$user_id}',
+					$this->MembershipTransactions->save($save_data);
+					$this->MembershipTransactions->query("INSERT INTO member_billings
+												(fb_id,log_dt,expire)
+												VALUES('{$userData['fb_id']}',
 														NOW(), NOW() + INTERVAL 1 MONTH)");
 
 					$this->User->query("UPDATE users SET paid_member=1,paid_member_status=1 
-										WHERE id='{$user_id}'");
+										WHERE fb_id='{$userData['fb_id']}'");
 
 					$dataSource->commit();
 				}catch(Exception $e){
@@ -160,22 +158,21 @@ class UpgradeController extends AppController {
 				try{
 					$dataSource = $this->User->getDataSource();
 					$dataSource->begin();
-					$rs_user = $this->User->findByFb_id($userData['fb_id']);
-					$user_id = $rs_user['User']['id'];
 					$save_data = array(
-										'user_id' => $user_id,
+										'fb_id' => $userData['fb_id'],
 										'transaction_dt' => date("Y-m-d H:i:s"),
 										'transaction_name' => $transaction_name,
 										'transaction_type' => 'RENEWAL MEMBER',
 										'amount' => 10000,
 										'details' => $detail
 									);
-					$this->GameTransaction->save($save_data);
-					$this->GameTransaction->query("UPDATE member_billings
+					$this->MembershipTransactions->save($save_data);
+					$this->MembershipTransactions->query("UPDATE member_billings
 												SET log_dt=NOW(),expire=NOW() + INTERVAL 1 MONTH
-												WHERE user_id='{$user_id}'");
+												WHERE fb_id='{$userData['fb_id']}'");
 					
-					$this->User->query("UPDATE users SET paid_member_status=1 WHERE id='{$user_id}'");
+					$this->User->query("UPDATE users SET paid_member_status=1 
+										WHERE fb_id='{$userData['fb_id']}'");
 
 					$dataSource->commit();
 				}catch(Exception $e){

@@ -461,27 +461,25 @@ ALTER TABLE `fantasy`.`points` DROP KEY `UNIQUE_TEAM`, ADD UNIQUE `UNIQUE_TEAM` 
 ALTER TABLE `fantasy`.`users` 
 ADD UNIQUE INDEX `UNIQUE_FB_ID` (`fb_id` ASC);
 
-CREATE TABLE `game_transactions` (
+CREATE TABLE `member_billings` (
   `id` bigint(21) NOT NULL AUTO_INCREMENT,
-  `user_id` bigint(21) DEFAULT NULL,
+  `fb_id` varchar(140) DEFAULT NULL,
+  `log_dt` datetime DEFAULT NULL,
+  `expire` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `membership_transactions` (
+  `id` bigint(21) NOT NULL AUTO_INCREMENT,
+  `fb_id` varchar(140) DEFAULT NULL,
   `transaction_dt` datetime DEFAULT NULL,
   `transaction_name` varchar(140) DEFAULT NULL,
   `transaction_type` varchar(20) DEFAULT NULL,
   `amount` int(11) DEFAULT '0',
   `details` text,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UNIQUE_TRANSACTION` (`user_id`,`transaction_name`)
+  UNIQUE KEY `UNIQUE_TRANSACTION` (`fb_id`,`transaction_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE `member_billings` (
-  `id` bigint(21) NOT NULL AUTO_INCREMENT,
-  `user_id` bigint(21) DEFAULT NULL,
-  `log_dt` datetime DEFAULT NULL,
-  `expire` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-
 
 CREATE TABLE fantasy.game_team_cash (
   `id` bigint(21) NOT NULL AUTO_INCREMENT,
@@ -502,4 +500,4 @@ CREATE TABLE fantasy.game_transactions (
   `details` varchar(140) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQUE_TRANSACTION` (`transaction_name`,`fb_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

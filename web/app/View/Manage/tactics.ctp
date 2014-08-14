@@ -154,24 +154,17 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
             </div><!-- end .widget -->
             <div class="widget tr squad-team-name">
                 <h3>HOW TO USE TACTICS</h3>
-                <ul>
+                <ol>
                     <li>
-                        Lorem ipsum dolor sit amet
+                        1. Pilih pemain yang akan elo kasih Instruksi Taktik
                     </li>
                     <li>
-                        Lorem ipsum dolor sit amet
+                        2. Pilih Instruksi apa yang akan elo kasih ke pemain
                     </li>
                     <li>
-                        Lorem ipsum dolor sit amet
+                        3. Isi poin dengan Instruction Points maksimal 5 points per pemain
                     </li>
-                    <li>
-                        Lorem ipsum dolor sit amet
-                    </li>
-                    <li>
-                        Lorem ipsum dolor sit amet
-                    </li>
-
-                </ul>
+                </ol>
             </div><!-- end .widget -->
         </div><!-- end .box4 -->
     </div><!-- end #thecontent -->
@@ -194,6 +187,21 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
 
 
 <script>
+$(document).ready(function(){
+    var max_inspoint = <?=$INSTRUCTION_POINTS?>;
+    var total_point  = 0;
+    $('input[name="points[]"]').each(function(){
+        var points = Math.abs($(this).val());
+        if(points == ''){
+            points = 0;
+        }
+        total_point = total_point + points;
+    });
+
+    $('#point_left').html(max_inspoint - total_point);
+
+});
+
 $(".btn-save-tactic").click(function(){
     var max_inspoint = <?=$INSTRUCTION_POINTS?>;
     var total_point  = 0;
@@ -211,7 +219,7 @@ $(".btn-save-tactic").click(function(){
     }
 });
 
-$('input[name="points[]"]').on('change',function(e){
+$('input[name="points[]"]').on('keyup',function(e){
     
     var max_point = 5;
     var max_inspoint = <?=$INSTRUCTION_POINTS?>;
@@ -240,6 +248,6 @@ $('input[name="points[]"]').on('change',function(e){
     }else{
         $('#point_left').html(max_inspoint - total_point);
     }
- 
+
 });
 </script>

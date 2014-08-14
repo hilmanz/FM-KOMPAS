@@ -31,7 +31,7 @@ if(typeof argv.league !== 'undefined'){
 }
 
 
-console.log(config);
+
 
 
 //our api libs

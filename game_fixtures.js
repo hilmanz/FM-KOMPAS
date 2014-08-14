@@ -1,5 +1,5 @@
 /**
-populating the ffgame.game_fixtures
+populating the "+config.database.database+".game_fixtures
 **/
 /////THE MODULES/////////
 var fs = require('fs');
@@ -11,6 +11,22 @@ var master = require('./libs/master');
 var async = require('async');
 var mysql = require('mysql');
 /////DECLARATIONS/////////
+
+var argv = require('optimist').argv;
+
+
+if(typeof argv.league !== 'undefined'){
+	switch(argv.league){
+		case 'ita':
+			console.log('Serie A Activated');
+			config = require('./config.ita').config;
+		break;
+		default:
+			console.log('EPL Activated');
+			config = require('./config').config;
+		break;
+	}
+}
 var FILE_PREFIX = config.updater_file_prefix+config.competition.id+'-'+config.competition.year;
 
 
@@ -45,7 +61,7 @@ function(err,result){
 });
 
 /*
-INSERT INTO ffgame.game_fixtures
+INSERT INTO "+config.database.database+".game_fixtures
 (game_id,home_id,away_id,period,matchday,competition_id,session_id,home_score,away_score,attendance,is_dummy,is_processed,match_date)
 VALUES
 (?,?,?,?,?,?,?,?,?,?,?,?,?)
@@ -68,7 +84,7 @@ function process_match_data(conn,competition_id,session_id,data,done){
 			//console.log(team);
 			//callback();
 			
-			conn.query("INSERT INTO ffgame.game_fixtures\
+			conn.query("INSERT INTO "+config.database.database+".game_fixtures\
 						(game_id,home_id,away_id,period,matchday,competition_id,\
 						session_id,home_score,away_score,attendance,is_dummy,is_processed,\
 						match_date)\
@@ -134,7 +150,7 @@ function handleError(err){
 	done(err,'<xml><error>1</error></xml>');
 }
 /*
-conn.query("SELECT * FROM ffgame.game_fixtures \
+conn.query("SELECT * FROM "+config.database.database+".game_fixtures \
 		WHERE is_processed=0 \
 		ORDER BY id ASC LIMIT 100;",[],
 		function(err,games){

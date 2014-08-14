@@ -203,10 +203,10 @@ function processHomeTeams(since_id,until_id,start,limit,team_id,game_id,rank,awa
 										async.waterfall([
 											function(cb){
 												//no need to calculate the home revenue in brazil edition
-												/*calculate_home_revenue_stats(team,game_id,game,rank,away_rank,function(err){
+												calculate_home_revenue_stats(team,game_id,game,rank,away_rank,function(err){
 													cb(err);
-												});*/
-												cb(null);
+												});
+												
 											},
 											function(cb){
 												punishment.execute_punishment(conn,
@@ -257,11 +257,11 @@ function processAwayTeams(since_id,until_id,start,limit,team_id,game_id,rank,awa
 										async.waterfall([
 											function(cb){
 												//brazil edition - no need to calculate away revenue
-												/*
+												
 												calculate_away_revenue_stats(team,game_id,game,rank,away_rank,function(err){
 													cb(err);		
-												});*/
-												cb(null);
+												});
+												
 											},
 											function(cb){
 												punishment.execute_punishment(conn,
@@ -611,7 +611,7 @@ function calculate_away_revenue_stats(team,game_id,game,rank,away_rank,done){
 				function(player_salaries,officials,callback){
 					console.log(officials);
 
-					//7. Player Salaries (to be added soon)
+					//7. Player Salaries
 					console.log('player salaries : ',player_salaries);
 					costs.push({name:'player_salaries',value:player_salaries,total:1});
 					//8. Official Salaries

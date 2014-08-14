@@ -32,9 +32,6 @@ var stat_maps = require('./libs/stats_map').getStats();
 
 var match_results = require('./libs/match_results');
 //var match_results = require('./libs/match_results_dummy');
-var lineup_stats = require('./libs/gamestats/lineup_stats');
-var business_stats = require('./libs/gamestats/business_stats');
-var ranks = require(path.resolve('./libs/gamestats/ranks'));
 var league = 'epl';
 var argv = require('optimist').argv;
 var config = require('./config').config;
@@ -96,7 +93,6 @@ function generateReports(games){
 		console.log('Done updating master stats and distributing the job');
 		pool.end(function(err){
 			match_results.done();
-			business_stats.done();
 			console.log('closing redis connection');
 			redisClient.quit();
 		});

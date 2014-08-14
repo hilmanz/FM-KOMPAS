@@ -2621,6 +2621,16 @@ table.dataTable{
 	height:915px;
 	margin:0 0 0 20px;
 }
+#tacticBox{
+	
+	padding:0 10px;
+}
+#tacticBox.box3{
+	width:420px;
+}
+#tacticBox input[type="text"]{
+	width:50%;
+}
 #boxSquad{
 	float:left;
 	margin:0 0 0 20px;
@@ -2805,4 +2815,14 @@ input[type=text], input[type="password"]{
 	box-shadow:0 2px 2px rgba(0,0,0,0.25) inset,1px 1px 1px rgba(255,125,124,0.2);
 	color:#fff;
 	height:20px;
+}
+
+#pilih-liga{
+	width:460px;
+	float:left;
+	margin:10px;
+}
+#pilih-liga img{
+	width:100%;
+	margin-bottom:20px;
 }

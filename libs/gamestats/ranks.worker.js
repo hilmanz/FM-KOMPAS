@@ -806,7 +806,7 @@ function distribute_weekly_cash(conn,teams,matchday,done){
 									});
 					},
 					function(points,c){
-						var cash_bonus = 10;
+						var cash_bonus = 2;
 						console.log('Weekly_cash','adding #',team.game_team_id,' matchday#',last_matchday,
 									 'points:',points.total_points, 'cash bonus : ',cash_bonus);
 

@@ -89,7 +89,8 @@ exports.apply_bonus = function(conn,game_team_id,player_id,new_stats,matchday,do
 				async.eachSeries(bonuses,function(bonus,next){
 					saveExtraPoint(conn,game_id,matchday,game_team_id,
 									'tactical_'+player_id+'_'+bonus.stats,
-									bonus.point,function(err,rs){
+									(bonus.point * bonus.value),
+									function(err,rs){
 
 										next();
 									});

@@ -20,8 +20,8 @@ var transport = nodemailer.createTransport("SMTP",{
 										    	secureConnection: true, // use SSL
 										    	port: 465, // port for secure SMTP
 										    	auth: {
-										        	user: "AKIAJYPEIMSEIVGQHNTA",
-										        	pass: "AqkTdt3g+a6jKvD6zYNUkLDnNwjskCkBQ4Joe7tpo9tP"
+										        	user: "AKIAIVAZ23POJSA74BRQ",
+										        	pass: "AtqAGkYl4FCvih1yQ7P/uu6qt3GyV4v9RIg77F29aIbM"
 										    	}
 										    });
 var sleep = require('sleep');
@@ -106,7 +106,8 @@ function runLoop(){
 								}
 							},
 						function (error, response, body) {
-							
+							console.log(response);
+							console.log(body);
 						  if (!error && response.statusCode == 200) {
 						  	
 						    var resp = JSON.parse(body);
@@ -215,18 +216,18 @@ function runLoop(){
 			}
 		],
 		function(err,rs){
-			conn.end(function(err){
-				if(rs==null || (total_sent >= send_limit)){
-					if(total_sent >= send_limit){
-						console.log('Sending limit reached :( ---> ',total_sent);
-					}
-					pool.end(function(err){
-						
-					});
-				}else{
-					runLoop();	
+			conn.release();
+			if(rs==null || (total_sent >= send_limit)){
+				if(total_sent >= send_limit){
+					console.log('Sending limit reached :( ---> ',total_sent);
 				}
-			});
+				pool.end(function(err){
+					
+				});
+			}else{
+				runLoop();	
+			}
+			
 		});
 	});
 }

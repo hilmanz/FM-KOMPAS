@@ -54,7 +54,7 @@ var http = require('http');
 var match_results = require('./libs/match_results');
 var lineup_stats = require('./libs/gamestats/lineup_stats.worker');
 var business_stats = require('./libs/gamestats/business_stats.worker');
-var ranks = require(path.resolve('./libs/gamestats/ranks'));
+var ranks = require(path.resolve('./libs/gamestats/ranks.worker'));
 
 
 

@@ -61,7 +61,7 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
         	
             
         </div><!-- end .box4 -->
-        <div class="box3 tr fl" id="formationBox">
+        <div class="box3 tr fl" id="tacticBox">
             <h3>
                 Set Up Tactics for Matchday <?=$next_match['matchday']?>
             </h3>
@@ -71,7 +71,7 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
             </div>
             <?php endif;?>
             <form id="frmTactic" action="<?=$this->Html->url('/manage/tactics')?>" method="POST" enctype="application/x-www-form-urlencoded">
-                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
                     <thead>
                         <tr>
                             <th width="160px" align="center">Pemain</th>

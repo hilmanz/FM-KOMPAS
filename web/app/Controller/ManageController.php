@@ -844,6 +844,17 @@ class ManageController extends AppController {
 				
 		$total_spend = 0;
 		for($i=0;$i<sizeof($this->request->data['instruction']);$i++){
+			
+			//maksimal instruction poin yang bisa dibagikan hanya 5pts
+			$this->request->data['points'][$i] = intval($this->request->data['points'][$i]);
+			if($this->request->data['points'][$i] > 5){
+				$this->request->data['points'][$i] = 5;
+			}else if($this->request->data['points'][$i] < 0){
+				$this->request->data['points'][$i] = 0;
+			}else{
+				//do nothing
+			}
+			
 			$total_spend += $this->request->data['points'][$i];
 			if($i>0){
 				$sql.=",";
@@ -875,8 +886,12 @@ class ManageController extends AppController {
 											FROM ".$_SESSION['ffgamedb'].".game_fixtures GROUP BY matchday) a 
 											WHERE match_status = 0 ORDER BY matchday ASC LIMIT 1;");
 		
-	
-		$upcoming_matchday = $check[0]['a']['matchday'];
+		try{
+			$upcoming_matchday = @$check[0]['a']['matchday'];
+		}catch(Exception $e){
+			$upcoming_matchday = 0;
+		}
+		
 		return $upcoming_matchday;
 	}
 	// instruction points is 1% of the average weekly points
@@ -888,22 +903,31 @@ class ManageController extends AppController {
 
 		$rs = $this->Game->query("SELECT (points+extra_points) as total_points 
 											FROM ".Configure::read('FRONTEND_SCHEMA').".points a
-											WHERE team_id={$team_id} LIMIT 1");
+											WHERE team_id={$team_id} 
+											AND league = '{$_SESSION['league']}' 
+											LIMIT 1");
 
-		$total_points = intval(@$rs[0]['a']['total_points']);
+		
+		
+		$total_points = intval(@$rs[0][0]['total_points']);
+
+		
 		$total_matches =  $this->Game->query("SELECT matchday FROM ".$_SESSION['ffgamedb'].".game_fixtures a
 											 WHERE period='FullTime' AND is_processed = 1 
 											 ORDER BY matchday DESC LIMIT 1;");
 
 		$total_matchday = intval(@$total_matches[0]['a']['matchday']);
+		
+
 		if($total_matchday > 0){
 			$average_points = round($total_points / $total_matchday);	
 		}else{
 			$average_points = 0;
 		}
 		
-
-		$instruction_points = $average_points * 0.01;
+		
+		$instruction_points = round($average_points * 0.05);
+		
 		if($instruction_points < $minimum_ip){
 			$instruction_points = $minimum_ip;
 		}
@@ -911,6 +935,9 @@ class ManageController extends AppController {
 	}
 
 	private function getCurrentTactics($upcoming_matchday){
+		if($upcoming_matchday==null){
+			$upcoming_matchday = 0;
+		}
 		$game_team_id = $this->userData['team']['id'];
 		$sql = "SELECT * FROM ".$_SESSION['ffgamedb'].".game_team_instructions a
 				WHERE game_team_id = {$game_team_id} 

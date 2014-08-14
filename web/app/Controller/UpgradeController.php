@@ -19,6 +19,7 @@ class UpgradeController extends AppController {
 		$this->loadModel('Game');
 		$this->loadModel('User');
 		$this->loadModel('MembershipTransactions');
+		$this->loadModel('Team');
 		if(!$this->hasTeam()){
 			$this->redirect('/login/expired');
 		}
@@ -33,7 +34,7 @@ class UpgradeController extends AppController {
 	
 	public function index()
 	{
-		
+		$this->redirect('/profile');
 	}
 
 	public function member()
@@ -43,10 +44,16 @@ class UpgradeController extends AppController {
 		$transaction_id = intval($rs_user['User']['id']).'-'.date("YmdHis").'-'.rand(0,999);
 		$description = 'Purchase Order #'.$transaction_id;
 
+		$amount = 10000;
+		if($this->checkTotalTeam() > 1)
+		{
+			$amount = 20000;
+		}
+
 		$rs = $this->Game->getEcashUrl(array(
 			'transaction_id'=>$transaction_id,
 			'description'=>$description,
-			'amount'=>10000,
+			'amount'=>$amount,
 			'clientIpAddress'=>$this->request->clientIp(),
 			'source'=>'FMUPGRADE'
 		));
@@ -68,6 +75,11 @@ class UpgradeController extends AppController {
 				$userData = $this->userData;
 				$transaction_name = 'Purchase Order #'.$data[3];
 				$detail = json_encode($rs['data']);
+				$amount = 10000;
+				if($this->checkTotalTeam() > 1)
+				{
+					$amount = 20000;
+				}
 
 				try{
 					$dataSource = $this->User->getDataSource();
@@ -77,7 +89,7 @@ class UpgradeController extends AppController {
 										'transaction_dt' => date("Y-m-d H:i:s"),
 										'transaction_name' => $transaction_name,
 										'transaction_type' => 'UPGRADE MEMBER',
-										'amount' => 10000,
+										'amount' => $amount,
 										'details' => $detail
 									);
 					$this->MembershipTransactions->save($save_data);
@@ -123,10 +135,16 @@ class UpgradeController extends AppController {
 			$transaction_id = intval($rs_user['User']['id']).'-'.date("YmdHis").'-'.rand(0,999);
 			$description = 'Purchase Order #'.$transaction_id;
 
+			$amount = 10000;
+			if($this->checkTotalTeam() > 1)
+			{
+				$amount = 20000;
+			}
+
 			$rs = $this->Game->getEcashUrl(array(
 				'transaction_id'=>$transaction_id,
 				'description'=>$description,
-				'amount'=>10000,
+				'amount'=>$amount,
 				'clientIpAddress'=>$this->request->clientIp(),
 				'source'=>'FMRENEWAL'
 			));
@@ -154,6 +172,11 @@ class UpgradeController extends AppController {
 				$userData = $this->userData;
 				$transaction_name = 'Purchase Order #'.$data[3];
 				$detail = json_encode($rs['data']);
+				$amount = 10000;
+				if($this->checkTotalTeam() > 1)
+				{
+					$amount = 20000;
+				}
 
 				try{
 					$dataSource = $this->User->getDataSource();
@@ -163,7 +186,7 @@ class UpgradeController extends AppController {
 										'transaction_dt' => date("Y-m-d H:i:s"),
 										'transaction_name' => $transaction_name,
 										'transaction_type' => 'RENEWAL MEMBER',
-										'amount' => 10000,
+										'amount' => $amount,
 										'details' => $detail
 									);
 					$this->MembershipTransactions->save($save_data);
@@ -193,5 +216,16 @@ class UpgradeController extends AppController {
 			Cakelog::write('error', 'Upgrade.renewal '.$id.'Not Found');
 			$this->render('error');
 		}
+	}
+
+	private function checkTotalTeam()
+	{
+		$userData 	= $this->userData;
+		$rs_user 	= $this->User->findByFb_id($userData['fb_id']);
+		$total_team = $this->Team->find('count', array(
+	        'conditions' => array('Team.user_id' => $rs_user['User']['id'])
+	    ));
+
+	    return $total_team;
 	}
 }

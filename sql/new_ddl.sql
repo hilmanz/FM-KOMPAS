@@ -501,3 +501,19 @@ CREATE TABLE fantasy.game_transactions (
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQUE_TRANSACTION` (`transaction_name`,`fb_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+ALTER TABLE `fantasy`.`league` 
+ADD COLUMN `league` VARCHAR(5) NULL DEFAULT 'epl' AFTER `n_status`;
+
+ALTER TABLE `fantasy`.`league_invitations` 
+ADD COLUMN `league` VARCHAR(5) NULL DEFAULT 'epl' AFTER `n_status`;
+
+ALTER TABLE `fantasy`.`league_member` 
+ADD COLUMN `league` VARCHAR(5) NULL DEFAULT 'epl' AFTER `n_status`;
+
+ALTER TABLE `fantasy`.`league_table` 
+ADD COLUMN `league` VARCHAR(5) NULL DEFAULT 'epl' AFTER `points`;
+
+ALTER TABLE `fantasy`.`league_member` 
+DROP INDEX `UNIQUE` ,
+ADD UNIQUE INDEX `UNIQUE` (`team_id` ASC, `league_id` ASC, `league` ASC);

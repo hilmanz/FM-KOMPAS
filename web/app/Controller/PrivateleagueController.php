@@ -13,6 +13,7 @@ class PrivateleagueController extends AppController {
 
 	public $name = 'Privateleague';
 	public $components = array('Thumbnail');
+	public $league;
 
 	public function beforeFilter()
 	{
@@ -27,6 +28,8 @@ class PrivateleagueController extends AppController {
 		if(!$this->hasTeam()){
 			$this->redirect('/login/expired');
 		}
+
+		$this->league = $this->Session->read('league');
 	}
 
 	public function hasTeam(){
@@ -42,8 +45,9 @@ class PrivateleagueController extends AppController {
 		$rs_user = $this->User->findByFb_id($userData['fb_id']);
 		$team_id 	= $rs_user['Team']['id'];
 
-		$rs = $this->League->getLeague($team_id);
+		$rs = $this->League->getLeague($team_id, $this->league);
 		$this->set('rs', $rs);
+		$this->set('user_id', $rs_user['User']['id']);
 	}
 
 	public function create()
@@ -57,7 +61,7 @@ class PrivateleagueController extends AppController {
 		$team_id 	= $rs_user['Team']['id'];
 
 		//check if user has create private league or user has joined private league
-		$result = $this->League->checkUser($email, $team_id);
+		$result = $this->League->checkUser($email, $team_id, $this->league);
 
 		if($result['has_invited'] == 1)
 		{
@@ -82,51 +86,54 @@ class PrivateleagueController extends AppController {
 				$allow_ext = array('jpeg', 'jpg', 'gif');
 				$aFile = explode('.', $league_logo['name']);
 				$file_ext = array_pop($aFile);
-				$filename = date("ymdhis").'-'.rand(0, 99999).'.'.$file_ext;
+				$filename = 'privateleague_default.jpg';
 				if(in_array($file_ext, $allow_ext))
 				{
+					$filename = date("ymdhis").'-'.rand(0, 99999).'.'.$file_ext;
 					if(move_uploaded_file($league_logo['tmp_name'], $upload_dir.$filename))
 					{
 						$this->Thumbnail->create($upload_dir.$filename,
 														$upload_dir.'thumb_'.$filename,
 														150,150);
-						
-						$data = array('name' => $league_name,
+					}
+				}
+
+				$data = array('name' => $league_name,
 									'logo' => $filename,
 									'type' => 'private_league',
 									'user_id' => $user_id,
 									'max_player' => 30,
 									'date_created' => date("Y-m-d H:i:s"),
-									'n_status' => 1
+									'n_status' => 1,
+									'league' => $this->league
 										);
 
-						try{
-							$dataSource = $this->League->getDataSource();
-							$dataSource->begin();
+				try{
+					$dataSource = $this->League->getDataSource();
+					$dataSource->begin();
 
-							$this->League->create();
-							$this->League->save($data);
+					$this->League->create();
+					$this->League->save($data);
 
-							$league_id = $this->League->id;
+					$league_id = $this->League->id;
 
-							$this->League->query("INSERT INTO 
-												league_invitations(league_id, email, n_status) 
-												VALUES('{$league_id}','{$email}',1)");
+					$this->League->query("INSERT INTO 
+										league_invitations(league_id, email, n_status, league) 
+										VALUES('{$league_id}','{$email}',1,'{$this->league}')");
 
-							$this->League->query("INSERT INTO league_member
-														(league_id,team_id,join_date,n_status) 
-														VALUES('{$league_id}','{$team_id}',now(),1)");
+					$this->League->query("INSERT INTO league_member
+												(league_id,team_id,join_date,n_status,league) 
+												VALUES('{$league_id}','{$team_id}',
+													now(),1,'{$this->league}')");
 
-							$dataSource->commit();
-							$this->Session->write('league_id', $league_id);
-							$this->redirect('/privateleague/invite');
+					$dataSource->commit();
+					$this->Session->write('league_id', $league_id);
+					$this->redirect('/privateleague/invite');
 
-						}catch(Exception $e){
-							$dataSource->rollback();
-							$this->Session->setFlash('Terjadi kesalahan, silahkan coba lagi');
-							$this->redirect('/privateleague/error');
-						}
-					}
+				}catch(Exception $e){
+					$dataSource->rollback();
+					$this->Session->setFlash('Terjadi kesalahan, silahkan coba lagi');
+					$this->redirect('/privateleague/error');
 				}
 			}
 		}
@@ -135,20 +142,49 @@ class PrivateleagueController extends AppController {
 	public function invite()
 	{
 		$league_id = $this->Session->read('league_id');
-		if($league_id == NULL): $this->redirect('/privateleague'); endif;
+		if($league_id == NULL){
+			$league_trx = unserialize(decrypt_param($this->request->data['league_trx']));
+			$league_id = $league_trx['league_id']; 
+			if(!isset($league_id)){
+				$this->redirect('/privateleague');
+			}
+		}
+
+		$rs_league = $this->League->findById($league_id);
+		$max_player = $rs_league['League']['max_player'];
+
+		$rs_invited = $this->leagueInvitation->find('count', array(
+	        'conditions' => array(
+	        						'leagueInvitation.league_id' => $league_id,
+	        						'league' => $this->league,
+	        						'n_status' => 0
+	        					))
+	    );
+
+	    $rs_joined = $this->leagueInvitation->find('count', array(
+	        'conditions' => array(
+	        						'leagueInvitation.league_id' => $league_id,
+	        						'league' => $this->league,
+	        						'n_status' => 1
+	        					))
+	    );
+
+	    $limit = $max_player - ($rs_invited + $rs_joined);
+	    $this->set('limit', $limit);
 
 		if($this->request->is('post'))
 		{
 			try{
 				$email = $this->request->data['email'];
 				
-				$i=0;
+				$i=2;
 				foreach ($email as $value)
 				{
 					$data[] = array('league_id' => $league_id,
 									'email' => $value,
-									'n_status' => 0);
-					if($i == 28){
+									'n_status' => 0,
+									'league' => $this->league);
+					if($i == $limit){
 						break;
 					}
 					$i++;
@@ -172,14 +208,57 @@ class PrivateleagueController extends AppController {
 		$rs_user 	= $this->User->findByFb_id($userData['fb_id']);
 		$email 		= $rs_user['User']['email'];
 
-		$rs_league = $this->League->query("SELECT * FROM ".Configure::read('FRONTEND_SCHEMA').".league_invitations a 
+		$rs_league = $this->League->query("SELECT * FROM league_invitations a 
 											INNER JOIN league b ON a.league_id = b.id 
 											INNER JOIN users c ON b.user_id = c.id 
 											WHERE a.email = '{$email}' AND a.n_status = 0
+											AND a.league='{$this->league}'
 											LIMIT 1");
 		if(count($rs_league) > 0)
 		{
+			$data_enc = array(
+								'email' => $rs_league[0]['a']['email'], 
+								'league_id' => $rs_league[0]['a']['league_id'],
+								'league' => $rs_league[0]['a']['league']
+								);
+			$trx_code = encrypt_param(serialize($data_enc));
+
+			$this->set('trx_code', $trx_code);
 			$this->set('rs_league', $rs_league);
+		}
+		else
+		{
+			$this->redirect('/privateleague');
+		}
+
+	}
+
+	public function linkjoin()
+	{
+		$trx_code = $this->request->query['trx'];
+		$param = unserialize(decrypt_param($trx_code));
+		$userData 	= $this->getUserData();
+		$rs_user = $this->User->findByFb_id($userData['fb_id']);
+
+		if($param['email'] == $rs_user['User']['email'])
+		{
+			$rs_league = $this->League->query("SELECT * FROM league_invitations a 
+											INNER JOIN league b ON a.league_id = b.id 
+											INNER JOIN users c ON b.user_id = c.id 
+											WHERE a.email = '{$param['email']}' AND a.n_status = 0
+											AND a.league='{$param['league']}' 
+											AND league_id='{$param['league_id']}'
+											LIMIT 1");
+
+			if(count($rs_league) > 0)
+			{
+				$this->set('rs_league', $rs_league);
+				$this->set('trx_code', $trx_code);
+			}
+			else
+			{
+				$this->redirect('/privateleague');
+			}
 		}
 		else
 		{
@@ -195,27 +274,45 @@ class PrivateleagueController extends AppController {
 		$email 		= $rs_user['User']['email'];
 		$team_id 	= $rs_user['Team']['id'];
 
-		try{
-			$dataSource = $this->League->getDataSource();
-			$dataSource->begin();
-			
-			$rs_league = $this->leagueInvitation->findByEmail($email);
-			$league_id = $rs_league['leagueInvitation']['league_id'];
+		$trx_code = $this->request->query['trx'];
+		$param = unserialize(decrypt_param($trx_code));
 
-			$this->leagueInvitation->updateAll(
-								array('n_status' => 1),
-								array('email' => $email, 'n_status' => 0));
-			$this->League->query("INSERT INTO league_member(league_id,team_id,join_date,n_status)
-									VALUES('{$league_id}','{$team_id}',now(), 1)");
-			$dataSource->commit();
-			$this->redirect('/privateleague');
-		}catch(Exception $e){
-			$dataSource->rollback();
-			$this->leagueInvitation->updateAll(
-								array('n_status' => 2),
-								array('email' => $email, 'n_status' => 0));
-			$this->Session->setFlash("Low gak bisa join karena sudah join private league sebelumnya");
-			$this->redirect("/privateleague/error");
+		if($param['email'] == $email)
+		{
+			try{
+				$dataSource = $this->League->getDataSource();
+				$dataSource->begin();
+
+				$this->leagueInvitation->updateAll(
+									array('n_status' => 1),
+									array(
+											'league_id' => $param['league_id'],
+											'email' => $param['email'], 
+											'n_status' => 0, 
+											'league' => $param['league']
+										)
+									);
+				$this->League->query("INSERT INTO league_member(league_id,team_id,join_date,n_status,league)
+										VALUES('{$param['league_id']}','{$team_id}',now(),1,'{$param['league']}')");
+				$dataSource->commit();
+				$this->redirect('/privateleague');
+			}catch(Exception $e){
+				$dataSource->rollback();
+				$this->leagueInvitation->updateAll(
+									array('n_status' => 2),
+									array(
+											'league_id' => $param['league_id'],
+											'email' => $param['email'], 
+											'n_status' => 0,
+											'league' => $param['league']
+										));
+				$this->Session->setFlash("Loe gak bisa join karena sudah pernah join private league sebelumnya");
+				$this->redirect("/privateleague/error");
+			}
+		}
+		else
+		{
+			$this->redirect("/privateleague");
 		}
 	}
 
@@ -225,11 +322,81 @@ class PrivateleagueController extends AppController {
 		$rs_user 	= $this->User->findByFb_id($userData['fb_id']);
 		$email 		= $rs_user['User']['email'];
 
-		$this->leagueInvitation->updateAll(
-								array('n_status' => 2),
-								array('email' => $email, 'n_status' => 0));
-		$this->redirect('/privateleague');
+		$trx_code = $this->request->query['trx'];
+		$param = unserialize(decrypt_param($trx_code));
 
+		if($param['email'] == $email)
+		{
+			$this->leagueInvitation->updateAll(
+									array('n_status' => 2),
+									array(
+										'league_id' => $param['league_id'],
+										'email' => $param['email'],
+										'n_status' => 0,
+										'league' => $param['league']
+										));
+			$this->redirect('/privateleague');
+		}
+		else
+		{
+			$this->redirect('/privateleague');
+		}
+
+	}
+
+	public function pengaturan()
+	{
+		$userData 	= $this->getUserData();
+		$rs_user 	= $this->User->findByFb_id($userData['fb_id']);
+
+	    $rs_league = $this->League->query("SELECT * FROM league 
+	    									WHERE user_id='{$rs_user['User']['id']}'
+	    									AND league='{$this->league}' LIMIT 1");
+
+	    $max_player = $rs_league[0]['league']['max_player'];
+
+	    if(count($rs_league) == 0){
+	    	$this->redirect('/privateleague');
+	    }
+
+	    $league_id = $rs_league[0]['league']['id'];
+	    $league_id_enc = encrypt_param(serialize(array('league_id' => $league_id)));
+	    $this->set('league_trx', $league_id_enc);
+
+	    $rs_invited = $this->leagueInvitation->find('all', array(
+	    	'limit' => 1000,
+	        'conditions' => array(
+	        						'leagueInvitation.league_id' => $league_id,
+	        						'league' => $this->league,
+	        						'n_status' => 0
+	        					))
+	    );
+	    foreach ($rs_invited as $key => $value) {
+	    	$data_enc = array(
+	    						'league_id' => $value['leagueInvitation']['league_id'],
+	    						'email' => $value['leagueInvitation']['email'],
+	    						'league' => $value['leagueInvitation']['league']
+	    					);
+	    	$rs_invited[$key]['leagueInvitation']['trx_code'] = encrypt_param(serialize($data_enc));
+	    }
+
+	    //$params = encrypt_param(serialize($data_user));
+
+	    $rs_joined = $this->leagueInvitation->find('all', array(
+	    	'limit' => 1000,
+	        'conditions' => array(
+	        						'leagueInvitation.league_id' => $league_id,
+	        						'league' => $this->league,
+	        						'n_status' => 1
+	        					))
+	    );
+
+	    $limit = $max_player - (count($rs_invited) + count($rs_joined));
+	    
+	    $this->set('limit', $limit);
+	    $this->set('rs_invited', $rs_invited);
+	    $this->set('rs_joined', $rs_joined);
+	    
 	}
 
 	public function error()
@@ -245,14 +412,15 @@ class PrivateleagueController extends AppController {
 
 		$matchday = 0;
 
-		$rs_leaguetable = $this->League->query("SELECT matchday FROM league_table 
+		$rs_leaguetable = $this->League->query("SELECT matchday FROM league_table
+												WHERE league='{$this->league}' 
 												ORDER BY id DESC LIMIT 1");
 
 		if(count($rs_leaguetable) > 0){
 			$matchday = $rs_leaguetable[0]['league_table']['matchday'];
 		}
 
-		$rs_league = $this->League->getLeague($team_id);
+		$rs_league = $this->League->getLeague($team_id, $this->league);
 
 		$rs_leaderboard = $this->League->query("SELECT a.*,b.*,c.*,d.name FROM league_member a 
 												INNER JOIN league_table b ON a.league_id = b.league_id
@@ -260,6 +428,7 @@ class PrivateleagueController extends AppController {
 												INNER JOIN users d ON c.user_id = d.id
 												WHERE b.league_id='{$rs_league[0]['b']['id']}' 
 												AND b.matchday='{$matchday}'
+												AND b.league='{$this->league}'
 												GROUP BY b.team_id
 												ORDER BY b.points DESC
 												LIMIT 1000");

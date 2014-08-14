@@ -29,22 +29,21 @@
                 </form>
 			</div><!-- end .content -->
         </div><!-- end #content -->
-	<div id="sidebar" class="tr">
-      
-      <div class="widget">
-          <div class="cash-left">
-          </div>
-      </div><!-- end .widget -->
-       
-  </div><!-- end #sidebar -->
     </div><!-- end #thecontent -->
 </div><!-- end #fillDetailsPage -->
 <script type="text/javascript">
+  
+  var limit = <?=$limit?>;
+  var count = 2;
   $('#add_email').on('click', function(e){
-    $('#t_email').append('<div class="row">\
+    if(count <= limit)
+    {
+      $('#t_email').append('<div class="row">\
                         <label>Email</label>\
                         <input id="email" type="text" name="email[]" value="" maxlength="30"/>\
                     </div>');
+    }
+    count++;
   });
   $('#submit_invite').on('click', function(e){
       var email_array = $('input[name="email[]"]').serializeArray();

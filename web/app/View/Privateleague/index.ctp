@@ -39,10 +39,12 @@
                                         href="<?=$this->Html->url('/privateleague/leaderboard')?>">
                                             Peringkat
                                         </a>
+                                    <?php if($rs[0]['b']['user_id'] == $user_id): ?>
                                         <a class="button" 
-                                        href="<?=$this->Html->url('/privateleague/config')?>">
+                                        href="<?=$this->Html->url('/privateleague/pengaturan')?>">
                                             Atur Liga
                                         </a>
+                                    <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php $i++; endforeach; ?>

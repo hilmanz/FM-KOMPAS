@@ -355,7 +355,6 @@ class AppController extends Controller {
 				
 				
 				
-
 				//notification stuffs
 				
 				

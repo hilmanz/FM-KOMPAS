@@ -410,7 +410,7 @@ Configure::write('MAILGUN',
 Configure::write('privateleague_web_dir','/home/duf/node_workspace/fm_2014/web/app/webroot/files/privateleague/');
 Configure::write('privateleague_web_url','http://localhost/fm_2014/files/privateleague/');
 
-Configure::write('MINIMUM_INSTRUCTION_POINTS',50);
+Configure::write('MINIMUM_INSTRUCTION_POINTS',10);
 
 
 Configure::write('FRONTEND_SCHEMA','fantasy');

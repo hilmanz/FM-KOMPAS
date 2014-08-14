@@ -404,12 +404,15 @@ CREATE TABLE ffgame.game_team_instructions(
   `id` bigint(21) NOT NULL AUTO_INCREMENT,
   `game_team_id` bigint(21) DEFAULT NULL,
   `matchday` int(3) DEFAULT '1',
-  `player_id` int(3) DEFAULT '0',
+  `player_id` varchar(32) DEFAULT '0',
   `instruction_id` int(3) DEFAULT NULL,
   `amount` int(3) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQUE_INSTRUCTIONS` (`game_team_id`,`matchday`,`player_id`,`instruction_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
 
 ALTER TABLE `fantasy`.`league` 
 CHANGE COLUMN `limit` `max_player` VARCHAR(2) NULL DEFAULT NULL ;

@@ -841,10 +841,10 @@ class ManageController extends AppController {
 				player_id,
 				instruction_id,
 				amount) VALUES ";
-				
+		
 		$total_spend = 0;
 		for($i=0;$i<sizeof($this->request->data['instruction']);$i++){
-			
+
 			//maksimal instruction poin yang bisa dibagikan hanya 5pts
 			$this->request->data['points'][$i] = intval($this->request->data['points'][$i]);
 			if($this->request->data['points'][$i] > 5){
@@ -854,8 +854,9 @@ class ManageController extends AppController {
 			}else{
 				//do nothing
 			}
-			
+
 			$total_spend += $this->request->data['points'][$i];
+			
 			if($i>0){
 				$sql.=",";
 			}
@@ -870,7 +871,7 @@ class ManageController extends AppController {
 				ON DUPLICATE KEY UPDATE
 				amount = VALUES(amount);";
 
-
+		
 		if($total_spend <= $instruction_points){
 			$is_ok = true;
 		}
@@ -894,7 +895,7 @@ class ManageController extends AppController {
 		
 		return $upcoming_matchday;
 	}
-	// instruction points is 1% of the average weekly points
+	// instruction points is 1% of the average weekly points + minimum instruction points (10)
 	// for example, if average weekly points is 1000, then the instruction points is 10
 	private function getInstructionPoints(){
 
@@ -926,11 +927,12 @@ class ManageController extends AppController {
 		}
 		
 		
-		$instruction_points = round($average_points * 0.05);
+		$instruction_points = round($average_points * 0.01) + $minimum_ip;
 		
-		if($instruction_points < $minimum_ip){
+		/*if($instruction_points < $minimum_ip){
 			$instruction_points = $minimum_ip;
-		}
+		}*/
+
 		return $instruction_points;
 	}
 

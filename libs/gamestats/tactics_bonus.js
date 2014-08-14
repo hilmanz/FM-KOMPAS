@@ -26,15 +26,11 @@ var affected_stats = {
 			'won_tackle'
 		],
 	'6':[
-			'aerial_won'
+			'won_contest'
 		],
 	'7':[
 			'interception_won',
-			'effective_blocked_cross'
-		],
-	'8':[
-			'duel_won'
-		],
+		]
 }
 
 /*
@@ -83,10 +79,17 @@ exports.apply_bonus = function(conn,game_team_id,player_id,new_stats,matchday,do
 						
 					}
 				}
+				console.log('TACTIC',bonuses);
 				cb(null);
 			},
 			function(cb){
 				async.eachSeries(bonuses,function(bonus,next){
+					if(bonus.point > 5){
+						bonus.point = 5;
+					}else if(bonus.point < 0){
+						bonus.point = 0;
+					}
+					console.log('TACTIC',player_id,'->',bonus.point,'x',bonus.value);
 					saveExtraPoint(conn,game_id,matchday,game_team_id,
 									'tactical_'+player_id+'_'+bonus.stats,
 									(bonus.point * bonus.value),

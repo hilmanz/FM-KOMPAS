@@ -2,6 +2,8 @@
 api related to match
 */
 var config = {};
+
+
 exports.setConfig = function(c){
 	config = c;
 }

@@ -25,6 +25,8 @@ exports.setLeague = function(l){
 	league = l;
 }
 var match = require(path.resolve('./libs/api/match'));
+
+
 var officials = require(path.resolve('./libs/api/officials'));
 
 
@@ -35,7 +37,7 @@ exports.setConfig = function(c){
 	frontend_schema = config.database.frontend_schema;
 	officials.setConfig(config);
 	sponsorship.setConfig(config);
-
+	match.setConfig(config);
 }
 
 function prepareDb(callback){

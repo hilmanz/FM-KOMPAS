@@ -373,7 +373,7 @@ class ManageController extends AppController {
 					WHERE a.game_id IN ({$gids})
 					AND a.is_processed = 1
 					ORDER BY a.matchday DESC";
-
+		
 			try{
 
 
@@ -871,7 +871,7 @@ class ManageController extends AppController {
 				ON DUPLICATE KEY UPDATE
 				amount = VALUES(amount);";
 
-		
+
 		if($total_spend <= $instruction_points){
 			$is_ok = true;
 		}

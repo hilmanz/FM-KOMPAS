@@ -106,9 +106,8 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
                                     <option value="3" <?php if($instruction_id == 3): echo 'selected="selected"';endif;?>>Focus on Through Ball</option>
                                     <option value="4" <?php if($instruction_id == 4): echo 'selected="selected"';endif;?>>Create Chances</option>
                                     <option value="5" <?php if($instruction_id == 5): echo 'selected="selected"';endif;?>>More Tackles</option>
-                                    <option value="6" <?php if($instruction_id == 6): echo 'selected="selected"';endif;?>>More Aerial Defense</option>
+                                    <option value="6" <?php if($instruction_id == 6): echo 'selected="selected"';endif;?>>Dribbling</option>
                                     <option value="7" <?php if($instruction_id == 7): echo 'selected="selected"';endif;?>>More Blocks</option>
-                                    <option value="8" <?php if($instruction_id == 8): echo 'selected="selected"';endif;?>>More Hard Challenges</option>
                                 </select>
 
                             </td>
@@ -151,7 +150,7 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
 
             </div><!-- end .widget -->
             <div class="widget tr squad-team-name">
-                <h3>INSTRUCTION POINTS : <span class="yellow"><?=$INSTRUCTION_POINTS?></span></h3>
+                <h3>INSTRUCTION POINTS : <span id="point_left" class="yellow"><?=$INSTRUCTION_POINTS?></span></h3>
             </div><!-- end .widget -->
             <div class="widget tr squad-team-name">
                 <h3>HOW TO USE TACTICS</h3>
@@ -196,6 +195,51 @@ if(strlen(@$user['avatar_img'])!=0 && @$user['avatar_img']!='0'){
 
 <script>
 $(".btn-save-tactic").click(function(){
-    $('#frmTactic').submit();
+    var max_inspoint = <?=$INSTRUCTION_POINTS?>;
+    var total_point  = 0;
+    $('input[name="points[]"]').each(function(){
+        var points = parseInt($(this).val());
+        if(points == '' || isNaN(points))
+        {
+            points = 0;
+        }
+        total_point = total_point + points;
+    });
+    if(total_point <= max_inspoint)
+    {
+        $('#frmTactic').submit();
+    }
+});
+
+$('input[name="points[]"]').on('change',function(e){
+    
+    var max_point = 5;
+    var max_inspoint = <?=$INSTRUCTION_POINTS?>;
+
+    if(isNaN(Math.abs($(this).val()))){
+        $(this).val(0);
+    }else if($(this).val() < 0){
+        $(this).val(0);
+    }else if($(this).val() > max_point){
+        $(this).val(max_point);
+    }
+
+    var total_point  = 0;
+    $('input[name="points[]"]').each(function(){
+        var points = Math.abs($(this).val());
+        if(points == ''){
+            points = 0;
+        }
+        total_point = total_point + points;
+    });
+
+    if(total_point > max_inspoint){
+        total_point = total_point - $(this).val();
+        $('#point_left').html(max_inspoint - total_point);
+        $(this).val(0);
+    }else{
+        $('#point_left').html(max_inspoint - total_point);
+    }
+ 
 });
 </script>

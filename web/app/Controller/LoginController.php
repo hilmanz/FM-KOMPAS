@@ -110,6 +110,17 @@ class LoginController extends AppController {
 				$email = trim(Sanitize::clean($this->request->data['email']));
 				$rs_user = $this->User->findByEmail($email);
 
+				$email_domain = explode('@', $email);
+				$email_domain = explode('.', $email_domain[1]);
+				$blocked_email = Configure::read('BLOCKED_EMAIL');
+				
+				if(in_array($email_domain[0], $blocked_email))
+				{
+					$this->Session->destroy();
+					$this->redirect('/login/error_email');
+				}
+
+
 				$fb_id = date("Ymdhis").rand(1000, 9999);
 				if(isset($rs_user['User']['email'])){
 					$fb_id = $rs_user['User']['fb_id'];
@@ -135,6 +146,11 @@ class LoginController extends AppController {
 			}
 			
 		}
+	}
+
+	function error_email()
+	{
+
 	}
 
 	public function facebook_auth()

@@ -464,7 +464,7 @@ ALTER TABLE `fantasy`.`points` DROP KEY `UNIQUE_TEAM`, ADD UNIQUE `UNIQUE_TEAM` 
 ALTER TABLE `fantasy`.`users` 
 ADD UNIQUE INDEX `UNIQUE_FB_ID` (`fb_id` ASC);
 
-CREATE TABLE `member_billings` (
+CREATE TABLE fantasy.member_billings (
   `id` bigint(21) NOT NULL AUTO_INCREMENT,
   `fb_id` varchar(140) DEFAULT NULL,
   `log_dt` datetime DEFAULT NULL,
@@ -472,7 +472,7 @@ CREATE TABLE `member_billings` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `membership_transactions` (
+CREATE TABLE fantasy.membership_transactions (
   `id` bigint(21) NOT NULL AUTO_INCREMENT,
   `fb_id` varchar(140) DEFAULT NULL,
   `transaction_dt` datetime DEFAULT NULL,

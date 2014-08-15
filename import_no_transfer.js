@@ -22,11 +22,24 @@ var conn = mysql.createConnection({
    password : config.database.password,
 });
 
+/*
 var price_range = {
 	High:[7000000,7500000,8000000,8500000,9000000,9500000,10000000],
 	Low:[1000000,1500000,2000000],
 	Middle:[4000000,4500000,5000000,5500000,6000000,6500000,7000000],
 	Medium:[4000000,4500000,5000000,5500000,6000000,6500000,7000000],
+}
+*/
+
+
+
+var price_range = {
+	VH:[40000000,42000000,42500000,44000000,45000000,46000000,47000000,48000000,48500000,50000000],
+	H:[30000000,32000000,32500000,34000000,35000000,36000000,37000000,38000000,38500000,39000000],
+	M:[20000000,22000000,22500000,24000000,25000000,26000000,27000000,28000000,28500000,29000000],
+	L:[10000000,12000000,12500000,14000000,15000000,16000000,17000000,18000000,18500000,19000000],
+	VL:[1500000,2500000,3000000,3400000,3600000,3800000,4500000,4800000,5000000,6000000,6800000,7500000,8000000,9000000,9500000],
+	F:[0]
 }
 function getRandomInt(category) {
 	var min = 0;
@@ -35,7 +48,7 @@ function getRandomInt(category) {
 }
 async.waterfall([
 	function(callback){
-		open_file('transfer_value_random2.csv',function(err,content){
+		open_file('transfer_value_v3.csv',function(err,content){
 			callback(err,content.toString());
 		});
 	},
@@ -52,11 +65,11 @@ async.waterfall([
 				
 				try{
 					data.push({
-						player_id:a[1],
-						transfer_value:getRandomInt(a[4])
+						player_id:a[0],
+						transfer_value:getRandomInt(a[5])
 					});
 				}catch(e){
-					console.log('-->'+a[1]);
+					console.log('-->'+a[1]+':'+a[5]);
 				}
 				
 				

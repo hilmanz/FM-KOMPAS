@@ -163,6 +163,7 @@ class ProfileController extends AppController {
 						}
 						else
 						{
+							Cakelog::write('error', 'profile.create_password email error :'.json_encode($rs_user['User']));
 							$this->Session->setFlash("Email yang loe masukan gak valid !");
 							$this->redirect("/profile/send_activation");
 						}
@@ -593,6 +594,7 @@ class ProfileController extends AppController {
 									}
 									else
 									{
+										Cakelog::write('error', 'profile.register email error :'.json_encode($user_data));
 										$this->Session->setFlash("Email yang loe masukan gak valid !");
 										$this->redirect("/profile/send_activation");
 									}
@@ -714,6 +716,7 @@ class ProfileController extends AppController {
 
 				if($trxsess != 1){
 					if(!$this->send_mail($rs_user['User'])){
+						Cakelog::write('error', 'profile.send_activation email error :'.json_encode($rs_user['User']));
 						$this->Session->setFlash("Email yang loe masukan gak valid !");
 						$this->redirect("/profile/send_activation");
 					}
@@ -834,17 +837,30 @@ class ProfileController extends AppController {
 										'url'=> $data['url'],
 									));
 
-		$Email = new CakeEmail('smtp');
-		$Email->from(array('noreplysupersoccer@gmail.com' => 'supersoccer'));
-		$Email->to($data['email']);
-		$Email->subject('Reset Password');
-		$Email->emailFormat('html');
-		if($Email->send($body))
-		{
-			return true;
-		}
+		# Instantiate the client.
+		$mgClient = new Mailgun('key-9oyd1c7638c35gmayktmgeyjhtyth5w0');
+		$domain = "mg.supersoccer.co.id";
 
-		return false;
+		//validation
+		$result = $mgClient->get("address/validate", array('address' => trim($data['email'])));
+
+		if($result->http_response_body->is_valid == 1){
+			# Make the call to the client.
+			$result = $mgClient->sendMessage($domain, array(
+			    'from'    => 'supersoccer <postmaster@mg.supersoccer.co.id>',
+			    'to'      => '<'.trim($data['email']).'>',
+			    'subject' => 'Reset Password',
+			    'html'    => $body
+			));
+			if($result->http_response_code == 200){
+				return true;
+			}
+			Cakelog::write('error', 'profile.send_reset_password email error :'.json_encode($data));
+			return false;
+		}else{
+			Cakelog::write('error', 'profile.send_reset_password email error :'.json_encode($data));
+			return false;
+		}
 	}
 
 	public function send_mail($data = array()){
@@ -860,14 +876,23 @@ class ProfileController extends AppController {
 										'activation_code'=> $data['activation_code'],
 									));
 
-		$Email = new CakeEmail('smtp');
-		$Email->from(array('noreplysupersoccer@gmail.com' => 'supersoccer'));
-		$Email->to($data['email']);
-		$Email->subject('Kode Aktivasi');
-		$Email->emailFormat('html');
-		if($Email->send($body))
+		# Instantiate the client.
+		$mgClient = new Mailgun($smtp_config['api_key']);
+		$domain = $smtp_config['domain'];
+		$result = $mgClient->get("address/validate", array('address' => $data['email']));
+
+		if($result->http_response_body->is_valid == 1)
 		{
-			return true;
+			# Make the call to the client.
+			$result = $mgClient->sendMessage($domain, array(
+			    'from'    => $smtp_config['from'],
+			    'to'      => '<'.trim($data['email']).'>',
+			    'subject' => 'Kode Aktivasi',
+			    'html'    => $body
+			));
+			if($result->http_response_code == 200){
+				return true;
+			}
 		}
 
 		return false;

@@ -2036,8 +2036,8 @@ function getTeamResultStats(conn,team_id,callback){
 							FROM \
 							"+config.database.database+".game_fixtures \
 							WHERE (home_id = ? OR away_id= ?) \
-							AND is_processed=1 AND period='FullTime';",
-							[team_id,team_id],
+							AND is_processed=1 AND period='FullTime' AND session_id=?;",
+							[team_id,team_id,config.competition.year],
 							function(err,rs){
 								if(rs.length>0){
 									callback(err,rs);

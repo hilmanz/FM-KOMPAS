@@ -30,6 +30,7 @@
     "validator":"latest",
     "php-unserialize":"latest",
     "request":"latest",
-    "nodemailer-smtp-transport":"latest"
+    "nodemailer-smtp-transport":"latest",
+    "nodemailer-sendmail-transport":"latest"
   }
 }

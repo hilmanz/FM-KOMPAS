@@ -178,7 +178,7 @@ function create(data,callback){
 				},
 				function(user,callback){
 					if(user==null){
-						cb(new Error('user not found'),null);
+						callback(new Error('user not found'),null);
 					}else{
 						console.log(user);
 						conn.query("INSERT INTO "+config.database.database+".game_teams\

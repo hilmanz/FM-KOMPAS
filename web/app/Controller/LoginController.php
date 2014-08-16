@@ -100,6 +100,8 @@ class LoginController extends AppController {
 
 			$this->Captchacode->set($this->request->data);
 			$this->Captchacode->setCaptcha($this->Captcha->getVerCode());
+			$data_post = $this->request->data;
+			$this->set('data_post', $data_post);
 			if(!$this->Captchacode->validates())
 			{
 				$this->Session->setFlash('Wrong Captcha Input');

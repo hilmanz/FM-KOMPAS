@@ -840,26 +840,49 @@ class ProfileController extends AppController {
 		# Instantiate the client.
 		$mgClient = new Mailgun('key-9oyd1c7638c35gmayktmgeyjhtyth5w0');
 		$domain = "mg.supersoccer.co.id";
+		$email = trim($data['email']);
 
 		//validation
-		$result = $mgClient->get("address/validate", array('address' => trim($data['email'])));
+		$result = $mgClient->get("address/validate", array('address' => $email));
+		$rs_mail = $this->User->query("SELECT * FROM whitelist 
+										WHERE email='{$email}' LIMIT 1");
 
-		if($result->http_response_body->is_valid == 1){
-			# Make the call to the client.
-			$result = $mgClient->sendMessage($domain, array(
-			    'from'    => 'supersoccer <postmaster@mg.supersoccer.co.id>',
-			    'to'      => '<'.trim($data['email']).'>',
-			    'subject' => 'Reset Password',
-			    'html'    => $body
-			));
-			if($result->http_response_code == 200){
-				return true;
+		if(count($rs_mail) == 0 || $rs_mail[0]['whitelist']['n_status'] != 'NOK')
+		{
+			if($result->http_response_body->is_valid == 1){
+				$params = array('email' => $email);
+				$result = $this->curlPost('http://198.199.110.39:3101/send', $params);
+				$result_array = json_decode($result, true);
+				if($result_array['status'] == 1)
+				{
+					$this->User->query("INSERT INTO whitelist(email,n_status) 
+										VALUE('{$email}', 'OK')
+										ON DUPLICATE KEY UPDATE n_status='OK'");
+
+					# Make the call to the client.
+					$result = $mgClient->sendMessage($domain, array(
+					    'from'    => 'supersoccer <postmaster@mg.supersoccer.co.id>',
+					    'to'      => '<'.trim($data['email']).'>',
+					    'subject' => 'Reset Password',
+					    'html'    => $body
+					));
+					if($result->http_response_code == 200){
+						return true;
+					}
+				}
+				else
+				{
+					$this->User->query("INSERT INTO whitelist(email,n_status) 
+										VALUE('{$email}', 'NOK')
+										ON DUPLICATE KEY UPDATE n_status='NOK'");
+
+					Cakelog::write('error', 'profile.send_reset_password email error :'.json_encode($data));
+					return false;
+				}
+			}else{
+				Cakelog::write('error', 'profile.send_reset_password email error :'.json_encode($data));
+				return false;
 			}
-			Cakelog::write('error', 'profile.send_reset_password email error :'.json_encode($data));
-			return false;
-		}else{
-			Cakelog::write('error', 'profile.send_reset_password email error :'.json_encode($data));
-			return false;
 		}
 	}
 
@@ -879,22 +902,73 @@ class ProfileController extends AppController {
 		# Instantiate the client.
 		$mgClient = new Mailgun($smtp_config['api_key']);
 		$domain = $smtp_config['domain'];
-		$result = $mgClient->get("address/validate", array('address' => $data['email']));
+		$email = trim($data['email']);
+		$result = $mgClient->get("address/validate", array('address' => $email));
 
-		if($result->http_response_body->is_valid == 1)
+		$rs_mail = $this->User->query("SELECT * FROM whitelist 
+										WHERE email='{$email}' LIMIT 1");
+
+		if(count($rs_mail) == 0 || $rs_mail[0]['whitelist']['n_status'] != 'NOK')
 		{
-			# Make the call to the client.
-			$result = $mgClient->sendMessage($domain, array(
-			    'from'    => $smtp_config['from'],
-			    'to'      => '<'.trim($data['email']).'>',
-			    'subject' => 'Kode Aktivasi',
-			    'html'    => $body
-			));
-			if($result->http_response_code == 200){
-				return true;
+			if($result->http_response_body->is_valid == 1)
+			{
+				$params = array('email' => $email);
+				$result = $this->curlPost('http://198.199.110.39:3101/send', $params);
+				$result_array = json_decode($result, true);
+				if($result_array['status'] == 1)
+				{
+					$this->User->query("INSERT INTO whitelist(email,n_status) 
+										VALUE('{$email}', 'OK')
+										ON DUPLICATE KEY UPDATE n_status='OK'");
+					# Make the call to the client.
+					$result = $mgClient->sendMessage($domain, array(
+					    'from'    => $smtp_config['from'],
+					    'to'      => '<'.$email.'>',
+					    'subject' => 'Kode Aktivasi',
+					    'html'    => $body
+					));
+					if($result->http_response_code == 200){
+						return true;
+					}
+				}
+				else
+				{
+					$this->User->query("INSERT INTO whitelist(email,n_status) 
+										VALUE('{$email}', 'NOK')
+										ON DUPLICATE KEY UPDATE n_status='NOK'");
+					return false;
+				}
+			}
+			else
+			{
+				return false;
 			}
 		}
 
 		return false;
+	}
+
+
+	private function curlPost($url,$params,$cookie_file='',$timeout=15){
+	  $ch = curl_init();
+	  curl_setopt($ch, CURLOPT_URL,$url);
+	  curl_setopt($ch,CURLOPT_TIMEOUT,$timeout);
+	  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);  
+	  curl_setopt($ch, CURLOPT_POST, 1);
+	  curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 1);
+	  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	  curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+	  
+	  if($cookie_file!=''){
+	    curl_setopt($ch,CURLOPT_COOKIEJAR, $cookie_file);
+	    curl_setopt($ch,CURLOPT_COOKIEFILE, $cookie_file); 
+	  }
+	  $response = curl_exec ($ch);
+	  $info = curl_getinfo($ch);
+	  if($info['http_code']==0){
+	    $response = json_encode(array('error'=>'unable to connect to web service !'));
+	  }
+	  curl_close ($ch);
+	  return $response;
 	}
 }

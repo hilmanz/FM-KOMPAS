@@ -68,7 +68,7 @@
                     </div><!-- end .row -->
                     <div class="row">
                         <label>Nomor HP</label>
-                        <input type="text" name="phone_number"/>
+                        <input type="text" name="phone_number" value="<?=h(@$user['phone_number'])?>" />
                         <?php if($phone_empty):?>
                         <span class="error">harap isi dahulu.</span>
                         <?php endif;?>
@@ -102,7 +102,7 @@
                     </div><!-- end .row -->
                     <div class="row">
                         <label>Sebutkan klub favorit elo</label>
-                        <input type="text" name="faveclub" value=""/>
+                        <input type="text" name="faveclub" value="<?=h(@$user['faveclub'])?>"/>
                     </div><!-- end .row -->
                     <div class="row">
                         <div>

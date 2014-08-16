@@ -8,42 +8,54 @@
         <form class="theForm" action="<?=$this->Html->url('/login/register')?>" method="post" enctype="multipart/form-data">
             <div class="row">
                 <label>Nama</label>
-                <input name="name" value="" type="text">
+                <input name="name" value="<?=@$data_post['name']?>" type="text">
             </div><!-- end .row -->
             <div class="row">
                 <label>Email</label>
-                <input name="email" value="" type="text">
+                <input name="email" value="<?=@$data_post['email']?>" type="text">
                                     </div><!-- end .row -->
             <div class="row">
                 <label>Tanggal Lahir</label>
                 <select name="bod_dt">
                     <option value="0">Tanggal</option>
                     <?php for($i=1;$i<=31;$i++): ?>
+                    <?php if(@$data_post['bod_dt'] == $i): ?>
+                        <option selected="selected" value="<?=$i?>"><?=$i?></option>
+                    <?php else: ?>
                         <option value="<?=$i?>"><?=$i?></option>
+                    <?php endif; ?>
                     <?php endfor; ?>
                 </select>
                 -
                  <select name="bod_mt">
                     <option value="0">Bulan</option>
                     <?php for($i=1;$i<=12;$i++): ?>
+                    <?php if(@$data_post['bod_mt'] == $i): ?>
+                        <option selected="selected" value="<?=$i?>"><?=$i?></option>
+                    <?php else: ?>
                         <option value="<?=$i?>"><?=$i?></option>
+                    <?php endif; ?>
                     <?php endfor; ?>
                 </select>
                 -
                  <select name="bod_yr">
                     <option value="0">Tahun</option>
                     <?php for($i=1930;$i<(date("Y"));$i++): ?>
+                    <?php if(@$data_post['bod_yr'] == $i): ?>
+                        <option selected="selected" value="<?=$i?>"><?=$i?></option>
+                    <?php else: ?>
                         <option value="<?=$i?>"><?=$i?></option>
+                    <?php endif; ?>
                     <?php endfor; ?>                
                 </select>
             </div><!-- end .row -->
             <div class="row">
                 <label>Lokasi</label>
-                <input name="city" value="" type="text">
+                <input name="city" value="<?=@$data_post['city']?>" type="text">
             </div><!-- end .row -->
             <div class="row">
                 <label>Nomor HP</label>
-                <input name="phone_number" type="text">
+                <input name="phone_number" value="<?=@$data_post['phone_number']?>" type="text">
             </div><!-- end .row -->
             <div class="row">
                 <label>Password</label>
@@ -74,7 +86,7 @@
             </div><!-- end .row -->
             <div class="row">
                 <label>Sebutkan klub favorit elo</label>
-                <input type="text" name="faveclub" value=""/>
+                <input type="text" name="faveclub" value="<?=@$data_post['faveclub']?>"/>
             </div><!-- end .row -->
             <div class="row">
                 <div>

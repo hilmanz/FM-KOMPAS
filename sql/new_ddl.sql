@@ -520,3 +520,13 @@ ADD COLUMN `league` VARCHAR(5) NULL DEFAULT 'epl' AFTER `points`;
 ALTER TABLE `fantasy`.`league_member` 
 DROP INDEX `UNIQUE` ,
 ADD UNIQUE INDEX `UNIQUE` (`team_id` ASC, `league_id` ASC, `league` ASC);
+
+CREATE TABLE `fantasy`.`whitelist` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `email` varchar(100) DEFAULT NULL,
+  `n_status` varchar(10) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE `fantasy`.`whitelist` 
+ADD UNIQUE INDEX `UNIQUE_EMAIL` (`email` ASC);

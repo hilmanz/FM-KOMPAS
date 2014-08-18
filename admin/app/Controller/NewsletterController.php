@@ -78,7 +78,7 @@ class NewsletterController extends AppController {
 													'body'=>$rs['Newsletter']['content']));
 		
 		$body = mysql_escape_string($body);
-		$rs = $this->Game->query("INSERT IGNORE INTO ffgame.email_queue
+		$rs = $this->Game->query("INSERT IGNORE INTO ".$_SESSION['ffgamedb'].".email_queue
 							(SUBJECT,email,plain_txt,html_text,queue_dt,n_status)
 							SELECT 
 							'{$rs['Newsletter']['subject']}',

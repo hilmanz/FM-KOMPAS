@@ -530,3 +530,9 @@ CREATE TABLE `fantasy`.`whitelist` (
 
 ALTER TABLE `fantasy`.`whitelist` 
 ADD UNIQUE INDEX `UNIQUE_EMAIL` (`email` ASC);
+
+ALTER TABLE `ffgame`.`game_team_players` 
+ADD INDEX `INDEX` (`player_id` ASC);
+
+ALTER TABLE `ffgame`.`master_player` 
+ADD INDEX `INDEX` (`uid` ASC);

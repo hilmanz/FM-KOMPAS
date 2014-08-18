@@ -174,7 +174,7 @@ class Game extends AppModel {
 
 
 	///TEAM EXPENDITURES HELPER
-	//it's a helper to insert data to ffgame.game_team_expenditures
+	//it's a helper to insert data to ".$_SESSION['ffgamedb'].".game_team_expenditures
 	public function addTeamExpenditures(
 		$game_team_id,
 		$item_name,
@@ -184,7 +184,7 @@ class Game extends AppModel {
 		$match_day,
 		$item_total=1,
 		$base_price=1){
-		$sql = "INSERT IGNORE INTO ffgame.game_team_expenditures
+		$sql = "INSERT IGNORE INTO ".$_SESSION['ffgamedb'].".game_team_expenditures
 				(game_team_id,
 				item_name,
 				item_type,
@@ -214,7 +214,7 @@ class Game extends AppModel {
 	*/
 	public function addCoinTransaction($game_team_id,$transaction_name,$amount,$details){
 		//insert the transaction
-		$sql = "INSERT INTO ffgame.game_transactions
+		$sql = "INSERT INTO ".$_SESSION['ffgamedb'].".game_transactions
 				(game_team_id,transaction_dt,transaction_name,amount,details)
 				VALUES
 				({$game_team_id},NOW(),'{$transaction_name}',{$amount},'{$details}')
@@ -223,10 +223,10 @@ class Game extends AppModel {
 		$rs = $this->query($sql,false);
 
 		//and then update the cash 
-		$sql = "INSERT INTO ffgame.game_team_cash
+		$sql = "INSERT INTO ".$_SESSION['ffgamedb'].".game_team_cash
 				(game_team_id,cash)
 				SELECT game_team_id,SUM(amount) AS cash 
-				FROM ffgame.game_transactions
+				FROM ".$_SESSION['ffgamedb'].".game_transactions
 				WHERE game_team_id = {$game_team_id}
 				GROUP BY game_team_id
 				ON DUPLICATE KEY UPDATE
@@ -234,13 +234,13 @@ class Game extends AppModel {
 
 		$rs = $this->query($sql,false);
 
-		$rs = $this->query("SELECT id FROM ffgame.game_transactions a
+		$rs = $this->query("SELECT id FROM ".$_SESSION['ffgamedb'].".game_transactions a
 							WHERE game_team_id = {$game_team_id} ORDER BY id DESC LIMIT 1",false);
 
 		return $rs[0]['a']['id'];
 	}
 	public function getCurrentCoin($game_team_id){
-		$sql = "SELECT * FROM ffgame.game_team_cash a WHERE game_team_id = {$game_team_id} LIMIT 1";
+		$sql = "SELECT * FROM ".$_SESSION['ffgamedb'].".game_team_cash a WHERE game_team_id = {$game_team_id} LIMIT 1";
 		$rs = $this->query($sql,false);
 		return $rs[0]['a']['cash'];
 	}
@@ -248,7 +248,7 @@ class Game extends AppModel {
 		$item_name,
 		$item_type,
 		$amount){
-		$sql = "SELECT * FROM ffgame.game_team_expenditures a
+		$sql = "SELECT * FROM ".$_SESSION['ffgamedb'].".game_team_expenditures a
 				WHERE game_team_id={$game_team_id} AND item_name='{$item_name}'
 				AND item_type='{$item_type}' LIMIT 1";
 		$rs = $this->query($sql);
@@ -260,7 +260,7 @@ class Game extends AppModel {
 		$item_name,
 		$item_type,
 		$amount){
-		$sql = "SELECT * FROM ffgame.game_team_expenditures Transaction
+		$sql = "SELECT * FROM ".$_SESSION['ffgamedb'].".game_team_expenditures Transaction
 				WHERE game_team_id={$game_team_id} AND item_name='{$item_name}'
 				AND item_type='{$item_type}' LIMIT 1";
 		$rs = $this->query($sql);

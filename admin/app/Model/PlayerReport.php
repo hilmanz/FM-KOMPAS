@@ -168,9 +168,9 @@ class PlayerReport extends AppModel {
 		}
 
 		$rs = $this->query("SELECT * FROM team_summary Summary
-							INNER JOIN ffgame.game_teams GameTeam
+							INNER JOIN ".$_SESSION['ffgamedb'].".game_teams GameTeam
 							ON Summary.game_team_id = GameTeam.id
-							INNER JOIN ffgame.game_users GameUser
+							INNER JOIN ".$_SESSION['ffgamedb'].".game_users GameUser
 							ON GameTeam.user_id = GameUser.id
 							ORDER BY {$orderBy} {$order} 
 							LIMIT {$start},{$limit};");
@@ -179,7 +179,7 @@ class PlayerReport extends AppModel {
 			$r = $this->query("SELECT * FROM users as User
 							INNER JOIN teams Team on
 							Team.user_id = User.id 
-							INNER JOIN ffgame.master_team MasterTeam
+							INNER JOIN ".$_SESSION['ffgamedb'].".master_team MasterTeam
 							ON Team.team_id = MasterTeam.uid 
 							WHERE User.fb_id = '{$v['GameUser']['fb_id']}'
 							LIMIT 1");
@@ -220,15 +220,15 @@ class PlayerReport extends AppModel {
 		$rs = $this->query("SELECT * FROM users as User
 							INNER JOIN teams Team on
 							Team.user_id = User.id 
-							INNER JOIN ffgame.master_team MasterTeam
+							INNER JOIN ".$_SESSION['ffgamedb'].".master_team MasterTeam
 							ON Team.team_id = MasterTeam.uid
 							ORDER BY {$order}
 							LIMIT {$start},{$limit}");
 
 		//additional data
 		foreach($rs as $n=>$v){
-			$r = $this->query("SELECT * FROM ffgame.game_users GameUser
-								INNER JOIN ffgame.game_teams GameTeam
+			$r = $this->query("SELECT * FROM ".$_SESSION['ffgamedb'].".game_users GameUser
+								INNER JOIN ".$_SESSION['ffgamedb'].".game_teams GameTeam
 								ON GameTeam.user_id = GameUser.id
 
 								WHERE GameUser.fb_id = '{$v['User']['fb_id']}' LIMIT 1;");
@@ -277,7 +277,7 @@ class PlayerReport extends AppModel {
 							FROM users AS User
 							INNER JOIN teams Team ON
 							Team.user_id = User.id 
-							INNER JOIN ffgame.master_team MasterTeam
+							INNER JOIN ".$_SESSION['ffgamedb'].".master_team MasterTeam
 							ON Team.team_id = MasterTeam.uid
 							INNER JOIN points Point
 							ON Point.team_id = Team.id
@@ -285,8 +285,8 @@ class PlayerReport extends AppModel {
 							LIMIT {$start},{$limit}");
 		//additional data
 		foreach($rs as $n=>$v){
-			$r = $this->query("SELECT * FROM ffgame.game_users GameUser
-								INNER JOIN ffgame.game_teams GameTeam
+			$r = $this->query("SELECT * FROM ".$_SESSION['ffgamedb'].".game_users GameUser
+								INNER JOIN ".$_SESSION['ffgamedb'].".game_teams GameTeam
 								ON GameTeam.user_id = GameUser.id
 
 								WHERE GameUser.fb_id = '{$v['User']['fb_id']}' LIMIT 1;");
@@ -334,7 +334,7 @@ class PlayerReport extends AppModel {
 							FROM users AS User
 							INNER JOIN teams Team ON
 							Team.user_id = User.id 
-							INNER JOIN ffgame.master_team MasterTeam
+							INNER JOIN ".$_SESSION['ffgamedb'].".master_team MasterTeam
 							ON Team.team_id = MasterTeam.uid
 							INNER JOIN points Point
 							ON Point.team_id = Team.id
@@ -342,8 +342,8 @@ class PlayerReport extends AppModel {
 							LIMIT {$start},{$limit}");
 		//additional data
 		foreach($rs as $n=>$v){
-			$r = $this->query("SELECT * FROM ffgame.game_users GameUser
-								INNER JOIN ffgame.game_teams GameTeam
+			$r = $this->query("SELECT * FROM ".$_SESSION['ffgamedb'].".game_users GameUser
+								INNER JOIN ".$_SESSION['ffgamedb'].".game_teams GameTeam
 								ON GameTeam.user_id = GameUser.id
 
 								WHERE GameUser.fb_id = '{$v['User']['fb_id']}' LIMIT 1;");
@@ -392,14 +392,14 @@ class PlayerReport extends AppModel {
 		$rs = $this->query("SELECT * FROM users User
 							INNER JOIN teams Team
 							ON Team.user_id = User.id
-							INNER JOIN ffgame.master_team MasterTeam
+							INNER JOIN ".$_SESSION['ffgamedb'].".master_team MasterTeam
 							ON Team.team_id = MasterTeam.uid
 							{$search}
 							LIMIT {$start},{$limit}",false);
 		//additional data
 		foreach($rs as $n=>$v){
-			$r = $this->query("SELECT * FROM ffgame.game_users GameUser
-								INNER JOIN ffgame.game_teams GameTeam
+			$r = $this->query("SELECT * FROM ".$_SESSION['ffgamedb'].".game_users GameUser
+								INNER JOIN ".$_SESSION['ffgamedb'].".game_teams GameTeam
 								ON GameTeam.user_id = GameUser.id
 								WHERE GameUser.fb_id = '{$v['User']['fb_id']}' LIMIT 1;",false);
 			$rs[$n]['GameData'] = $r[0];

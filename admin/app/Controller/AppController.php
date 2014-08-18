@@ -32,14 +32,60 @@ App::uses('Controller', 'Controller');
  * @link		http://book.cakephp.org/2.0/en/controllers.html#the-app-controller
  */
 class AppController extends Controller {
-
 	
 	public function beforeFilter(){
+		$this->loadModel('AddCoinHistory');
+		$this->loadModel('AddFundHistory');
+		$this->loadModel('Coupon');
+		$this->loadModel('CouponCode');
+		$this->loadModel('Events');
+		$this->loadModel('MasterMatchday');
+		$this->loadModel('MasterPerk');
+		$this->loadModel('Newsletter');
+		$this->loadModel('Perk');
+		$this->loadModel('SponsorBanner');
+		$this->loadModel('Sponsorship');
+		$this->loadModel('TriggeredEvents');
+		
+		//filter the league.
+		//the default league is epl
+		if($this->Session->read('league') == NULL){
+			$this->Session->write('league', 'epl');
+			$this->Session->write('ffgamedb', 'ffgame');
+			$this->Session->write('ffgamestatsdb', 'ffgame_stats');
+		}
+
+		if(isset($this->request->query['league'])){
+			if(@$this->request->query['league']=='ita'){
+				$this->Session->write('league', 'ita');
+				$this->Session->write('ffgamedb', 'ffgame_ita');
+				$this->Session->write('ffgamestatsdb', 'ffgame_stats_ita');
+			}else{
+				$this->Session->write('league', 'epl');
+				$this->Session->write('ffgamedb', 'ffgame');
+				$this->Session->write('ffgamestatsdb', 'ffgame_stats');
+			}
+			
+		}
+
 		$this->layout = 'admin';
 		$this->loadModel('Game');
 		//set acces token
 		$this->initAccessToken();
 		$this->Game->setAccessToken($this->getAccessToken());
+
+		$this->AddCoinHistory->useDbConfig = $_SESSION['ffgamedb'];
+		$this->AddFundHistory->useDbConfig = $_SESSION['ffgamedb'];
+		$this->Coupon->useDbConfig = $_SESSION['ffgamedb'];
+		$this->CouponCode->useDbConfig = $_SESSION['ffgamedb'];
+		$this->Events->useDbConfig = $_SESSION['ffgamedb'];
+		$this->MasterMatchday->useDbConfig = $_SESSION['ffgamedb'];
+		$this->MasterPerk->useDbConfig = $_SESSION['ffgamedb'];
+		$this->Newsletter->useDbConfig = $_SESSION['ffgamedb'];
+		$this->Perk->useDbConfig = $_SESSION['ffgamedb'];
+		$this->SponsorBanner->useDbConfig = $_SESSION['ffgamedb'];
+		$this->Sponsorship->useDbConfig = $_SESSION['ffgamedb'];
+		$this->TriggeredEvents->useDbConfig = $_SESSION['ffgamedb'];
 
 		if($this->Session->read('AdminLogin')==null && $this->request->params['controller']!='login'){
 			

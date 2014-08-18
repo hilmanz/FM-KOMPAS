@@ -6,6 +6,6 @@ App::uses('AppModel', 'Model');
  */
 class CouponCode extends AppModel {
 	public $useTable = 'coupon_codes'; 
-	public $useDbConfig = 'ffgame';
+	public $useDbConfig = "ffgame";
 	
 }

@@ -10,7 +10,7 @@ class Sponsorship extends AppModel {
 	public $useDbConfig = "ffgame";
 
 	public function getPerks(){
-		$rs = $this->query("SELECT * FROM ffgame.master_perks Perks LIMIT 100");
+		$rs = $this->query("SELECT * FROM ".$_SESSION['ffgamedb'].".master_perks Perks LIMIT 100");
 		$perks = array();
 		foreach($rs as $r){
 			$perks[] = $r['Perks'];
@@ -21,8 +21,8 @@ class Sponsorship extends AppModel {
 	}
 	public function getPerksBySponsorId($sponsor_id){
 		$rs = $this->query("SELECT *
-							FROM ffgame.game_sponsor_perks a
-							INNER JOIN ffgame.master_perks b
+							FROM ".$_SESSION['ffgamedb'].".game_sponsor_perks a
+							INNER JOIN ".$_SESSION['ffgamedb'].".master_perks b
 							ON a.perk_id = b.id
 							WHERE a.sponsor_id = {$sponsor_id} 
 							LIMIT 1000");
@@ -39,14 +39,14 @@ class Sponsorship extends AppModel {
 	}
 	public function addPerk($data){
 		$rs = $this->query("SELECT COUNT(*) as total 
-							FROM ffgame.game_sponsor_perks 
+							FROM ".$_SESSION['ffgamedb'].".game_sponsor_perks 
 							WHERE sponsor_id = {$data['sponsor_id']} 
 							AND perk_id = {$data['perkID']}");
 		
 		if($rs[0][0]['total']!=0){
 			return false;
 		}else{
-			$sql = "INSERT IGNORE INTO ffgame.game_sponsor_perks
+			$sql = "INSERT IGNORE INTO ".$_SESSION['ffgamedb'].".game_sponsor_perks
 						(sponsor_id,perk_id,amount)
 						VALUES(
 							{$data['sponsor_id']},{$data['perkID']},{$data['amount']})";
@@ -73,7 +73,7 @@ class Sponsorship extends AppModel {
 			$start = ($limit * $page) - $limit;
 		}
 		$rs = $this->query("SELECT * 
-							FROM ffgame.game_sponsorships Sponsors
+							FROM ".$_SESSION['ffgamedb'].".game_sponsorships Sponsors
 							LIMIT {$start},{$limit}",false);
 		return $rs;
 	}
@@ -86,7 +86,7 @@ class Sponsorship extends AppModel {
 		
 		
 	    // method body
-		$rs = $this->query("SELECT COUNT(id) AS total FROM ffgame.game_sponsorships");
+		$rs = $this->query("SELECT COUNT(id) AS total FROM ".$_SESSION['ffgamedb'].".game_sponsorships");
 		
 		return $rs[0][0]['total'];
 	}

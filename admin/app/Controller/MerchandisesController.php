@@ -533,7 +533,7 @@ class MerchandisesController extends AppController {
 			$refund_amount = intval($statement['amount']) * -1;
 			//if everything is fine, then we process the refund
 			$rs = $this->Game->query("
-				INSERT IGNORE INTO ffgame.game_transactions
+				INSERT IGNORE INTO ".$_SESSION['ffgamedb'].".game_transactions
 				(game_team_id,transaction_name,transaction_dt,
 				 amount,details)
 				VALUES
@@ -557,10 +557,10 @@ class MerchandisesController extends AppController {
 		return $refund_ok;
 	}
 	private function refresh_cash($game_team_id){
-		$sql = "INSERT INTO ffgame.game_team_cash
+		$sql = "INSERT INTO ".$_SESSION['ffgamedb'].".game_team_cash
 				(game_team_id,cash)
 				SELECT game_team_id,SUM(amount) AS cash 
-				FROM ffgame.game_transactions
+				FROM ".$_SESSION['ffgamedb'].".game_transactions
 				WHERE game_team_id = {$game_team_id}
 				GROUP BY game_team_id
 				ON DUPLICATE KEY UPDATE
@@ -576,7 +576,7 @@ class MerchandisesController extends AppController {
 		if(intval($statement['id']) > 0){
 			//if everything is fine, then we process the refund
 			$rs = $this->Game->query("
-				INSERT IGNORE INTO ffgame.game_team_expenditures
+				INSERT IGNORE INTO ".$_SESSION['ffgamedb'].".game_team_expenditures
 				(game_team_id,item_name,item_type,
 				 amount,game_id,match_day,item_total,base_price)
 				VALUES
@@ -596,7 +596,7 @@ class MerchandisesController extends AppController {
 		return $refund_ok;
 	}
 	private function getPurchaseStatement($game_team_id,$po_number){
-		$sql = "SELECT * FROM ffgame.game_team_expenditures a
+		$sql = "SELECT * FROM ".$_SESSION['ffgamedb'].".game_team_expenditures a
 				WHERE game_team_id={$game_team_id} AND 
 				item_name ='purchase merchandise - {$po_number}' LIMIT 1;";
 		$rs = $this->Game->query($sql,false);
@@ -607,7 +607,7 @@ class MerchandisesController extends AppController {
 		}
 	}
 	private function getCashPurchaseStatement($game_team_id,$po_number){
-		$sql = "SELECT * FROM ffgame.game_transactions a
+		$sql = "SELECT * FROM ".$_SESSION['ffgamedb'].".game_transactions a
 				WHERE game_team_id={$game_team_id} AND 
 				transaction_name ='purchase_{$po_number}' LIMIT 1;";
 		
@@ -620,7 +620,7 @@ class MerchandisesController extends AppController {
 		}
 	}
 	private function getCashRefundedStatement($game_team_id,$po_number){
-		$sql = "SELECT * FROM ffgame.game_transactions a
+		$sql = "SELECT * FROM ".$_SESSION['ffgamedb'].".game_transactions a
 				WHERE game_team_id={$game_team_id} AND 
 				transaction_name ='purchase_{$po_number} - refunded' LIMIT 1;";
 		$rs = $this->Game->query($sql,false);
@@ -631,7 +631,7 @@ class MerchandisesController extends AppController {
 		}
 	}
 	private function getRefundedStatement($game_team_id,$po_number){
-		$sql = "SELECT * FROM ffgame.game_team_expenditures a
+		$sql = "SELECT * FROM ".$_SESSION['ffgamedb'].".game_team_expenditures a
 				WHERE game_team_id={$game_team_id} AND 
 				item_name ='purchase merchandise - {$po_number} - refunded' LIMIT 1;";
 		$rs = $this->Game->query($sql,false);

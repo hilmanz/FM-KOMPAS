@@ -6,7 +6,7 @@ App::uses('AppModel', 'Model');
  */
 class MasterPerk extends AppModel {
 	public $useTable = 'master_perks';
-	public $useDbConfig = 'ffgame';
+	public $useDbConfig = "ffgame";
 
 	
 }

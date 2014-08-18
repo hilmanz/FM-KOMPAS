@@ -43,8 +43,8 @@ class UpdaterShell extends AppShell{
     	}
     }
     private function generate_summary($user){
-        $gameData = $this->Game->query("SELECT * FROM ffgame.game_users GameUser
-                              INNER JOIN ffgame.game_teams GameTeam
+        $gameData = $this->Game->query("SELECT * FROM ".$_SESSION['ffgamedb'].".game_users GameUser
+                              INNER JOIN ".$_SESSION['ffgamedb'].".game_teams GameTeam
                               ON GameTeam.user_id = GameUser.id
                               WHERE GameUser.fb_id = '{$user['User']['fb_id']}' LIMIT 1");
         pr($gameData);

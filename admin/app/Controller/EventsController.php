@@ -306,7 +306,7 @@ class EventsController extends AppController {
 		$n=0;
 		$team_id = json_decode($team_id,true);
 		foreach($team_id as $ids){
-			$team = $this->Events->query("SELECT * FROM ffgame.master_team 
+			$team = $this->Events->query("SELECT * FROM ".$_SESSION['ffgamedb'].".master_team 
 											WHERE uid = '{$ids}' 
 										  LIMIT 1;");
 			if($n!=0){
@@ -322,7 +322,7 @@ class EventsController extends AppController {
 		$n=0;
 		$player_id = json_decode($player_id,true);
 		foreach($player_id as $ids){
-			$player = $this->Events->query("SELECT * FROM ffgame.master_player 
+			$player = $this->Events->query("SELECT * FROM ".$_SESSION['ffgamedb'].".master_player 
 											WHERE uid = '{$ids}' 
 										  LIMIT 1;");
 			if($n!=0){
@@ -338,8 +338,8 @@ class EventsController extends AppController {
 		$n=0;
 		foreach($game_team_id as $ids){
 			$team = $this->Events->query("SELECT d.team_name
-								FROM ffgame.game_users a
-								INNER JOIN ffgame.game_teams b
+								FROM ".$_SESSION['ffgamedb'].".game_users a
+								INNER JOIN ".$_SESSION['ffgamedb'].".game_teams b
 								ON a.id = b.user_id
 								INNER JOIN ".Configure::read('DB').".users c
 								ON c.fb_id = a.fb_id
@@ -360,7 +360,7 @@ class EventsController extends AppController {
 		$start = intval(@$this->request->query['start']);
 		$limit = 20;
 		
-		$rs = $this->Events->query("SELECT * FROM ffgame.master_team
+		$rs = $this->Events->query("SELECT * FROM ".$_SESSION['ffgamedb'].".master_team
 									LIMIT {$start},{$limit};");
 		
 		
@@ -382,8 +382,8 @@ class EventsController extends AppController {
 		$rs = $this->Events->query("SELECT a.uid AS id,a.name,a.position,
 									a.first_name,a.last_name,a.known_name,b.name AS club,
 									a.transfer_value
-									FROM ffgame.master_player a
-									INNER JOIN ffgame.master_team b
+									FROM ".$_SESSION['ffgamedb'].".master_player a
+									INNER JOIN ".$_SESSION['ffgamedb'].".master_team b
 									ON a.team_id = b.uid 
 									LIMIT {$start},{$limit};");
 		
@@ -433,14 +433,14 @@ class EventsController extends AppController {
 	}
 	private function getGameTeamId($fb_id){
 		$rs = $this->Events->query("SELECT b.id AS game_team_id 
-										FROM ffgame.game_users a
-										INNER JOIN ffgame.game_teams b
+										FROM ".$_SESSION['ffgamedb'].".game_users a
+										INNER JOIN ".$_SESSION['ffgamedb'].".game_teams b
 										ON a.id = b.user_id
 										WHERE a.fb_id = '{$fb_id}' LIMIT 1;");
 		return $rs[0]['b']['game_team_id'];
 	}
 	private function getOriginalTeams(){
-		$master_team = $this->Events->query("SELECT * FROM ffgame.master_team t LIMIT 20;");
+		$master_team = $this->Events->query("SELECT * FROM ".$_SESSION['ffgamedb'].".master_team t LIMIT 20;");
 		$original_teams = array();
 		foreach($master_team as $team){
 			$original_teams[$team['t']['uid']] = $team['t']['name'];

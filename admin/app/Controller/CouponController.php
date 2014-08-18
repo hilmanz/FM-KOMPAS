@@ -281,9 +281,9 @@ class CouponController extends AppController {
 												FROM fantasy.users a
 												INNER JOIN fantasy.teams b
 												ON b.user_id = a.id
-												INNER JOIN ffgame.game_users c
+												INNER JOIN ".$_SESSION['ffgamedb'].".game_users c
 												ON c.fb_id = a.fb_id
-												INNER JOIN ffgame.game_teams d
+												INNER JOIN ".$_SESSION['ffgamedb'].".game_teams d
 												ON d.user_id = c.id
 												WHERE d.id = {$coupon[$i]['CouponCode']['game_team_id']} 
 												LIMIT 1;");

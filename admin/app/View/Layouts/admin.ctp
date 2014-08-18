@@ -85,6 +85,15 @@
                         <li>
                             <a href="<?=$this->Html->url('/banners')?>">Banners</a>
                         </li>
+                        <?php if($_SESSION['league'] == 'epl'): ?>
+                        <li>
+                            <a href="<?=$this->Html->url('?league=ita')?>">Switch To SERI A</a>
+                        </li>
+                        <?php elseif($_SESSION['league'] == 'ita'): ?>
+                        <li>
+                            <a href="<?=$this->Html->url('?league=epl')?>">Switch To EPL</a>
+                        </li>
+                        <?php endif; ?>
                     	<li><a href="<?=$this->Html->url('/login/logout')?>">Logout</a></li>
                     </ul>
                 </div>

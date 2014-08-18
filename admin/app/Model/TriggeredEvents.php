@@ -27,7 +27,7 @@ class TriggeredEvents extends AppModel {
 			$start = ($limit * $page) - $limit;
 		}
 		$rs = $this->query("SELECT * 
-							FROM ffgame.master_triggered_events Events
+							FROM ".$_SESSION['ffgamedb'].".master_triggered_events Events
 							LIMIT {$start},{$limit}",false);
 		
 		return $rs;
@@ -41,7 +41,7 @@ class TriggeredEvents extends AppModel {
 		
 		
 	    // method body
-		$rs = $this->query("SELECT COUNT(id) AS total FROM ffgame.master_triggered_events");
+		$rs = $this->query("SELECT COUNT(id) AS total FROM ".$_SESSION['ffgamedb'].".master_triggered_events");
 		
 		return $rs[0][0]['total'];
 	}

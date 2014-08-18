@@ -27,7 +27,7 @@ class Events extends AppModel {
 			$start = ($limit * $page) - $limit;
 		}
 		$rs = $this->query("SELECT * 
-							FROM ffgame.master_events Events
+							FROM ".$_SESSION['ffgamedb'].".master_events Events
 							LIMIT {$start},{$limit}",false);
 		return $rs;
 	}
@@ -40,7 +40,7 @@ class Events extends AppModel {
 		
 		
 	    // method body
-		$rs = $this->query("SELECT COUNT(id) AS total FROM ffgame.master_events");
+		$rs = $this->query("SELECT COUNT(id) AS total FROM ".$_SESSION['ffgamedb'].".master_events");
 		
 		return $rs[0][0]['total'];
 	}

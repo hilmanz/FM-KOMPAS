@@ -47,6 +47,10 @@ class LoginController extends AppController {
 		$this->redirect('/login');
 	}
 	
+	public function liga()
+	{
+		
+	}
 	/*
 	public function dummy(){
 		$username = "admin";

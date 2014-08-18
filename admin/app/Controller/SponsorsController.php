@@ -43,9 +43,9 @@ class SponsorsController extends AppController {
 										SUM(t_click) AS clicks,
 										SUM(t_view) AS views 
 										FROM 
-										ffgame.game_sponsorship_banners a
+										".$_SESSION['ffgamedb'].".game_sponsorship_banners a
 										INNER JOIN 
-										ffgame.sponsor_banner_logs b
+										".$_SESSION['ffgamedb'].".sponsor_banner_logs b
 										ON a.id = b.banner_id
 										WHERE a.sponsor_id = {$id}
 										GROUP BY b.banner_id
@@ -68,7 +68,7 @@ class SponsorsController extends AppController {
 		//overall monthly
 		$overall_monthly = $this->Game->query("SELECT current_month AS mt,current_year AS yr,
 												SUM(t_click) AS clicks,SUM(t_view) AS views 
-												FROM ffgame.sponsor_banner_logs 
+												FROM ".$_SESSION['ffgamedb'].".sponsor_banner_logs 
 												WHERE banner_id={$banner_id} GROUP BY current_month,current_year
 												ORDER BY current_year ASC,current_month ASC;");
 		$this->set('overall_monthly',$overall_monthly);
@@ -94,7 +94,7 @@ class SponsorsController extends AppController {
 		//overall monthly
 		$overall_monthly = $this->Game->query("SELECT location,current_month AS mt,current_year AS yr,
 												SUM(t_click) AS clicks,SUM(t_view) AS views 
-												FROM ffgame.sponsor_banner_logs 
+												FROM ".$_SESSION['ffgamedb'].".sponsor_banner_logs 
 												WHERE banner_id={$banner_id} AND location='{$location}' 
 												GROUP BY current_month,current_year,location
 												LIMIT 0,36;");
@@ -106,7 +106,7 @@ class SponsorsController extends AppController {
 		$sql = "SELECT location,
 				SUM(t_click) AS clicks,
 				SUM(t_view) AS views 
-				FROM ffgame.sponsor_banner_logs 
+				FROM ".$_SESSION['ffgamedb'].".sponsor_banner_logs 
 				WHERE banner_id=$banner_id
 				GROUP BY location
 				LIMIT {$start},20;";
@@ -277,8 +277,8 @@ class SponsorsController extends AppController {
 
 		if($filter=='everyone_once'){
 			$rs = $this->Sponsorship->query("SELECT a.fb_id,c.email,b.id AS game_team_id
-										FROM ffgame.game_users a
-										INNER JOIN ffgame.game_teams b
+										FROM ".$_SESSION['ffgamedb'].".game_users a
+										INNER JOIN ".$_SESSION['ffgamedb'].".game_teams b
 										ON a.id = b.user_id
 										INNER JOIN users c
 										ON a.fb_id = c.fb_id LIMIT {$start},20;
@@ -311,8 +311,8 @@ class SponsorsController extends AppController {
 			$end_rank = $rs['end_rank'];
 		}else{
 			$rs = $this->Sponsorship->query("SELECT a.fb_id,c.email,b.id AS game_team_id
-										FROM ffgame.game_users a
-										INNER JOIN ffgame.game_teams b
+										FROM ".$_SESSION['ffgamedb'].".game_users a
+										INNER JOIN ".$_SESSION['ffgamedb'].".game_teams b
 										ON a.id = b.user_id
 										INNER JOIN ffg.users c
 										ON a.fb_id = c.fb_id LIMIT {$start},20;
@@ -379,8 +379,8 @@ class SponsorsController extends AppController {
 			foreach($rs as $r){
 				//get the game_team_id and put it in queue
 				$team = $this->Game->query("SELECT a.id AS game_team_id 
-						FROM ffgame.game_teams a
-						INNER JOIN ffgame.game_users b
+						FROM ".$_SESSION['ffgamedb'].".game_teams a
+						INNER JOIN ".$_SESSION['ffgamedb'].".game_users b
 						ON a.user_id = b.id
 						WHERE b.fb_id = '{$r['c']['fb_id']}';");
 				
@@ -403,7 +403,7 @@ class SponsorsController extends AppController {
 													 $email_type);
 			//put into queue
 			if(intval($game_team_id)>0){
-				$q = $this->Sponsorship->query("INSERT INTO ffgame.game_sponsor_emails
+				$q = $this->Sponsorship->query("INSERT INTO ".$_SESSION['ffgamedb'].".game_sponsor_emails
 										(sponsor_id,game_team_id,email_type,email,apply_link,sent_dt)
 										VALUES
 										({$sponsor_id},{$game_team_id},'{$email_type}',
@@ -426,7 +426,7 @@ class SponsorsController extends AppController {
 					$body = mysql_escape_string($body);
 
 					//queue email
-					$this->Sponsorship->query("INSERT INTO ffgame.email_queue
+					$this->Sponsorship->query("INSERT INTO ".$_SESSION['ffgamedb'].".email_queue
 												(subject,email,plain_txt,html_text,queue_dt,send_dt,n_status)
 												VALUES
 												('{$subject}','{$email}','{$body}','{$body}',NOW(),NULL,0);");
@@ -454,7 +454,7 @@ class SponsorsController extends AppController {
 
 		foreach($rs as $n=>$v){
 			//check for queue
-			$cek = $this->Sponsorship->query("SELECT * FROM ffgame.game_sponsor_emails 
+			$cek = $this->Sponsorship->query("SELECT * FROM ".$_SESSION['ffgamedb'].".game_sponsor_emails 
 												WHERE sponsor_id={$sponsor_id} 
 												AND game_team_id={$v['b']['game_team_id']}
 												AND email_type='{$email_type}' LIMIT 1");
@@ -465,7 +465,7 @@ class SponsorsController extends AppController {
 														 $v['c']['email'],
 														 $email_type);
 				//put into queue
-				$q = $this->Sponsorship->query("INSERT INTO ffgame.game_sponsor_emails
+				$q = $this->Sponsorship->query("INSERT INTO ".$_SESSION['ffgamedb'].".game_sponsor_emails
 											(sponsor_id,game_team_id,email_type,email,apply_link,sent_dt)
 											VALUES
 											({$sponsor_id},{$v['b']['game_team_id']},'{$email_type}',
@@ -481,7 +481,7 @@ class SponsorsController extends AppController {
 						$plain = str_replace("{{APPLY_LINK}}",Configure::read('WWW_URL').$apply_link,$sponsor['win_bonus_email']);
 					}
 					//$plain = mysql_escape_string($plain);
-					$this->Sponsorship->query("INSERT INTO ffgame.email_queue
+					$this->Sponsorship->query("INSERT INTO ".$_SESSION['ffgamedb'].".email_queue
 												(email,plain_txt,html_text,queue_dt,send_dt,n_status)
 												VALUES
 												('{$v['c']['email']}','{$plain}','{$plain}',NOW(),NULL,0);");

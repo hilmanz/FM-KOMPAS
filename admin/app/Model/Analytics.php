@@ -104,12 +104,12 @@ class Analytics extends AppModel {
 	}
 
 	//query how many users use each team
-	//player's data team can be retrieved from ffgame.game_teams
-	//meanwhile the team data can be retrieved from ffgame.master_team
+	//player's data team can be retrieved from ".$_SESSION['ffgamedb'].".game_teams
+	//meanwhile the team data can be retrieved from ".$_SESSION['ffgamedb'].".master_team
 	public function team_used(){
 		$sql = "SELECT b.name,COUNT(b.uid) AS total 
-				FROM ffgame.game_teams a
-				INNER JOIN ffgame.master_team b
+				FROM ".$_SESSION['ffgamedb'].".game_teams a
+				INNER JOIN ".$_SESSION['ffgamedb'].".master_team b
 				ON a.team_id = b.uid
 				GROUP BY a.team_id ORDER BY total DESC LIMIT 20;";
 
@@ -123,12 +123,12 @@ class Analytics extends AppModel {
 		return $results;
 	}
 	//query how many users use each player
-	//player's data team can be retrieved from ffgame.game_team_players
-	//meanwhile the team data can be retrieved from ffgame.master_player
+	//player's data team can be retrieved from ".$_SESSION['ffgamedb'].".game_team_players
+	//meanwhile the team data can be retrieved from ".$_SESSION['ffgamedb'].".master_player
 	public function player_used(){
 		$sql = "SELECT b.name,COUNT(b.uid) AS total 
-				FROM ffgame.game_team_players a
-				INNER JOIN ffgame.master_player b
+				FROM ".$_SESSION['ffgamedb'].".game_team_players a
+				INNER JOIN ".$_SESSION['ffgamedb'].".master_player b
 				ON a.player_id = b.uid
 				GROUP BY a.player_id
 				ORDER BY total DESC LIMIT 40";
@@ -146,7 +146,7 @@ class Analytics extends AppModel {
 	//retrieve how many users use each formation(s)
 	public function formation_used(){
 		$sql = "SELECT formation,COUNT(formation) AS total 
-				FROM ffgame.game_team_formation a 
+				FROM ".$_SESSION['ffgamedb'].".game_team_formation a 
 				WHERE formation <> 'Pilih Formasi' 
 				GROUP BY formation ORDER BY total DESC LIMIT 50;";
 
@@ -164,10 +164,10 @@ class Analytics extends AppModel {
 	public function transfer_most_buy($tw_id){
 		$tw_id = intval($tw_id);
 		$sql = "SELECT player_id,c.name,COUNT(player_id) AS total
-				FROM ffgame.game_transfer_history a
-				INNER JOIN ffgame.master_transfer_window b
+				FROM ".$_SESSION['ffgamedb'].".game_transfer_history a
+				INNER JOIN ".$_SESSION['ffgamedb'].".master_transfer_window b
 				ON a.tw_id = b.id
-				INNER JOIN ffgame.master_player c
+				INNER JOIN ".$_SESSION['ffgamedb'].".master_player c
 				ON c.uid = a.player_id
 				WHERE a.tw_id = {$tw_id} AND transfer_type=1
 				GROUP BY player_id
@@ -186,10 +186,10 @@ class Analytics extends AppModel {
 	public function transfer_most_sold($tw_id){
 		$tw_id = intval($tw_id);
 		$sql = "SELECT player_id,c.name,COUNT(player_id) AS total
-				FROM ffgame.game_transfer_history a
-				INNER JOIN ffgame.master_transfer_window b
+				FROM ".$_SESSION['ffgamedb'].".game_transfer_history a
+				INNER JOIN ".$_SESSION['ffgamedb'].".master_transfer_window b
 				ON a.tw_id = b.id
-				INNER JOIN ffgame.master_player c
+				INNER JOIN ".$_SESSION['ffgamedb'].".master_player c
 				ON c.uid = a.player_id
 				WHERE a.tw_id = {$tw_id} AND transfer_type=2
 				GROUP BY player_id
@@ -207,7 +207,7 @@ class Analytics extends AppModel {
 	}
 
 	public function transfer_window(){
-		$sql = "SELECT * FROM ffgame.master_transfer_window a";
+		$sql = "SELECT * FROM ".$_SESSION['ffgamedb'].".master_transfer_window a";
 		$rs = $this->query($sql);
 		$results = array();
 		for($i=0;$i<sizeof($rs);$i++){
@@ -218,7 +218,7 @@ class Analytics extends AppModel {
 	}
 
 	public function getTransferWindowDetail($tw_id){
-		$sql = "SELECT * FROM ffgame.master_transfer_window a WHERE id = {$tw_id} LIMIT 1";
+		$sql = "SELECT * FROM ".$_SESSION['ffgamedb'].".master_transfer_window a WHERE id = {$tw_id} LIMIT 1";
 		$rs = $this->query($sql);
 		return $rs[0]['a'];
 	}

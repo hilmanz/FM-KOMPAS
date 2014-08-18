@@ -32,7 +32,7 @@ if(typeof argv.league !== 'undefined'){
 	}
 	league = argv.league;
 }
-console.log(config);
+
 
 
 var fs = require('fs');

@@ -43,7 +43,7 @@ pool.getConnection(function(err,conn){
 				getGameIdsByMatchday(conn,matchday,cb);
 			},
 			function(matchday,game_id,cb){
-				console.log(game_id);
+				console.log('match',game_id);
 				//foreach game_ids, retrieve the playerstats
 				//and populate it into ffgame_stats.master_player_progress
 				//console.log(game_id);
@@ -82,7 +82,7 @@ pool.getConnection(function(err,conn){
 function getCurrentMatchday(conn,done){
 	conn.query("SELECT matchday FROM \
 				ffgame.game_fixtures \
-				WHERE is_processed = 0 \
+				WHERE is_processed = 0 AND session_id=2014 \
 				ORDER BY id ASC LIMIT 1;",
 				[],function(err,rs){
 					if(rs!=null&&rs.length==1){
@@ -96,8 +96,8 @@ function getCurrentMatchday(conn,done){
 function getGameIdsByMatchday(conn,matchday,done){
 	conn.query("SELECT game_id,period FROM \
 				ffgame.game_fixtures \
-				WHERE matchday = ? \
-				ORDER BY id ASC LIMIT 40;",
+				WHERE matchday = ? AND session_id=2014\
+				ORDER BY match_date ASC LIMIT 40;",
 				[matchday],function(err,rs){
 					if(rs != null
 						 && rs.length > 0){
@@ -389,7 +389,7 @@ function getStatsCategory(){
 }
 */
 function storeToRedis(conn,matchday,game_id,done){
-	console.log(game_id);
+	console.log('match','Store to Redis',game_id);
 	async.each(
 	game_id,
 	function(item,next){
@@ -426,10 +426,11 @@ function storeMatchInfoToRedis(conn,matchday,done){
 						ON a.home_team = b.uid\
 						INNER JOIN optadb.master_team c\
 						ON a.away_team = c.uid\
-						WHERE a.matchday=? LIMIT 20;",
+						WHERE a.matchday=? AND a.season_id=2014 LIMIT 20;",
 						[matchday],
 						function(err,rs){
 							console.log(S(this.sql).collapseWhitespace().s);
+							console.log(rs);
 							cb(err,rs);
 						});
 		},
@@ -450,23 +451,26 @@ function storeMatchInfoToRedis(conn,matchday,done){
 					INNER JOIN\
 					    ffgame.master_team b ON a.team_id = b.uid\
 					ORDER BY\
-						group_name,group_position LIMIT 100;",[],function(err,rs){
-				cb(err,matches,rs);
+						group_name,group_position LIMIT 100;",[],
+			function(err,rs){
+				console.log('match','standing');
 				console.log(S(this.sql).collapseWhitespace().s);
+				cb(err,matches,rs);
+				
 			});
 		},
 		function(matches,standings,cb){
 			redisClient.set('standings',JSON.stringify(standings),function(err,rs){
 				if(!err){
-					console.log('standings successfully stored');
+					console.log('match','standings successfully stored');
 				}else{
-					console.log('Error',err.message);
+					console.log('match','Error',err.message);
 				}
 				cb(err,matches);
 			});
 		},
 		function(matches,cb){
-			console.log(matches);
+			console.log('match','storing matchinfo',matches);
 			redisClient.set('matchinfo_'+matchday,JSON.stringify(matches),function(err,rs){
 				if(!err){
 					console.log('matchinfo successfully stored');

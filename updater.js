@@ -17,7 +17,7 @@ if(typeof argv.league !== 'undefined'){
 		break;
 	}
 }
-console.log(config);
+
 
 var fs = require('fs');
 var path = require('path');

@@ -44,9 +44,10 @@ function fixtures(done){
 				ON a.home_id = b.uid\
 				INNER JOIN "+config.database.database+".master_team c\
 				ON a.away_id = c.uid\
+				WHERE a.session_id = ? \
 				ORDER BY a.matchday\
 				LIMIT 1000;",
-				[],
+				[config.competition.year],
 				function(err,match){
 					conn.release();
 					done(err,match);						

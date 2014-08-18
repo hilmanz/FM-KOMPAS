@@ -49,6 +49,7 @@ pool.getConnection(function(err,conn){
 				getGameIdsByMatchday(conn,matchday,cb);
 			},
 			function(matchday,game_id,cb){
+				console.log(game_id);
 				processData(conn,matchday,game_id,function(err,rs){
 					cb(err,rs);
 				});
@@ -917,7 +918,7 @@ function getMatchInfo(conn,game_id,cb){
 function getCurrentMatchday(conn,done){
 	conn.query("SELECT matchday FROM \
 				ffgame.game_fixtures \
-				WHERE is_processed = 0 \
+				WHERE is_processed = 0 AND session_id=2014 \
 				ORDER BY id ASC LIMIT 1;",
 				[],function(err,rs){
 					if(rs!=null&&rs.length==1){

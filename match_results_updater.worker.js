@@ -48,7 +48,7 @@ if(typeof argv.league !== 'undefined'){
 	}
 	league = argv.league;
 }
-console.log(config);
+
 
 var FILE_PREFIX = config.updater_file_prefix+config.competition.id+'-'+config.competition.year;
 

@@ -590,6 +590,7 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 													cb(null,false,0);
 												},
 												function(rooster_overlimit,total_game_players,cb){
+													/*
 													if(rooster_overlimit){
 														//if rooster is overlimit, we give penalty to user
 														var overlimit_penalty = (total_game_players - 23) * (-100);
@@ -622,8 +623,12 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 																	total_game_players,'OK');
 														cb(null,rooster_overlimit,0);
 													}
+													*/
+													cb(null,false,0);
 												},
 												function(rooster_overlimit,penalty,cb){
+													cb(null,true);
+													/*
 													//notify the user
 													if(rooster_overlimit){
 														var msg = "Kamu mendapatkan potongan poin sebesar `"+penalty+"` jumlah pemain tim kamu melebihi kapasitas (maksimum 23).";
@@ -638,7 +643,7 @@ function update_team_stats(queue_id,game_id,team,player_stats,team_summary,done)
 															});
 													}else{
 														cb(null,true);
-													}
+													}*/
 												},
 												function(endOfProcess,cb){
 													//apply jersey perks

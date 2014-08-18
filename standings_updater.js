@@ -84,7 +84,7 @@ open_the_file(the_file,function(err,doc){
 		update_standings(JSON.parse(xmlparser.toJson(doc.toString())),onDataProcessed);
 });
 function update_standings(data,callback){
-	console.log(data.SoccerFeed.SoccerDocument.Competition.TeamStandings[0].Round.Name.id);
+	//console.log(data.SoccerFeed.SoccerDocument.Competition.TeamStandings[0].Round.Name.id);
 	
 	if(Array.isArray(data.SoccerFeed.SoccerDocument.Competition.TeamStandings)){
 		//kalo team record ada lebih dari satu. berarti standingsnya dibagi berdasarkan group.

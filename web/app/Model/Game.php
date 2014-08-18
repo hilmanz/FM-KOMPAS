@@ -390,7 +390,7 @@ class Game extends AppModel {
 		$rs = $this->api_call('/fixtures');
 		$fixtures = $rs['matches'];
 		
-		$matchday = 33;
+		$matchday = 1;
 
 
 		for($i=0;$i<sizeof($fixtures);$i++){
@@ -411,6 +411,9 @@ class Game extends AppModel {
 		$show_stats = 0;
 		if(sizeof($response['data'])==0){
 			$matchday -= 1; //we use the previous matches
+			if($matchday < 1){
+				$matchday = 1;
+			}
 			$is_live = 0;
 			//check if the previous matchday has cached stats.
 			$response = $this->api_call('/livematches/'.$matchday);

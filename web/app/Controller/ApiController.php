@@ -2232,13 +2232,16 @@ class ApiController extends AppController {
 	}
 	public function livestats($game_id){
 		$game_id = Sanitize::paranoid($game_id);
+		if($_SESSION['ffgamedb']==null){
+			$_SESSION['ffgamedb'] = "ffgame";
+		}
 		$rs = $this->Game->query("SELECT home_id,away_id,b.name AS home_name,c.name AS away_name 
 							FROM ".$_SESSION['ffgamedb'].".game_fixtures a
 							INNER JOIN ".$_SESSION['ffgamedb'].".master_team b
 							ON a.home_id = b.uid
 							INNER JOIN ".$_SESSION['ffgamedb'].".master_team c
 							ON a.away_id = c.uid
-							WHERE a.game_id='{$game_id}'
+							WHERE a.game_id='{$game_id}' AND a.session_id=2014
 							LIMIT 1;");
 
 		$response = $this->Game->livestats($game_id);
@@ -2249,6 +2252,7 @@ class ApiController extends AppController {
 			'home_id'=>@$rs[0]['a']['home_id'],
 			'away_id'=>@$rs[0]['a']['away_id']
 		);
+		$data['raw'] = $rs;
 		
 		$this->set('response',$data);
 		$this->render('default');
@@ -2262,7 +2266,7 @@ class ApiController extends AppController {
 	}
 	public function livematches(){
 		//first we have to know our current
-		$matchday = 10;
+		$matchday = 1;
 		$response = $this->Game->livematches($matchday);
 		$this->set('response',$response);
 		$this->set('raw',true);

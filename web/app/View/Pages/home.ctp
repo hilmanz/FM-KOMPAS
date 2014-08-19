@@ -26,11 +26,11 @@
 		<h1>Super Soccer Football Manager</h1>
 		<div class="entry entry-home">
 			<img src="<?=$this->Html->url('/content/hadiah.png')?>" style="float:right; margin:0 0 0 10px; width:170px;"/>
-			<p><strong>Mau dapat hadiah-hadiah keren seperti PS 4, X-Box One,  Jesrey retro dan langka, jersey bertandatangan pemain dan hadiah elektronik lainnya?</strong> Atau elo mau nonton pertandingan  liga Inggris langsung di Inggris? Semuanya bisa elo dapetin di <strong>Super Soccer Football Manager.</strong></p>
-			<p><strong>Setiap putaran kita juga nyediain hadiah istimewa, yaitu jersey negara perserta Pesta Bola Dunia!</strong></p>
+			<p><strong>Mau jalan-jalan ke Inggris dan Italia nonton tim favorit elo main? </strong>Atau mau dapat hadiah-hadiah keren seperti jersey retro dan langka, jersey bertandatangan pemain dan hadiah elektronik lainnya? Semuanya bisa elo dapetin di <strong>Super Soccer Football Manager.</strong></p>
 			<p>Buat elo yang sukanya mengkritik manajer dan ngerasa lebih pinter dari mereka, buktiin omongan elo dan skill manajerial  elo disini, karena game ini menggunakan semua kriteria yang menentukan sukses seorang manajer di lapangan. <strong>Menghitung lebih dari 64 statistik pemain di pertandingan secara real time,</strong> penilaian elo sebagai ahli taktik akan benar benar diuji, karena poin elo dihitung berdasarkan gol, assist, crossing akurat, passing berbahaya, memotong umpan, menepis bola dan aksi lainnya yang dilakukan pemain sebenarnya di dunia nyata.</p>
+
 			<img src="<?=$this->Html->url('/content/stats.png')?>" style="float:left; margin:0 10px 0 0;"/>
-			<p>Setiap <strong>De Rossi</strong> memotong umpan, elo dapat 10 poin, setiap kali <strong>Neuer</strong> menepis bola elo dapat 10 poin, setiap kali <strong>Jagielka</strong> menghalau bola elo dapat  20 poin. Nah, dengan penghitungan se-realistik ini, apa yang elo lakukan di game ini sama seperti apa yang dilakukan manajer sepakbola di dunia nyata. </p>
+			<p>Setiap <strong>Arteta</strong> memotong umpan, elo dapat 10 poin, setiap kali <strong>Courtois</strong> menepis bola elo dapat 10 poin, setiap kali <strong>Lovren</strong> menghalau bola elo dapat  20 poin. Nah, dengan penghitungan se-realistik ini, apa yang elo lakukan di game ini sama seperti apa yang dilakukan manajer sepakbola di dunia nyata. </p>
 			<p>Seperti kata <strong>Roy Evans</strong> manajer legendaris <strong>Liverpool</strong>, semua fans merasa dirinya mampu menjadi manajer, namun dengan <strong>Super Soccer Football Manager</strong>, akhirnya elo harus mempertanggung jawabkan omongan elo. </p>
 			<p>Jadi, tunggu apalagi ayo bergabung dan bersaing dengan ratusan ribu manajer lainnya,</p>
 			<h4>Its Time to Show What You Know!</h4>

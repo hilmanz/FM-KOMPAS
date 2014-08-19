@@ -43,11 +43,13 @@ pool.getConnection(function(err,conn){
 						LIMIT ?,?",
 				[start,limit],
 				function(err,rs){
+					console.log(S(this.sql).collapseWhitespace().s);
 					console.log(rs);
 					if(rs.length>0){
-						sendMail(rs, function(err){});
-	        			start+=limit;
-	        			callback();
+						console.log('length :'+rs.length);
+						sendMail(conn, rs, function(err){
+							callback();
+						});
 					}else{
 						doLoop=false;
 						callback();
@@ -56,11 +58,14 @@ pool.getConnection(function(err,conn){
 	    },
 	    function (err) {
 	    	conn.release();
+	    	pool.end(function(err){
+				console.log('done');
+			});
 	    }
 	);
 });
 
-function sendMail(users,done){
+function sendMail(conn,users,done){
 	var i=0;
 	var loop = true;
 	async.whilst(
@@ -73,21 +78,18 @@ function sendMail(users,done){
 				transport.sendMail(mailOption, function(err, info){
 					if(err){
 						console.log(err);
+						callback();
 					}else{
 						console.log("Message Sent "+info.response);
-						pool.getConnection(function(err, conn){
-							conn.query("UPDATE "+frontend_schema+".league_invitations SET is_processed=1 \
-										WHERE id=?",[id],function(err,rs){
-											console.log(S(this.sql).collapseWhitespace().s);
-										});
-						}, 
-						function(err){
-					    	conn.release();
-					    });
+						conn.query("UPDATE "+frontend_schema+".league_invitations SET is_processed=1 \
+									WHERE id=?",[id],function(err,rs){
+										console.log(S(this.sql).collapseWhitespace().s);
+										i++;
+										done();
+									});
 					}
 				});
-				i++;
-				callback();
+				//callback();
 			}else{
 				loop = false;
 				callback();
@@ -96,6 +98,7 @@ function sendMail(users,done){
 	    },
 	    function (err) {
 	    	transport.close();
+	    	done();
 	    }
 	);
 }

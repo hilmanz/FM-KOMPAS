@@ -40,6 +40,22 @@ class ApiController extends AppController {
 	private $starting_budget = 0;
 	private $finance_total_items_raw = null;
 	private $tickets_sold = null;
+	private $league;
+	private $ffgamedb = 'ffgame';
+	private $ffgamestatsdb = 'ffgame_stats';
+
+	public function beforeFilter(){
+		parent::beforeFilter();
+		if(@$_REQUEST['league']=='ita'){
+			$this->league = 'ita';
+			$this->ffgamedb = 'ffgame_ita';
+			$this->ffgamestatsdb = 'ffgame_stats_ita';
+		}else{
+			$this->league = 'epl';
+			$this->ffgamedb = 'ffgame';
+			$this->ffgamestatsdb = 'ffgame_stats';
+		}
+	}
 	public function auth(){
 		$fb_id = $this->request->query('fb_id');
 		$user = $this->User->findByFb_id($fb_id);
@@ -5033,5 +5049,214 @@ class ApiController extends AppController {
 	//--> end of ticketing stuffs
 
 
+	//Tactics API
+	public function tactics(){
+		$this->loadModel('Team');
+		$this->loadModel('User');
+		$this->loadModel('Info');
 
+
+
+		$api_session = $this->readAccessToken();
+		$fb_id = $api_session['fb_id'];
+		$user = $this->User->findByFb_id($fb_id);
+		$game_team = $this->Game->getTeam($fb_id);
+
+
+		//can updte formation
+		$can_update_formation = true;
+
+		$club = $this->Team->findByUser_id($user['User']['id']);
+		
+		$next_match = $this->Game->getNextMatch($game_team['team_id']);
+		$next_match['match']['home_original_name'] = $next_match['match']['home_name'];
+		$next_match['match']['away_original_name'] = $next_match['match']['away_name'];
+
+		if($next_match['match']['home_id']==$game_team['team_id']){
+			$next_match['match']['home_name'] = $club['Team']['team_name'];
+		}else{
+			$next_match['match']['away_name'] = $club['Team']['team_name'];
+		}
+		$next_match['match']['match_date_ts'] = strtotime($next_match['match']['match_date']);
+		$this->getCloseTime($next_match);
+
+
+		
+		if(time() > $this->closeTime['ts'] && Configure::read('debug') == 0){
+		    
+		    $can_update_formation = false;
+		    if(time() > $this->openTime){
+		       
+		        $can_update_formation = true;
+		    }
+		}else{
+		    if(time() < $this->openTime){
+		       
+		        $can_update_formation = false;
+		    }
+		}
+
+		$lineup = $this->Game->getLineup($game_team['id']);
+		$instruction_points = $this->getInstructionPoints($user['Team']['id']);
+		$upcoming_matchday = $this->getUpcomingMatchday();
+		$current_tactics = $this->getCurrentTactics($upcoming_matchday,$game_team['id']);
+		
+		if($this->request->is('post')){
+			if($can_update_formation){
+				$save_success = $this->saveTactics($next_match['match'],$instruction_points,$upcoming_matchday,$game_team['id']);
+				if($save_success){
+					$this->set('response',array('status'=>1));
+				}else{
+					$this->set('response',array('status'=>0,'error'=>'Tactics tidak dapat disimpan'));
+				}
+			}else{
+				$this->set('response',array('status'=>0,'error'=>'you cannot update tactics at these moment, please wait until the matches is over.'));		
+			}
+		}else{
+			$this->set('response',array('status'=>1,'data'=>array('tactics'=>$current_tactics,
+																'instruction_points'=>$instruction_points)));
+		}
+		
+		$this->render('default');
+	}
+	private function saveTactics($next_match,$instruction_points,$upcoming_matchday,$game_team_id){
+
+		$is_ok = false;
+
+		
+		
+		
+
+		$sql = "INSERT INTO ".$this->ffgamedb.".game_team_instructions
+				(game_team_id,
+				matchday,
+				player_id,
+				instruction_id,
+				amount) VALUES ";
+		//CakeLog::write('tactics',$_POST['instruction']);
+		$total_spend = 0;
+		for($i=0;$i<sizeof($this->request->data['instruction']);$i++){
+
+			//maksimal instruction poin yang bisa dibagikan hanya 5pts
+			$this->request->data['points'][$i] = intval($this->request->data['points'][$i]);
+			if($this->request->data['points'][$i] > 5){
+				$this->request->data['points'][$i] = 5;
+			}else if($this->request->data['points'][$i] < 0){
+				$this->request->data['points'][$i] = 0;
+			}else{
+				//do nothing
+			}
+
+			$total_spend += $this->request->data['points'][$i];
+			
+			if($i>0){
+				$sql.=",";
+			}
+			$sql.= "({$game_team_id},
+					{$upcoming_matchday},
+					'{$this->request->data['player'][$i]}',
+					{$this->request->data['instruction'][$i]},
+					{$this->request->data['points'][$i]})";
+
+		}
+		$sql.="
+				ON DUPLICATE KEY UPDATE
+				amount = VALUES(amount);";
+
+		//CakeLog::write('tactics',$sql);
+
+		if($total_spend <= $instruction_points && $total_spend > 0 && intval($upcoming_matchday) > 0){
+			$is_ok = true;
+		}
+		if($is_ok){
+			$this->Game->query("DELETE FROM ".$this->ffgamedb.".game_team_instructions 
+							WHERE game_team_id = {$game_team_id} AND matchday = {$upcoming_matchday}");
+
+			$this->Game->query($sql);
+		}
+		return $is_ok;
+	}
+	//get upcoming matchday
+	//these is useful for saving lineup / formations and tactics.
+	private function getUpcomingMatchday(){
+		$check = $this->Game->query("SELECT * FROM (SELECT matchday,MAX(is_processed) AS match_status
+											FROM ".$this->ffgamedb.".game_fixtures GROUP BY matchday) a 
+											WHERE match_status = 0 ORDER BY matchday ASC LIMIT 1;");
+		
+		try{
+			$upcoming_matchday = @$check[0]['a']['matchday'];
+		}catch(Exception $e){
+			$upcoming_matchday = 0;
+		}
+		
+		return $upcoming_matchday;
+	}
+	// instruction points is 1% of the average weekly points + minimum instruction points (10)
+	// for example, if average weekly points is 1000, then the instruction points is 10
+	private function getInstructionPoints($team_id){
+
+		
+		$minimum_ip = Configure::read('MINIMUM_INSTRUCTION_POINTS');
+
+		$rs = $this->Game->query("SELECT (points+extra_points) as total_points 
+											FROM ".Configure::read('FRONTEND_SCHEMA').".points a
+											WHERE team_id={$team_id} 
+											AND league = '{$_SESSION['league']}' 
+											LIMIT 1");
+
+		
+		
+		$total_points = intval(@$rs[0][0]['total_points']);
+
+		
+		$total_matches =  $this->Game->query("SELECT matchday FROM ".$this->ffgamedb.".game_fixtures a
+											 WHERE period='FullTime' AND is_processed = 1 
+											 ORDER BY matchday DESC LIMIT 1;");
+
+		$total_matchday = intval(@$total_matches[0]['a']['matchday']);
+		
+
+		if($total_matchday > 0){
+			$average_points = round($total_points / $total_matchday);	
+		}else{
+			$average_points = 0;
+		}
+		
+		
+		$instruction_points = round($average_points * 0.01) + $minimum_ip;
+		
+		/*if($instruction_points < $minimum_ip){
+			$instruction_points = $minimum_ip;
+		}*/
+
+		return $instruction_points;
+	}
+
+	private function getCurrentTactics($upcoming_matchday,$game_team_id){
+		if($upcoming_matchday==null){
+			$upcoming_matchday = 0;
+		}
+	
+		$sql = "SELECT * FROM ".$this->ffgamedb.".game_team_instructions a
+				WHERE game_team_id = {$game_team_id} 
+				AND matchday={$upcoming_matchday} 
+				LIMIT 16";
+		$rs = $this->Game->query($sql);
+
+		$tactics = array();
+		for($i=0;$i<sizeof($rs);$i++){
+			$tactics[] = $rs[$i]['a'];
+		}
+		return $tactics;
+	}
+	public function tactic_list(){
+		$opts = array('Tidak Ada','More Shoots','More Crosses','Focus on Through Ball','Create Chances','More Tackles','Dribbling','More Blocks');
+		$tactics = array();
+		for($i=0;$i<sizeof($opts);$i++){
+			$tactics[] = array('id'=>$i,'name'=>$opts[$i]);
+		}
+		$this->set('response',array('status'=>1,'data'=>$tactics));
+		$this->render('default');
+	}
+	//--> end of tactics API
 }

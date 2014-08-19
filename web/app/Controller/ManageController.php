@@ -914,7 +914,7 @@ class ManageController extends AppController {
 
 		
 		$total_matches =  $this->Game->query("SELECT matchday FROM ".$_SESSION['ffgamedb'].".game_fixtures a
-											 WHERE period='FullTime' AND is_processed = 1 
+											 WHERE period='FullTime' AND is_processed = 1 AND session_id=2014
 											 ORDER BY matchday DESC LIMIT 1;");
 
 		$total_matchday = intval(@$total_matches[0]['a']['matchday']);

@@ -536,3 +536,6 @@ ADD INDEX `INDEX` (`player_id` ASC);
 
 ALTER TABLE `ffgame`.`master_player` 
 ADD INDEX `INDEX` (`uid` ASC);
+
+ALTER TABLE `fantasy`.`whitelist` 
+CHANGE COLUMN `log_dt` `log_dt` DATETIME NULL DEFAULT NULL ;

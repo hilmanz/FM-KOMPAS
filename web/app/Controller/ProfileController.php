@@ -287,6 +287,8 @@ class ProfileController extends AppController {
 	{
 		$user_fb = $this->Session->read('Userlogin.info');
 
+		Cakelog::write('debug', 'profile.activation user_fb:'.json_encode($user_fb));
+
 		$this->loadModel('User');
 		$rs_user = $this->User->findByFb_id($user_fb['fb_id']);
 
@@ -299,8 +301,15 @@ class ProfileController extends AppController {
 			if($act_code == $rs_user['User']['activation_code'])
 			{
 				try{
-					$this->User->query("UPDATE users SET n_status = 1 WHERE fb_id = '{$user_fb['fb_id']}'");
-					$rs_user = $this->User->findByFb_id($user_fb['fb_id']);
+					$rs = $this->User->updateAll(
+	                                                array('n_status' => 1),
+	                                                array(
+	                                                                'fb_id' => $user_fb['fb_id']
+	                                                        )
+	                                                );
+	                Cakelog::write('debug','profile.activation rs:'.json_encode($rs));
+					Cakelog::write('debug','profile.activation rs_user:'.json_encode($rs_user));
+					
 					if($rs_user['User']['password'] == ''){
 						$this->Session->write('Userlogin.is_login', false);
 						$this->redirect('/profile/create_password');
@@ -309,7 +318,7 @@ class ProfileController extends AppController {
 						$this->redirect('/profile/register_team');
 					}
 				}catch(Exception $e){
-
+					Cakelog::write('error', 'profile.activation message:'.$e->getMessage());
 				}
 			}
 			else
@@ -340,13 +349,17 @@ class ProfileController extends AppController {
 
 			$result = $this->Game->create_team($data);
 
-			
+			$this->loadModel('User');			
+			$user = $this->User->findByFb_id($userData['fb_id']);
+
 			if(isset($result['error'])){
+				$this->User->id = $user['User']['id'];
+				$this->User->set('register_completed',1);
+				$rs = $this->User->save();
+
 				$this->Session->setFlash('Maaf, Anda tidak dapat membentuk tim lagi. Nampaknya Anda sudah melakukan pembentukan tim sebelumnya.');
 				$this->redirect('/profile/team_error');
 			}else{
-				$this->loadModel('User');			
-				$user = $this->User->findByFb_id($userData['fb_id']);
 				$userData['team'] = $this->Game->getTeam(Sanitize::paranoid($userData['fb_id']));
 				$this->loadModel('Team');
 				$this->Team->create();
@@ -356,6 +369,12 @@ class ProfileController extends AppController {
 					'team_name'=>Sanitize::clean($team['team_name']),
 					'league'=>$_SESSION['league']
 				));
+
+				$this->User->id = $user['User']['id'];
+				$this->User->set('register_completed',1);
+				$rs = $this->User->save();
+
+
 				$this->Session->write('Userlogin.info',$userData);
 				$this->Session->write('TeamRegister',null);
 				$this->Session->setFlash('Congratulations, Your team is ready !');
@@ -492,6 +511,7 @@ class ProfileController extends AppController {
 			$user_fb = $this->Session->read('Userlogin.info');
 			$this->set('user',$user_fb);
 			$this->set('phone_empty',false);
+			Cakelog::write('debug', 'profile.register user_fb:'.json_encode($user_fb));
 
 			if($user_fb['fb_id']==null){
 				$this->Session->setFlash('Mohon maaf, tidak berhasil login menggunakan akun facebook kamu. 
@@ -774,7 +794,10 @@ class ProfileController extends AppController {
 							);
 
 				if($trxsess != 1){
-					$this->send_reset_password($data);
+					if(!$this->send_reset_password($data))
+					{
+						$this->redirect("email_not_valid");
+					}
 				}
 
 				$this->Session->write('trxsess_'.$this->request->data['trxsess'],1);
@@ -826,6 +849,7 @@ class ProfileController extends AppController {
 
 	public function send_reset_password($data)
 	{
+		$email_proxy = Configure::read('EMAIL_PROXY');
 		$view = new View($this, false);
 
 		if(isset($this->request->data_request))
@@ -851,12 +875,12 @@ class ProfileController extends AppController {
 		{
 			if($result->http_response_body->is_valid == 1){
 				$params = array('email' => $email);
-				$result = $this->curlPost('http://198.199.110.39:3101/send', $params);
+				$result = $this->curlPost($email_proxy, $params);
 				$result_array = json_decode($result, true);
 				if($result_array['status'] == 1)
 				{
-					$this->User->query("INSERT INTO whitelist(email,n_status) 
-										VALUE('{$email}', 'OK')
+					$this->User->query("INSERT INTO whitelist(email,n_status,log_dt) 
+										VALUE('{$email}', 'OK', now())
 										ON DUPLICATE KEY UPDATE n_status='OK'");
 
 					# Make the call to the client.
@@ -872,8 +896,8 @@ class ProfileController extends AppController {
 				}
 				else
 				{
-					$this->User->query("INSERT INTO whitelist(email,n_status) 
-										VALUE('{$email}', 'NOK')
+					$this->User->query("INSERT INTO whitelist(email,n_status,log_dt) 
+										VALUE('{$email}', 'NOK', now())
 										ON DUPLICATE KEY UPDATE n_status='NOK'");
 
 					Cakelog::write('error', 'profile.send_reset_password email error :'.json_encode($data));
@@ -888,6 +912,7 @@ class ProfileController extends AppController {
 
 	public function send_mail($data = array()){
 		$smtp_config = Configure::read('MAILGUN');
+		$email_proxy = Configure::read('EMAIL_PROXY');
 		$view = new View($this, false);
 
 		if(isset($this->request->data_request))
@@ -913,12 +938,12 @@ class ProfileController extends AppController {
 			if($result->http_response_body->is_valid == 1)
 			{
 				$params = array('email' => $email);
-				$result = $this->curlPost('http://198.199.110.39:3101/send', $params);
+				$result = $this->curlPost($email_proxy, $params);
 				$result_array = json_decode($result, true);
 				if($result_array['status'] == 1)
 				{
-					$this->User->query("INSERT INTO whitelist(email,n_status) 
-										VALUE('{$email}', 'OK')
+					$this->User->query("INSERT INTO whitelist(email,n_status,log_dt) 
+										VALUE('{$email}', 'OK',now())
 										ON DUPLICATE KEY UPDATE n_status='OK'");
 					# Make the call to the client.
 					$result = $mgClient->sendMessage($domain, array(
@@ -946,6 +971,11 @@ class ProfileController extends AppController {
 		}
 
 		return false;
+	}
+
+	public function email_not_valid()
+	{
+		
 	}
 
 

@@ -181,6 +181,7 @@ class GameController extends AppController {
 		//check if the transfer window is opened, or the player is just registered within 24 hours
 		$is_new_user = false;
 		$can_transfer = false;
+		
 		if(time()<strtotime($this->userDetail['User']['register_date'])+(24*60*60)){
 			$is_new_user = true;
 		}

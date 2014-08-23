@@ -392,19 +392,24 @@ class Game extends AppModel {
 		
 		$matchday = 1;
 
-
+		$tr = 0;
+		$ts = 0;
+		$dd = array();
 		for($i=0;$i<sizeof($fixtures);$i++){
 			//strtotime($fixtures[$i]['match_date']) > (time()-24*60*60*7)
 			if($fixtures[$i]['period']=='FullTime'){
-				//$matchday = $fixtures[$i]['matchday'];
+				$matchday = $fixtures[$i]['matchday'];
+				$tr++;
 			}else{
+				$ts++;
+				$dd[] = $matchday.' - '.$fixtures[$i]['matchday'];
 				if($matchday > $fixtures[$i]['matchday']){
 					$matchday = $fixtures[$i]['matchday'];
 				}
 			}
 		}
 		//$matchday+=1;
-
+		$nm = $matchday;
 		$response 	= $this->api_call('/livematches/'.$matchday);
 		$standings	= $this->api_call('/standings');
 		$is_live = 1;
@@ -435,7 +440,11 @@ class Game extends AppModel {
 				  'live_data'=>$response['data'],
 				  'show_stats'=>$show_stats,
 				  'matchday'=>$matchday,
-				  'standings'=>$standings
+				  'standings'=>$standings,
+				  'nm'=>$nm,
+				  'ts'=>$ts,
+				  'tr'=>$tr,
+				  'dd'=>$dd
 				))
 		);
 	}

@@ -228,6 +228,7 @@ class AppController extends Controller {
 					//pr( strtotime($previous_match['start_dt']));
 					//pr(strtotime($previous_match['end_dt']));
 					//pr(strtotime($upcoming_match['start_dt']));
+					
 					if($matchstatus['is_finished']==0){
 
 						//if the backend process is not finished,

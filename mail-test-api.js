@@ -19,23 +19,37 @@ var config = require('./config').config;
 var async = require('async');
 
 var nodemailer = require('nodemailer');
-var sendmailTransport = require('nodemailer-sendmail-transport');
+//var sendmailTransport = require('nodemailer-sendmail-transport');
+var smtpTransport = require('nodemailer-smtp-transport');
 var validator = require('validator');
 var crypto = require('crypto');
 var sha1sum = crypto.createHash('sha1');
 //email setup
 
+
+var transport = nodemailer.createTransport(smtpTransport({
+			    	host: "128.199.222.110", // hostname
+			    	secure: false, // use SSL
+			    	port: 587, // port for secure SMTP
+			    	auth:{
+			    		user:'test',
+			    		pass:'password'
+			    	},
+			    	greetingTimeout:30000,
+			    	authMethod:'CRAM-MD5',
+			    	debug:true,
+			    	name:'localhost'
+			    }));
+
+transport.on('log',function(data){
+	console.log(data);
+});
+console.log(transport);
 /*
-var transport = nodemailer.createTransport("SMTP",{
-			    	host: "localhost", // hostname
-			    	secureConnection: false, // use SSL
-			    	port: 25, // port for secure SMTP
-			    	auth: false
-			    });
-*/
 var transport = nodemailer.createTransport(sendmailTransport({
     path: '/usr/sbin/sendmail'
 }));
+*/
 /*
 var transport = nodemailer.createTransport("SES",{
 			    	AWSAccessKeyID: "AKIAJYPEIMSEIVGQHNTA",
@@ -72,18 +86,20 @@ app.post('/send', [],function(req,res){
 	
 	sha1sum = crypto.createHash('sha1');
 	var mailOptions = {
-	    from: 'postmaster@mg.supersoccer.co.id',
+	    from: 'noreply@sg.supersoccer.co.id',
 	    to: req.body.email,
 	    subject: 'Welcome to Supersoccer',
 	    generateTextFromHTML:true,
-	    html: "welcome to supersoccer<br/>you have successfully subscribed to our mailing list.\
-	    		if you wish to unsubscribe, please follow these link :<br/> \
-	    			http://fm.supersoccer.co.id/pages/unsubscribe/<br/><br/>\
-	    		Best Regards,<br/><br/>FM Super Soccer Team\r\n",
+	    html: "Selamat Datang di SuperSoccer!<br/>Saat ini, lo sudah resmi terdaftar sebagai anggota FM Supersoccer.\
+	    		Jika tidak ingin menerima update terbaru dan paling menarik dari kami, \
+	    		silahkan klik link ini: http://fm.supersoccer.co.id/pages/unsubcribe<br/>\
+	    		<br/>\
+				Terima Kasih!<br/>\
+				SuperSoccer Team.<br/>\r\n",
 	    forceEmbeddedImages: true,
 	    debug:true
 	};
-	console.log('sending',mailOptions.to);
+	//console.log('sending',mailOptions.to);
 	
 	sendMail(mailOptions,function(err,responseStatus){
 		if(!err){
@@ -105,8 +121,8 @@ http.createServer(app).listen(app.get('port'), function(){
 function sendMail(mailOptions,callback){
 
 	transport.sendMail(mailOptions,function(error, responseStatus){
-		console.log(mailOptions,'---',responseStatus);
-		console.log('------------');
+		//console.log(mailOptions,'---',responseStatus);
+		//console.log('------------');
 		if(error){
 			console.log('ERROR',error.message);
 		}

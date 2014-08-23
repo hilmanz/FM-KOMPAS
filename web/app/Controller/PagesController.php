@@ -139,7 +139,7 @@ class PagesController extends AppController {
 	    if(!isset($rs)){
 	    	
 		    //get the current matchday
-		    $sql = "SELECT matchday FROM ".$_SESSION['ffgamedb'].".game_fixtures 
+		    $sql = "SELECT matchday FROM ffgame.game_fixtures 
 		    		WHERE is_processed = 1 AND period='FullTime' 
 		    		ORDER BY matchday DESC LIMIT 1;";
 
@@ -178,8 +178,8 @@ class PagesController extends AppController {
 			    	//get manager's name
 
 			    	$manager = $this->User->findById($poin['Team']['user_id']);
-			    	$game_team = $this->Game->query("SELECT b.id as id FROM ".$_SESSION['ffgamedb'].".game_users a
-								INNER JOIN ".$_SESSION['ffgamedb'].".game_teams b
+			    	$game_team = $this->Game->query("SELECT b.id as id FROM ffgame.game_users a
+								INNER JOIN ffgame.game_teams b
 								ON a.id = b.user_id WHERE fb_id = '{$manager['User']['fb_id']}' LIMIT 1;");
 
 			    	$rs[$n]['Manager'] = @$manager['User'];

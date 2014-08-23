@@ -143,7 +143,7 @@ class LoginController extends AppController {
 											'name'=>'',
 											'role'=>1,
 											'access_token'=>$this->getAccessToken()));
-
+				
 				$this->requestAction('/profile/register');
 			}
 			

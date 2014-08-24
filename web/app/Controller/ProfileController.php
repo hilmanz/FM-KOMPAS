@@ -849,7 +849,6 @@ class ProfileController extends AppController {
 
 	public function send_reset_password($data)
 	{
-		$email_proxy = Configure::read('EMAIL_PROXY');
 		$view = new View($this, false);
 
 		if(isset($this->request->data_request))
@@ -861,58 +860,21 @@ class ProfileController extends AppController {
 										'url'=> $data['url'],
 									));
 
-		# Instantiate the client.
-		$mgClient = new Mailgun('key-9oyd1c7638c35gmayktmgeyjhtyth5w0');
-		$domain = "mg.supersoccer.co.id";
-		$email = trim($data['email']);
-
-		//validation
-		$result = $mgClient->get("address/validate", array('address' => $email));
-		$rs_mail = $this->User->query("SELECT * FROM whitelist 
-										WHERE email='{$email}' LIMIT 1");
-
-		if(count($rs_mail) == 0 || $rs_mail[0]['whitelist']['n_status'] != 'NOK')
+		$Email = new CakeEmail('smtp');
+		$Email->from(array('noreply@sg.supersoccer.co.id' => 'supersoccer'));
+		$Email->to(trim($data['email']));
+		$Email->subject('Reset Password');
+		$Email->emailFormat('html');
+		if($Email->send($body))
 		{
-			if($result->http_response_body->is_valid == 1){
-				$params = array('email' => $email);
-				$result = $this->curlPost($email_proxy, $params);
-				$result_array = json_decode($result, true);
-				if($result_array['status'] == 1)
-				{
-					$this->User->query("INSERT INTO whitelist(email,n_status,log_dt) 
-										VALUE('{$email}', 'OK', now())
-										ON DUPLICATE KEY UPDATE n_status='OK'");
-
-					# Make the call to the client.
-					$result = $mgClient->sendMessage($domain, array(
-					    'from'    => 'supersoccer <postmaster@mg.supersoccer.co.id>',
-					    'to'      => '<'.trim($data['email']).'>',
-					    'subject' => 'Reset Password',
-					    'html'    => $body
-					));
-					if($result->http_response_code == 200){
-						return true;
-					}
-				}
-				else
-				{
-					$this->User->query("INSERT INTO whitelist(email,n_status,log_dt) 
-										VALUE('{$email}', 'NOK', now())
-										ON DUPLICATE KEY UPDATE n_status='NOK'");
-
-					Cakelog::write('error', 'profile.send_reset_password email error :'.json_encode($data));
-					return false;
-				}
-			}else{
-				Cakelog::write('error', 'profile.send_reset_password email error :'.json_encode($data));
-				return false;
-			}
+			return true;
 		}
+
+		return false;
 	}
 
 	public function send_mail($data = array()){
 		$smtp_config = Configure::read('MAILGUN');
-		$email_proxy = Configure::read('EMAIL_PROXY');
 		$view = new View($this, false);
 
 		if(isset($this->request->data_request))
@@ -924,50 +886,14 @@ class ProfileController extends AppController {
 										'activation_code'=> $data['activation_code'],
 									));
 
-		# Instantiate the client.
-		$mgClient = new Mailgun($smtp_config['api_key']);
-		$domain = $smtp_config['domain'];
-		$email = trim($data['email']);
-		$result = $mgClient->get("address/validate", array('address' => $email));
-
-		$rs_mail = $this->User->query("SELECT * FROM whitelist 
-										WHERE email='{$email}' LIMIT 1");
-
-		if(count($rs_mail) == 0 || $rs_mail[0]['whitelist']['n_status'] != 'NOK')
+		$Email = new CakeEmail('smtp');
+		$Email->from(array('noreply@sg.supersoccer.co.id' => 'supersoccer'));
+		$Email->to(trim($data['email']));
+		$Email->subject('Kode Aktivasi');
+		$Email->emailFormat('html');
+		if($Email->send($body))
 		{
-			if($result->http_response_body->is_valid == 1)
-			{
-				$params = array('email' => $email);
-				$result = $this->curlPost($email_proxy, $params);
-				$result_array = json_decode($result, true);
-				if($result_array['status'] == 1)
-				{
-					$this->User->query("INSERT INTO whitelist(email,n_status,log_dt) 
-										VALUE('{$email}', 'OK',now())
-										ON DUPLICATE KEY UPDATE n_status='OK'");
-					# Make the call to the client.
-					$result = $mgClient->sendMessage($domain, array(
-					    'from'    => $smtp_config['from'],
-					    'to'      => '<'.$email.'>',
-					    'subject' => 'Kode Aktivasi',
-					    'html'    => $body
-					));
-					if($result->http_response_code == 200){
-						return true;
-					}
-				}
-				else
-				{
-					$this->User->query("INSERT INTO whitelist(email,n_status) 
-										VALUE('{$email}', 'NOK')
-										ON DUPLICATE KEY UPDATE n_status='NOK'");
-					return false;
-				}
-			}
-			else
-			{
-				return false;
-			}
+			return true;
 		}
 
 		return false;

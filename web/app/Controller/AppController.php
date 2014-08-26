@@ -60,12 +60,12 @@ class AppController extends Controller {
 		if(isset($this->request->query['league'])){
 			if(@$this->request->query['league']=='ita'){
 				$_SESSION['league'] = 'ita';
-				$_SESSION['ffgamedb'] = 'ffgame_ita';
-				$_SESSION['ffgamestatsdb'] = 'ffgame_stats_ita';
+				$_SESSION['ffgamedb'] = 'ffgame_kompas';
+				$_SESSION['ffgamestatsdb'] = 'ffgame_stats_kompas';
 			}else{
 				$_SESSION['league'] = 'epl';
-				$_SESSION['ffgamedb'] = 'ffgame';
-				$_SESSION['ffgamestatsdb'] = 'ffgame_stats';
+				$_SESSION['ffgamedb'] = 'ffgame_kompas';
+				$_SESSION['ffgamestatsdb'] = 'ffgame_stats_kompas';
 			}
 			
 			$endpoints = Configure::read('API_ENDPOINTS');
@@ -75,13 +75,13 @@ class AppController extends Controller {
 				$this->renewUserData();
 			}
 		}else{
-			$_SESSION['ffgamedb'] = 'ffgame';
-			$_SESSION['ffgamestatsdb'] = 'ffgame_stats';
+			$_SESSION['ffgamedb'] = 'ffgame_kompas';
+			$_SESSION['ffgamestatsdb'] = 'ffgame_stats_kompas';
 		}
 		if(!isset($_SESSION['league'])){
 			$_SESSION['league'] = 'epl';
-			$_SESSION['ffgamedb'] = 'ffgame';
-			$_SESSION['ffgamestatsdb'] = 'ffgame_stats';
+			$_SESSION['ffgamedb'] = 'ffgame_kompas';
+			$_SESSION['ffgamestatsdb'] = 'ffgame_stats_kompas';
 
 		}
 		/*

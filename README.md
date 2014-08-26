@@ -8,3 +8,4 @@
 * Private League
 * Feature Tactics
 * fitur training (bahas dulu sama echa), enakan sih jadi digital item aja (point booster).
+kompas

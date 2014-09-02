@@ -32,7 +32,7 @@ body{
 	padding:0;
     font-family: 'Lato', Arial, sans-serif;
 	font-size:14px;
-	font-weight:300;
+	font-weight:400;
 	color:#333;
 	line-height:1.4;
 	overflow-x:hidden;
@@ -76,7 +76,7 @@ a:hover{
 	color:#f33e07;
 }
 .red{
-	color:#F00;
+	color:#e94f1d;
 }
 .white{
 	color:#FFF;
@@ -126,7 +126,7 @@ a.download-appstore{
 	position:relative;
 }
 #container{
-	padding:20px;
+	padding:0 10px;
 	overflow:hidden;
 	clear:both;
 }
@@ -144,7 +144,7 @@ a.download-appstore{
 	line-height:18px;
 }
 #user-info a{
-	color:#fff;
+	color:#e94f1d;
 }
 #user-info a.logout{
 	color:#000;
@@ -162,14 +162,11 @@ a.download-appstore{
 }
 /*============= navigation ===============*/
 #navigation{
-	background:url(../images/tr.png) repeat;
-	box-shadow:0 0 50px rgba(0,0,0,0.25) inset,0 0 10px rgba(0,0,0,0.7) inset;
-	-o-box-shadow:0 0 50px rgba(0,0,0,0.25) inset,0 0 10px rgba(0,0,0,0.7) inset;
-	border-radius:7px;
-	padding:5px 0;
-	margin:4px 0 20px 0;
+/*	background:url(../images/tr.png) repeat;
+	background:rgba(0,0,0,0.2);*/
+	border-radius:5px;
+	padding:5px 0 2px 0;
 	text-align:center;
-	min-height:40px;
 	display:table;
 	width:100%;
 }
@@ -177,17 +174,19 @@ a.download-appstore{
 	margin:0 auto 0 auto;
 	list-style:none;
 	padding:0;
+	float:none;
+	display:inline-block;
 
 }
 #navigation ul li{
-	width:110px;
+	width:125px;
 	display:inline-block;
 	background:#232323;
 	padding:3px;
 	box-shadow:0 0 2px rgba(0,0,0,0.25) inset,1px 1px 1px rgba(255,125,124,0.2);
 	-o-box-shadow:0 0 2px rgba(0,0,0,0.25) inset,1px 1px 1px rgba(255,125,124,0.2);
 	border-radius:4px;
-	margin:0 8px;
+	margin:0 3px;
 }
 #navigation ul li a{
 	background:url(../images/bg_nav.jpg) repeat-x 0 -32px;
@@ -203,7 +202,7 @@ a.download-appstore{
 #navigation ul ul{
 	background:none;
 	left:auto;
-	top:45px;
+	top:35px;
 	padding:5px;
 	background:#000;
 }
@@ -234,13 +233,15 @@ a.download-appstore{
 }
 #navigation ul li a:hover,#navigation ul li.current a{
 	background:url(../images/bg_nav.jpg) repeat-x;
-	color:#ff0000;
+	color:#fff;
 	text-decoration:none;
 }
 #info-bar{
 	overflow:hidden;
-	border-radius:5px;
+	border-bottom:solid 1px #ccc;
 	padding:5px 20px;
+	background:none;
+	margin:20px 0;
 }
 #info-bar h4{
 	margin:0;
@@ -250,8 +251,10 @@ a.download-appstore{
 }
 .nav-side ul li a{
 	background:url(../images/tr.png) repeat;
+	background:rgba(0,0,0,0.8);
 	display:block;
 	line-height:35px;
+	color:#fff;
 	border-radius:3px;
 	padding:0 20px;
     font-family: 'BebasNeueRegular';
@@ -265,11 +268,13 @@ a.download-appstore{
 	padding:0 20px;
     font-family: 'BebasNeueRegular';
 	font-size:16px;
+	color:#fff;
 }
 .nav-side ul li a:hover,.nav-side ul li.current a,.nav-side ul li.current span{
 	background:url(../images/tr2.png) repeat;
+	background:#e94f1d;
 	text-decoration:none;
-	color:#FC0;
+	color:#fff;
 }
 
 .topnav{
@@ -300,7 +305,7 @@ a.download-appstore{
 }
 #topnav li a:hover{
 	text-decoration:none;
-	color:#F00;
+	color:#e94f1d;
 }
 .nav1{
 	background:url(../images/nav-home.jpg) no-repeat;
@@ -378,9 +383,6 @@ a.download-appstore{
 	border-radius:5px;
 	min-height:135px;
 }
-.page-merchandises .box4{
-	width:300px;
-}
 .box3{
 	width:460px;
 	min-height:135px;
@@ -403,14 +405,14 @@ a.download-appstore{
 	clear:both;
 	display:table;
 	width:100%;
-	padding:20px 0;
-	border-bottom:solid 1px #742d2d;
+	padding:10px 0;
+	border-bottom:solid 1px #ddd;
 }
 .row-3{
 	clear:both;
 	padding:0 0 20px 0;
 	margin:0 0 20px 0;
-	border-bottom:solid 1px #742d2d;
+	border-bottom:solid 1px #ccc;
 }
 .whites{
 	color:#fff;
@@ -432,9 +434,9 @@ a.download-appstore{
 }
 .widget,.widgets{
 	padding:15px 20px;
-	margin:0 0 2px 20px;
 	overflow:hidden;
 	border-radius:5px;
+	margin:0 0 5px 0;
 }
 .widget h2{
 	font-size:24px;
@@ -504,8 +506,11 @@ a.download-appstore{
 	padding:0 10px;
 }
 .squad-team-name h3{
-	margin:0;
-	font-size:24px;
+	margin: 0;
+	font-size: 24px;
+	background: #f33e07;
+	color: #fff;
+	padding: 5px 20px;
 }
 .squad-team{
 	min-height:750px;
@@ -532,7 +537,6 @@ a.download-appstore{
 	font-size:12px;
 }
 .squad-team .player-name{
-    font-family: 'ColaborateBoldRegular';
 }
 .squad-team .player-status{
 	color:#f33e07;
@@ -602,7 +606,7 @@ a.download-appstore{
 	color:white;
 }
 .jersey{
-	width:46px; height:46px;
+	width:48px; height:46px;
 	position:relative;
 	margin:0 auto;
 	text-align:center;
@@ -655,7 +659,7 @@ a.download-appstore{
 	height:17px;
 	line-height:18px;
 	float:left;
-	color:#999;
+	color:#fff;
 }
 .next{
 	background:url(../images/next_btn.png) no-repeat right 0;
@@ -706,6 +710,7 @@ a.download-appstore{
 	width:300px;
 	float:right;
 	border-radius:5px;
+	padding:20px 0;
 }
 .latestActivity{
 	height:545px;
@@ -789,9 +794,10 @@ a.download-appstore{
 }
 .titles h2{
 	margin:0;
+	font-size:20px;
 }
 .titles{
-	border-bottom: solid 1px #742d2d;
+	border-bottom: solid 1px #ddd;
 	padding: 0 0 10px 0;
 	margin: 0 0 10px 0;
 }
@@ -803,7 +809,6 @@ a.download-appstore{
 }
 .row{
 	clear:both;
-	border-bottom:solid 1px #ddd;
 	padding:18px 0;
 	overflow:hidden;
 }
@@ -836,7 +841,6 @@ a.download-appstore{
 	width:40px; height:40px;
 }
 .content{
-	padding:0 20px;
 }
 .content h1{
 	margin:0 0 10px 0;
@@ -849,7 +853,12 @@ a.download-appstore{
 	margin:15px 0 0 0;
 }
 .select-team div.team-name{
-	color: white; margin: 10px;font-size:10px;
+	color: white; margin: 5px 0;font-size:12px;
+}
+.select-team .theForm label{
+	display:block;
+	width:100%;
+	float:none;
 }
 /*============= FORM ===============*/
 .checkbox, .radio {
@@ -966,7 +975,7 @@ input[type=text]{
 }
 .avatarBox{
 	width:150px;
-	padding:15px;
+	padding:15px 10px;
 	position:absolute;
 	right:0;
 	top:20px;
@@ -1007,6 +1016,7 @@ input[type=text]{
 }
 .teamBox{
 	background:url(../images/tr.png) repeat;
+	background:rgba(0,0,0,0.3);
 	border-radius:5px;
 	padding:20px;
 	width:124px; height:70px;
@@ -1023,10 +1033,11 @@ input[type=text]{
 .teamBox:hover{
 	text-decoration:none;
 	background:url(../images/tr2.png) repeat;
+	background:rgba(0,0,0,0.8);
 }
 .selected{
 	text-decoration:none;
-	background:url(../images/selected.png) #FF0 no-repeat top right;
+	background:url(../images/selected.png) #e94f1d  no-repeat top right;
 
 }
 .selected:hover{
@@ -1043,14 +1054,13 @@ input[type=text]{
 }
 #clubtabs ul li,#bantuanTab ul li{
 	float:left;
-	width:150px;
 	text-align:center;
 	margin:0 10px 0 0;
 }
 #clubtabs ul li a,#bantuanTab ul li a{
-	background:url(../images/bg_nav.jpg) repeat-x 0 -32px;
+	background:#666;
 	display:block;
-	line-height:32px;
+	line-height:35px;
 	color:#fff;
 	text-shadow:0 1px 1px #000;
 	border-radius:4px;
@@ -1059,13 +1069,13 @@ input[type=text]{
 	-o-box-shadow:0 0 2px rgba(0,0,0,0.25) inset,1px 1px 1px rgba(255,125,124,0.2);
 	font-family:'BebasNeueRegular',serif;
 	text-decoration:none;
-	font-size:16px;
+	font-size:20px;
 	padding:0 20px;
 }
 #clubtabs ul li a:hover,#clubtabs ul li.ui-state-active a,
 #bantuanTab ul li a:hover,#bantuanTab ul li.ui-state-active a{
-	background:url(../images/bg_nav.jpg) repeat-x;
-	color:#ff0000;
+	background:#ff0000;
+	color:#fff;
 	text-decoration:none;
 }
 
@@ -1102,9 +1112,8 @@ input[type=text]{
 	overflow:hidden;
 }
 .ui-tabs-panel{
-	background:url(../images/tr.png) repeat;
 	clear:both;
-	padding:20px;
+	padding:20px 0;
 	overflow:hidden;
 	margin:20px 0 0 0;
 	border-radius:5px;
@@ -1118,17 +1127,20 @@ input[type=text]{
 	font-size:16px;
 }
 .headbar{
-	padding:15px;
 	overflow:hidden;
 	border-radius:5px;
 	margin:20px 0;
 	min-height:32px;
+	background:#fff;
 }
 .headbars{
-	padding:10px 15px;
-	border-radius:5px;
-	margin:20px 0 0 0;
-	height:35px;
+	padding: 0 15px;
+	margin: 0;
+	height: 55px;
+	background: #000;
+	color: #fff;
+	line-height: 60px;
+	border-radius: 5px 5px 0 0;
 }
 .headbars h3{
 	font-size:30px;
@@ -1138,9 +1150,6 @@ input[type=text]{
 	margin:0;
 	font-family:'BebasNeueRegular',serif;
 	font-size:14px;
-}
-.club-info-entry{
-	padding:0 0 0 10px;
 }
 .clubrank{
 	color:#FC0;
@@ -1184,10 +1193,21 @@ input[type=text]{
 .entry p{
 	margin:0;
 }
+.cash-left h3{
+	margin: 0;
+	color: #fff;
+	background: #666;
+	padding: 8px 20px;
+	text-align: center;
+	border-radius:5px 5px 0 0;
+}
 .cash-left h1{
-	font-size:40px;
-	line-height:0.9;
-	margin:0;
+	font-size: 40px;
+	margin: 0 0 5px 0;
+	background: #f33e07;
+	color: #fff;
+	text-align: center;
+	border-radius:0 0 5px 5px;
 }
 .entries p{
 	margin:10px 0 20px 0;
@@ -1252,12 +1272,21 @@ table td a.button,table td .buttons{
 	margin:0;
 }
 .leaderboard-rank{
-	text-align:right;
+	text-align: center;
+	width: 50%;
+	height: 80px;
+	background: #f33e07;
+	text-transform: uppercase;
+	color: #fff;
+	padding: 20px 0;
+}
+.leaderboard-rank span{
+	font-weight:900;
 }
 .leaderboard-rank h3{
 	margin:0;
-	font-size:40px;
-	line-height:40px;
+	font-size:50px;
+	line-height:50px;
 	color:#FC0;
 }
 /*============= FOOTER ===============*/
@@ -1316,9 +1345,8 @@ table td a.button,table td .buttons{
 	margin:0 0 0 0px;
 }
 .playerBoxSelected .jersey,.ui-draggable .jersey{
-	background-color:rgba(0,0,0,0.02);
+	background-color:#fff;
 	border-radius:4px;
-	border:solid 1px #FDCB02;
 	text-decoration:none !important; 
 }
 .playerBoxChoosed .jersey{
@@ -1554,19 +1582,20 @@ table td a.button,table td .buttons{
 }
 .slot{
 	border:1px solid #FDCB02;
-	box-shadow:0 0 5px #FDCB02;
 	border-radius:4px;
 
 }
 .fbexpired{
 	margin:0 auto;
-	width:460px;
 	text-align:center;
+	padding:100px 0;
+	overflow:hidden;
 }
 .fbexpired .box{
 	margin:0 auto !important;
 	width:460px;
 	min-height:75px;
+	float:none;
 }
 .fbexpired .box h3{
 	color:#eee;
@@ -1589,7 +1618,7 @@ table td a.button,table td .buttons{
 	color:#0C0;
 }
 .icon_unvailable{
-	color:#F00;
+	color:#e94f1d;
 }
 .teamname{
 	float:right;
@@ -1615,13 +1644,13 @@ table td a.button,table td .buttons{
 	padding:0 0 10px 0;
 }
 .buttons{
-	background: url(../images/bg_nav.jpg) repeat-x 0 -32px;
+	background:#f33e07;
 	padding: 0 20px;
-	line-height: 28px;
+	line-height: 35px;
 	display: inline-block;
-	border-radius: 10px;
+	border-radius: 5px;
 	color: #fff;
-	border: solid 1px #333;
+	border: none;
 }
 .buttons:hover{
 	background:#222;
@@ -1700,7 +1729,7 @@ table td a.button,table td .buttons{
 	color:#fff;
 }
 .player-detail,.profileStats-container{
-	width:500px;
+	width:48%;
 	float:left;
 	border-radius:10px;
 	overflow:hidden;
@@ -1715,11 +1744,11 @@ table td a.button,table td .buttons{
 }
 .opta-widget-container h2,.profileStats-container h2{
 	background-color: #000;
-	height: 38px;
-	line-height: 38px;
+	height: 42px;
+	line-height: 45px;
 	text-transform: uppercase;
 	margin: 0;
-	font-size: 18px;
+	font-size: 20px;
 	font-family: 'BebasNeueRegular';
 	font-weight: normal;
 }
@@ -1739,11 +1768,15 @@ table td a.button,table td .buttons{
 .player-detail .opta-widget-container .profile .team-logo{
 	border-right:solid 1px #000;
 }
+.opta-widget-container .profile dl{
+	padding:15px 0;
+}
 .player-height{
 	border:none !important;
 }
 .profileStats{
 	overflow:auto;
+	padding:15px 10px;
 }
 .profileStats dl{
 	clear:both;
@@ -1773,7 +1806,7 @@ a.statsbox{
 	padding:15px 5px;
 	display:block;
 	text-decoration:none;
-	border-radius:10px;
+	border-radius:5px;
 	color:#fff;
 }
 a.statsbox:hover{
@@ -1791,11 +1824,11 @@ a.statsbox:hover{
 	line-height:24px;
 }
 .headbar .club-info{
-	width:140px;
 	text-align:center;
+	height:70px;
 }
-.headbar .player-club{
-	width:300px;
+.club-info,.leaderboard-head{
+	padding:15px 30px;
 }
 .club-info h4{
 	font-size:30px;
@@ -1812,9 +1845,32 @@ a.statsbox:hover{
 	margin:0;
 	color:#f33e07;
 }
+.club-info:nth-child(2) {
+    background: #ebebeb;
+}
+.club-info:nth-child(3) {
+    background: #cbcbcb;
+}
+.club-info:nth-child(4) {
+    background: #c1c0c0;
+}
+.club-info:nth-child(5) {
+    background: #bababa;
+}
+.headbar .button{
+	line-height: 100px;
+	height: 100px;
+	border-radius: 0;
+}
 .club-money .buttons{
-	display:block;
-	margin:0 0 5px 0;
+	display: block;
+	margin: 0 0 0 2px;
+	height: 100px;
+	float: right;
+	border: none;
+	background: #f33e07;
+	line-height: 100px;
+	border-radius: 0;
 }
 #profiletabs ul li:first-child,#profiletabs ul li:last-child{
 	width:155px;
@@ -1852,25 +1908,27 @@ h3.tabtitle{
 	color:#f33e07;
 }
 #starterTeam .flex-viewport{
-	height:670px !important;
-	top:20px;
-	padding:10px;
-	left:-10px;
+	height:630px !important;
+	top:30px;
+	padding:0 10px;
+	left:10px;
 }
 #starterTeam .flex-direction-nav a{
 	opacity:1;
 }
 #starterTeam .flex-direction-nav .flex-prev{
-	background:url(../images/arrow_top.png) no-repeat;
-	top:85px;
-	left:122px;
+	background: url(../images/arrow_top.png) no-repeat center #000;
+	top: 59px;
+	left: 0;
+	width: 305px;
 }
 #starterTeam .flex-direction-nav .flex-next{
-	background:url(../images/arrow_bottom.png) no-repeat;
+	background:url(../images/arrow_bottom.png) no-repeat center #000;
 	top:auto;
-	left:122px;
+	left:0;
 	right:auto;
-	bottom:10px;
+	bottom:0;
+	width: 305px;
 }
 #starterTeam .slides li{
 	clear:both;
@@ -1879,14 +1937,15 @@ h3.tabtitle{
 }
 .thumbPlayers,.thumbPlayersSmall{
 	display:block;
-	width:100px; height:100px;
+	width:60px; height:60px;
 	border:solid 1px #fff;
 	overflow:hidden;
 	position:relative;
 }
 .thumbPlayers img{
 	position:absolute;
-	top:-20px;
+	top: -10px;
+	width: 60px;
 }
 .opta-widget-container .profile .team-logo img{
 	border:solid 1px #fff;
@@ -1944,6 +2003,7 @@ h3.tabtitle{
 	background: #000;
 	padding: 5px 15px;
 	border-radius: 5px 5px 0 0;
+	color:#fff;
 }
 #klabPage .widget{
 	padding:0;
@@ -1985,6 +2045,9 @@ h3.tabtitle{
 .RingkasanKlab strong{
 	font-weight:bold;
 	color:#f33e07;
+}
+#RingkasanKlab{
+	padding:0;
 }
 .PertandinganLalu td a{
 	color:#f33e07;
@@ -2070,6 +2133,7 @@ h3.tabtitle{
 .instrution h4{
 	font-size:16px;
 	margin:0;
+	color:#fff;
 }
 .fake-title{
 	display:none;
@@ -2230,10 +2294,11 @@ table.dataTable{
 	opacity:1;
 	text-decoration:none;
 }
-#btn_save{
-	line-height:32px;
-	width:108px;
-	text-align:center;
+#btn_save,#btn_tactices{
+	line-height: 32px;
+	text-align: center;
+	padding: 0 10px;
+	font-size: 12px;
 }
 #tablePoint td{
 	text-align:center;
@@ -2259,6 +2324,7 @@ table.dataTable{
 	color:#f33e07;
 	display:block;
 	line-height:25px;
+	margin:0 0 3px 0;
 }
 .catalog-item {
     float: left;
@@ -2411,6 +2477,9 @@ table.dataTable{
 	border:none;
 	background:none;
 }
+#RingkasanKlab td:nth-child(1){
+	width:70px;
+}
 #RingkasanKlab .RingkasanKlabWidget td{
 	padding:0 10px 0 0;
 }
@@ -2419,7 +2488,8 @@ table.dataTable{
 	padding:0;
 	margin:0;
 }
-#RingkasanKlab .tr{
+#
+.tr{
 	border-radius:5px;
 }
 .rowd{
@@ -2428,9 +2498,6 @@ table.dataTable{
 	overflow:hidden;
 }
 .page-team .rowd{
-	padding:10px 0;
-}
-.rowd .widget{
 	padding:10px 0;
 }
 #banner{
@@ -2642,12 +2709,12 @@ table.dataTable{
 	background:url(../images/tr.png) repeat;
 	line-height:35px;
 	text-transform:uppercase;
-	border-radius:0;
+	border-radius:3px;
 }
 .button2{
 	line-height:35px;
 	text-transform:uppercase;
-	border-radius:0;
+	border-radius:5px;
 	display:inline-block;
 	padding:0 20px;
 	text-transform:uppercase;
@@ -2779,6 +2846,7 @@ a.btnCoin:hover,a.btnCoinMandiri:hover{
 
 #loginContainer{
     text-align: center;
+	padding:40px 0;
 	color:#333;
 }
 #loginContainer h3{
@@ -2851,4 +2919,39 @@ input[type=text], input[type="password"]{
 #pilih-liga img{
 	width:100%;
 	margin-bottom:20px;
+}
+.page-merchandises .footable{
+	margin:0 0 10px 0;
+}
+.starters h4, .substitutions h4{
+	color:#fff;
+}
+.page-team .squad-team-name{
+	background:#fff;
+	margin:0 0 20px 0;
+	padding:0 0;
+}
+.page-team .RingkasanKlab span{
+	color:#333;
+}
+.RingkasanKlabWidget{
+	padding:15px 20px;
+}
+.squad-team{
+	padding:0;
+}
+.starters h4 {
+	margin: 0;
+	font-size: 24px;
+	background: #666;
+	color: #fff;
+	padding: 5px 20px;
+	line-height:normal;
+	height:auto;
+	border-radius:5px 5px 0 0;
+	position:relative;
+	z-index:1;
+}
+#starterTeam{
+	padding:10px 15px;
 }

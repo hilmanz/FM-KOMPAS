@@ -1,0 +1,69 @@
+﻿.footable {
+	border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.footable.breakpoint > tbody > tr > td.expand {
+  background: url('../images/plus.png') no-repeat 5px center #666;
+  padding-left: 40px;
+  color:#fff;
+}
+
+.footable.breakpoint > tbody > tr.footable-detail-show > td.expand {
+  background: url('../images/minus.png') no-repeat 5px center #666;
+  color:#fff;
+}
+
+.footable.breakpoint > tbody > tr.footable-row-detail {
+  background: #eee;
+  color:#333;
+}
+
+.footable > tbody > tr:hover {
+  background: #fbf8e9;
+}
+
+.footable.breakpoint > tbody > tr:hover:not(.footable-row-detail) {
+  cursor: pointer;
+}
+
+.footable > tbody > tr > td, .footable > thead > tr > th {
+}
+
+.footable > tbody > tr > td.footable-cell-detail {
+  border-left: none;
+}
+
+.footable > thead > tr > th, .footable > thead > tr > td {
+}
+
+.footable > thead > tr:first-child > th.footable-first-column, .footable > thead > tr:first-child > td.footable-first-column {
+}
+
+.footable > thead > tr:first-child > th.footable-last-column, .footable > thead > tr:first-child > td.footable-last-column {
+}
+
+.footable > thead > tr:first-child > th.footable-first-column.footable-last-column, .footable > thead > tr:first-child > td.footable-first-column.footable-last-column {
+}
+
+.footable > tbody > tr:last-child > td.footable-first-column {
+}
+
+.footable > tbody > tr:last-child > td.footable-last-column {
+}
+
+.footable > tbody > tr:last-child > td.footable-first-column.footable-last-column {
+}
+
+.footable > thead > tr > th.footable-first-column, .footable > thead > tr > td.footable-first-column,
+.footable > tbody > tr > td.footable-first-column {
+  border-left: none;
+}
+
+.footable > tbody img {
+  vertical-align:middle;
+}
+
+.footable > tfoot > tr > th, .footable > tfoot > tr > td {
+}

@@ -1,0 +1,263 @@
+
+/* Responsive */
+
+@media only screen and (max-width: 880px) {
+	.page-team{
+		overflow-x:inherit;
+	}
+	.page-team #universal{
+		width:1100px;
+		margin:0 auto;
+	}
+	.page-team #header{
+		width:1100px;
+		margin:0 auto;
+	}
+	.page-team #logo{
+		width:680px; height:80px; display:block;
+		background-size:auto auto;
+		margin:0;
+	}
+	#universal{
+		width:90%;
+	}
+	#logo{
+		background-size:100% auto;
+		position:relative;
+		top:auto; left:auto;
+		margin:0 auto;
+		float:none;
+	}
+	#header{
+		padding:20px 0;
+		height:auto;
+		overflow:hidden;
+	}
+	#user-info{
+		float:none;
+		left:auto;
+		top:auto;
+		right:auto;
+		float:right;
+		margin:10px 0 0 20px;
+	}
+	#body{
+		background:none;
+	}
+	#navigation{
+		clear:both;
+	}
+	#navigation ul li{
+		margin:5px;
+	}
+	#slider{
+		width:auto;
+		height:auto;
+	}
+	#content{
+		width:100%;
+		float:none;
+	}
+	.imgSlide img{
+		width:100%;
+	}
+	#listBox .box{
+		padding:20px;
+		width:auto;
+		float:none;
+	}
+	#listBox .bannerBox{
+		width:auto; height:auto;
+		float:none; margin:20px 0;
+	}
+	.bannerBox a,.bannerBox img{
+		height:auto;
+	}
+	#sidebar{
+		width:100%;
+		height:auto;
+		float:none;
+	}
+	#videoIntro iframe{
+		height:300px !important;
+	}
+	.select-team{
+		text-align:center;
+	}
+	.teamBox{
+		margin:10px;
+		float:none;
+		display:inline-block;
+	}
+	.select-team h3{
+		text-align:left;
+	}
+	.playerlistbox{
+		width:auto;
+		float:none;
+	}
+	.thumbPlayers, .thumbPlayersSmall{
+		width:45px; height:45px;
+	}
+	.thumbPlayers img .thumbPlayersSmall img,.thumbPlayers img{
+		width:45px;
+		top:-10px;
+	}
+	td, th{
+		padding:5px;
+	}/* Force table to not be like tables anymore */
+	table, thead, tbody, th, td, tr { 
+		display: block;
+		width:auto;
+	}
+	
+	/* Hide table headers (but not display: none;, for accessibility) */
+	thead tr { 
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+	}
+	
+	tr { border: 1px solid #ccc; }
+	
+	td { 
+		/* Behave  like a "row" */
+		border: none;
+		border-bottom: 1px solid #666; 
+		position: relative;
+	}
+	
+	td:before { 
+		/* Now like a table header */
+		position: absolute;
+		/* Top/left values mimic padding */
+		top: 6px;
+		left: 6px;
+		width: 45%; 
+		padding-right: 10px; 
+		white-space: nowrap;
+	}
+	.col2{
+		width:100%;
+		float:none;
+		padding:0 0 20px 0;
+	}
+	.content{
+		padding:0;
+	}
+	#info-bar .date-now{
+		float:none;
+	}
+	#newsticker{
+		width:100%;
+		float:none;
+		margin:0 0 10px 0;
+		padding:0 0 10px 0;
+		border-bottom:solid 1px #fff;
+		height:auto;
+	}
+	#info-bar h4{
+		float:none;
+	}
+	#catalogPage .col-content{
+		width:100%;
+		float:none;
+		padding:0;
+	}
+	.imagesCatalog{
+		width:100%;
+		max-width:300px;
+		margin:20px auto 20px auto;
+		float:none;
+	}
+	.detailCatalog, .desc{
+		padding:20px;
+		float:none;
+		width:80%;
+	}
+	#catalogPage .rowd{
+		position:relative;
+		padding:80px 0 0 0;
+	}
+	#catalogPage .rowd .box4{
+		position:absolute;
+		top:10px;
+		left:0;
+		min-height:inherit;
+	}
+	.avatarBox{
+		position:relative;
+		top:auto;
+	}
+	.page-market td{
+		text-align:left;
+	}
+	.page-leaderboard thead tr,.RingkasanKlab thead tr { 
+		position: relative;
+		top:auto;
+		left: auto;
+	}
+	.page-leaderboard thead,.RingkasanKlab td{
+		display:table-header-group;
+	}
+	.page-leaderboard tbody,.RingkasanKlab tbody{
+		display:table-row-group;
+	}
+	.page-leaderboard table,.RingkasanKlab table{
+		display:table;
+	}
+	.page-leaderboard tr,.RingkasanKlab tr{
+		display:table-row;
+	}
+	.page-leaderboard td,.page-leaderboard th,.RingkasanKlab td,.RingkasanKlab th{
+		display:table-cell;
+	}
+	.leaderboard-rank{
+		float:none;
+		text-align:left;
+		clear:both;
+		padding:20px 0 0 0;
+	}
+	#clubtabs ul li{
+		width:auto;
+	}
+	.mediumBanner{
+		float:none;
+		margin:20px 0;
+	}
+	.page-club td{
+		text-align:left;
+	}
+	.tabLeft{
+		float:none;
+		margin:0;
+	}
+	.col3{
+		float:none;
+		width:100%;
+	}
+	.page-club .ui-tabs-panel{
+		padding:0;
+	}
+	.col-content{
+		width:100%;
+		float:none;
+	}
+	#klabPage .PertandinganLalu .entry{
+		min-height:inherit;
+	}
+}
+
+@media only screen and (max-width: 667px) {
+}
+
+@media only screen and (max-width: 420px) {
+	.button{
+		float:none;
+		margin:0 0 10px 0;
+	}
+}
+
+@media only screen and (max-width: 320px) {
+	
+}
